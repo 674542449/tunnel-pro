@@ -1,0 +1,687 @@
+package main
+
+import (
+	"bufio"
+	"bytes"
+	"context"
+	"encoding/base64"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"log"
+	"math/rand"
+	"net"
+	"net/http"
+	"net/url"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strconv"
+	"strings"
+	"sync"
+	"sync/atomic"
+	"syscall"
+	"time"
+
+	"tunnel/internal/mux"
+	"tunnel/internal/proto"
+	"tunnel/internal/relay"
+	"tunnel/internal/socks5"
+
+	"github.com/gorilla/websocket"
+	utls "github.com/refraction-networking/utls"
+	wailsRT "github.com/wailsapp/wails/v2/pkg/runtime"
+)
+
+const apiBase = "https://cloud.xiaguamail.com"
+const clientVersion = "1.0.0"
+
+var uaPool = []string{
+	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+}
+
+var flagMap = map[string]string{
+	"US": "\U0001F1FA\U0001F1F8", "JP": "\U0001F1EF\U0001F1F5", "DE": "\U0001F1E9\U0001F1EA",
+	"SG": "\U0001F1F8\U0001F1EC", "KR": "\U0001F1F0\U0001F1F7", "HK": "\U0001F1ED\U0001F1F0",
+	"TW": "\U0001F1F9\U0001F1FC", "GB": "\U0001F1EC\U0001F1E7", "FR": "\U0001F1EB\U0001F1F7",
+	"CA": "\U0001F1E8\U0001F1E6", "AU": "\U0001F1E6\U0001F1FA", "NL": "\U0001F1F3\U0001F1F1",
+	"IN": "\U0001F1EE\U0001F1F3", "RU": "\U0001F1F7\U0001F1FA", "BR": "\U0001F1E7\U0001F1F7",
+	"TR": "\U0001F1F9\U0001F1F7",
+}
+
+type NodeInfo struct {
+	ID      int64  `json:"id"`
+	Name    string `json:"name"`
+	Region  string `json:"region"`
+	Flag    string `json:"flag"`
+	Latency int    `json:"latency"`
+}
+
+type SpeedInfo struct {
+	Upload   int64 `json:"upload"`
+	Download int64 `json:"download"`
+}
+
+type StatusInfo struct {
+	Connected bool   `json:"connected"`
+	NodeName  string `json:"nodeName"`
+	NodeID    int64  `json:"nodeId"`
+}
+
+type AuthState struct {
+	Token string          `json:"token,omitempty"`
+	User  json.RawMessage `json:"user,omitempty"`
+}
+
+type serverConfig struct {
+	Name   string `json:"name"`
+	Addr   string `json:"addr"`
+	IP     string `json:"ip,omitempty"`
+	PSK    string `json:"psk"`
+	ID     int64  `json:"id"`
+	Region string `json:"region,omitempty"`
+}
+
+type connPool struct {
+	mu   sync.Mutex
+	conn *mux.Mux
+	dial func() (*mux.Mux, error)
+}
+
+func (p *connPool) Get() (*mux.Mux, error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	if p.conn != nil && !p.conn.IsClosed() {
+		return p.conn, nil
+	}
+	m, err := p.dial()
+	if err != nil {
+		return nil, err
+	}
+	p.conn = m
+	return m, nil
+}
+
+type App struct {
+	ctx       context.Context
+	auth      AuthState
+	authPath  string
+	nodes     []serverConfig
+	mixedAddr string
+
+	mu        sync.RWMutex
+	pool      *connPool
+	activeID  int64
+	proxyOn   bool
+	upBytes   atomic.Int64
+	downBytes atomic.Int64
+}
+
+func NewApp() *App {
+	exe, _ := os.Executable()
+	dir := filepath.Dir(exe)
+	return &App{
+		authPath:  filepath.Join(dir, "auth.json"),
+		mixedAddr: "127.0.0.1:7890",
+		activeID:  -1,
+	}
+}
+
+func (a *App) startup(ctx context.Context) {
+	a.ctx = ctx
+	a.loadAuth()
+	go a.startMixed()
+	go a.healthCheck()
+}
+
+func (a *App) shutdown(ctx context.Context) {
+	a.Disconnect()
+}
+
+func (a *App) loadAuth() {
+	data, err := os.ReadFile(a.authPath)
+	if err == nil {
+		json.Unmarshal(data, &a.auth)
+	}
+}
+
+func (a *App) saveAuth() {
+	data, _ := json.MarshalIndent(a.auth, "", "  ")
+	os.WriteFile(a.authPath, data, 0644)
+}
+
+func parseJWTUID(token string) int64 {
+	parts := strings.SplitN(token, ".", 3)
+	if len(parts) < 2 {
+		return 0
+	}
+	data, err := base64.RawURLEncoding.DecodeString(parts[1])
+	if err != nil {
+		return 0
+	}
+	var c struct {
+		UID int64 `json:"uid"`
+	}
+	json.Unmarshal(data, &c)
+	return c.UID
+}
+
+// ---------- Wails bindings ----------
+
+func (a *App) Login(email, pass string) error {
+	body, _ := json.Marshal(map[string]string{"email": email, "password": pass})
+	resp, err := http.Post(apiBase+"/api/login", "application/json", bytes.NewReader(body))
+	if err != nil {
+		return fmt.Errorf("network error")
+	}
+	defer resp.Body.Close()
+	var result struct {
+		Token string          `json:"token"`
+		User  json.RawMessage `json:"user"`
+		Error string          `json:"error"`
+	}
+	json.NewDecoder(resp.Body).Decode(&result)
+	if result.Error != "" {
+		return errors.New(result.Error)
+	}
+	a.auth = AuthState{Token: result.Token, User: result.User}
+	a.saveAuth()
+	return nil
+}
+
+func (a *App) Register(email, pass string) error {
+	body, _ := json.Marshal(map[string]string{"email": email, "password": pass})
+	resp, err := http.Post(apiBase+"/api/register", "application/json", bytes.NewReader(body))
+	if err != nil {
+		return fmt.Errorf("network error")
+	}
+	defer resp.Body.Close()
+	var result struct {
+		Token string          `json:"token"`
+		User  json.RawMessage `json:"user"`
+		Error string          `json:"error"`
+	}
+	json.NewDecoder(resp.Body).Decode(&result)
+	if result.Error != "" {
+		return errors.New(result.Error)
+	}
+	a.auth = AuthState{Token: result.Token, User: result.User}
+	a.saveAuth()
+	return nil
+}
+
+func (a *App) GuestLogin() error {
+	resp, err := http.Post(apiBase+"/api/guest", "application/json", strings.NewReader("{}"))
+	if err != nil {
+		return fmt.Errorf("network error")
+	}
+	defer resp.Body.Close()
+	var result struct {
+		Token string          `json:"token"`
+		User  json.RawMessage `json:"user"`
+		Error string          `json:"error"`
+	}
+	json.NewDecoder(resp.Body).Decode(&result)
+	if result.Error != "" {
+		return errors.New(result.Error)
+	}
+	a.auth = AuthState{Token: result.Token, User: result.User}
+	a.saveAuth()
+	return nil
+}
+
+func (a *App) ActivateTrial() error {
+	req, _ := http.NewRequest("POST", apiBase+"/api/trial", nil)
+	req.Header.Set("Authorization", "Bearer "+a.auth.Token)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("network error")
+	}
+	defer resp.Body.Close()
+	var result struct {
+		Error string `json:"error"`
+	}
+	json.NewDecoder(resp.Body).Decode(&result)
+	if result.Error != "" {
+		return errors.New(result.Error)
+	}
+	return nil
+}
+
+func (a *App) IsLoggedIn() bool {
+	return a.auth.Token != ""
+}
+
+func (a *App) GetUser() string {
+	return string(a.auth.User)
+}
+
+func (a *App) Logout() {
+	a.Disconnect()
+	a.auth = AuthState{}
+	a.saveAuth()
+}
+
+func (a *App) GetNodes() []NodeInfo {
+	req, _ := http.NewRequest("GET", apiBase+"/api/nodes", nil)
+	req.Header.Set("Authorization", "Bearer "+a.auth.Token)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil
+	}
+	defer resp.Body.Close()
+	var result struct {
+		Nodes []struct {
+			ID      int64  `json:"id"`
+			Name    string `json:"name"`
+			Addr    string `json:"addr"`
+			IP      string `json:"ip"`
+			PSK     string `json:"psk"`
+			Region  string `json:"region"`
+			Enabled bool   `json:"enabled"`
+		} `json:"nodes"`
+	}
+	json.NewDecoder(resp.Body).Decode(&result)
+
+	a.nodes = nil
+	var out []NodeInfo
+	for _, n := range result.Nodes {
+		if !n.Enabled {
+			continue
+		}
+		a.nodes = append(a.nodes, serverConfig{
+			Name: n.Name, Addr: n.Addr, IP: n.IP, PSK: n.PSK, ID: n.ID, Region: n.Region,
+		})
+		flag := "\U0001F310"
+		region := strings.ToUpper(strings.TrimSpace(n.Region))
+		for code, emoji := range flagMap {
+			if strings.Contains(region, code) || strings.EqualFold(region, code) {
+				flag = emoji
+				break
+			}
+		}
+		regionNames := map[string]string{
+			"JP": "Japan", "US": "United States", "DE": "Germany", "SG": "Singapore",
+			"KR": "Korea", "HK": "Hong Kong", "TW": "Taiwan", "GB": "United Kingdom",
+			"FR": "France", "CA": "Canada", "AU": "Australia",
+		}
+		for code, name := range regionNames {
+			if strings.Contains(region, name) || strings.Contains(strings.ToUpper(n.Name), code) {
+				if f, ok := flagMap[code]; ok {
+					flag = f
+				}
+				break
+			}
+		}
+		out = append(out, NodeInfo{ID: n.ID, Name: n.Name, Region: n.Region, Flag: flag})
+	}
+	return out
+}
+
+func (a *App) Connect(nodeID int64) error {
+	var cfg *serverConfig
+	for i := range a.nodes {
+		if a.nodes[i].ID == nodeID {
+			cfg = &a.nodes[i]
+			break
+		}
+	}
+	if cfg == nil {
+		return errors.New("node not found")
+	}
+
+	a.Disconnect()
+
+	dialFn := func() (*mux.Mux, error) {
+		ws, err := dialWS(*cfg)
+		if err != nil {
+			return nil, err
+		}
+		mx, err := mux.NewClientMux(ws, cfg.PSK)
+		if err != nil {
+			ws.Close()
+			return nil, err
+		}
+		return mx, nil
+	}
+
+	mx, err := dialFn()
+	if err != nil {
+		return err
+	}
+	if uid := parseJWTUID(a.auth.Token); uid > 0 {
+		mx.SendUserID(strconv.FormatInt(uid, 10))
+	}
+
+	a.mu.Lock()
+	a.pool = &connPool{dial: dialFn, conn: mx}
+	a.activeID = nodeID
+	a.mu.Unlock()
+
+	setSystemProxy(a.mixedAddr)
+	a.proxyOn = true
+
+	wailsRT.EventsEmit(a.ctx, "connection-changed", StatusInfo{Connected: true, NodeName: cfg.Name, NodeID: nodeID})
+	return nil
+}
+
+func (a *App) Disconnect() {
+	a.mu.Lock()
+	if a.pool != nil {
+		if a.pool.conn != nil {
+			a.pool.conn.Close()
+		}
+		a.pool = nil
+	}
+	a.activeID = -1
+	a.mu.Unlock()
+
+	if a.proxyOn {
+		clearSystemProxy()
+		a.proxyOn = false
+	}
+
+	if a.ctx != nil {
+		wailsRT.EventsEmit(a.ctx, "connection-changed", StatusInfo{Connected: false})
+	}
+}
+
+func (a *App) GetStatus() StatusInfo {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+	if a.pool == nil || a.activeID < 0 {
+		return StatusInfo{Connected: false}
+	}
+	name := ""
+	for _, n := range a.nodes {
+		if n.ID == a.activeID {
+			name = n.Name
+			break
+		}
+	}
+	return StatusInfo{Connected: true, NodeName: name, NodeID: a.activeID}
+}
+
+func (a *App) GetSpeed() SpeedInfo {
+	return SpeedInfo{
+		Upload:   a.upBytes.Load(),
+		Download: a.downBytes.Load(),
+	}
+}
+
+func (a *App) ResetSpeed() {
+	a.upBytes.Store(0)
+	a.downBytes.Store(0)
+}
+
+func (a *App) TestLatency(nodeID int64) int {
+	var cfg *serverConfig
+	for i := range a.nodes {
+		if a.nodes[i].ID == nodeID {
+			cfg = &a.nodes[i]
+			break
+		}
+	}
+	if cfg == nil {
+		return -1
+	}
+	addr := cfg.Addr + ":443"
+	if cfg.IP != "" {
+		addr = cfg.IP + ":443"
+	}
+	start := time.Now()
+	conn, err := net.DialTimeout("tcp", addr, 5*time.Second)
+	if err != nil {
+		return -1
+	}
+	conn.Close()
+	return int(time.Since(start).Milliseconds())
+}
+
+// ---------- proxy ----------
+
+func (a *App) openStream(host string, port uint16) (*mux.Stream, error) {
+	a.mu.RLock()
+	p := a.pool
+	a.mu.RUnlock()
+	if p == nil {
+		return nil, errors.New("not connected")
+	}
+	for i := 0; i < 2; i++ {
+		mx, err := p.Get()
+		if err != nil {
+			if i == 0 {
+				continue
+			}
+			return nil, err
+		}
+		s, err := mx.OpenStream(host, port)
+		if err != nil {
+			continue
+		}
+		return s, nil
+	}
+	return nil, errors.New("tunnel unavailable")
+}
+
+func (a *App) startMixed() {
+	ln, err := net.Listen("tcp", a.mixedAddr)
+	if err != nil {
+		log.Printf("[mixed] listen error: %v", err)
+		return
+	}
+	log.Printf("[mixed] listening on %s", a.mixedAddr)
+	for {
+		c, err := ln.Accept()
+		if err != nil {
+			continue
+		}
+		go a.handleMixed(c)
+	}
+}
+
+type peekConn struct {
+	net.Conn
+	peeked []byte
+	idx    int
+}
+
+func (c *peekConn) Read(b []byte) (int, error) {
+	if c.idx < len(c.peeked) {
+		n := copy(b, c.peeked[c.idx:])
+		c.idx += n
+		return n, nil
+	}
+	return c.Conn.Read(b)
+}
+
+func (a *App) handleMixed(conn net.Conn) {
+	first := make([]byte, 1)
+	conn.SetReadDeadline(time.Now().Add(5 * time.Second))
+	_, err := conn.Read(first)
+	conn.SetReadDeadline(time.Time{})
+	if err != nil {
+		conn.Close()
+		return
+	}
+	wrapped := &peekConn{Conn: conn, peeked: first}
+	if first[0] == 0x05 {
+		socks5.HandleConn(wrapped, func(c net.Conn, host string, port uint16) {
+			defer c.Close()
+			stream, err := a.openStream(host, port)
+			if err != nil {
+				socks5.ReplyFailure(c)
+				return
+			}
+			defer stream.Close()
+			socks5.ReplySuccess(c)
+			relay.CountingRelay(stream, c, &a.downBytes, &a.upBytes)
+		})
+	} else {
+		a.handleHTTP(wrapped)
+	}
+}
+
+func (a *App) handleHTTP(conn net.Conn) {
+	defer conn.Close()
+	br := bufio.NewReader(conn)
+	req, err := http.ReadRequest(br)
+	if err != nil {
+		return
+	}
+	if req.Method == http.MethodConnect {
+		host, portStr, err := net.SplitHostPort(req.Host)
+		if err != nil {
+			conn.Write([]byte("HTTP/1.1 400 Bad Request\r\n\r\n"))
+			return
+		}
+		port, _ := strconv.Atoi(portStr)
+		stream, err := a.openStream(host, uint16(port))
+		if err != nil {
+			conn.Write([]byte("HTTP/1.1 502 Bad Gateway\r\n\r\n"))
+			return
+		}
+		defer stream.Close()
+		conn.Write([]byte("HTTP/1.1 200 Connection Established\r\n\r\n"))
+		relay.CountingRelay(stream, conn, &a.downBytes, &a.upBytes)
+		return
+	}
+	host := req.URL.Hostname()
+	port := uint16(80)
+	if req.URL.Port() != "" {
+		p, _ := strconv.Atoi(req.URL.Port())
+		port = uint16(p)
+	}
+	stream, err := a.openStream(host, port)
+	if err != nil {
+		conn.Write([]byte("HTTP/1.1 502 Bad Gateway\r\n\r\n"))
+		return
+	}
+	defer stream.Close()
+	req.RequestURI = req.URL.RequestURI()
+	req.Header.Del("Proxy-Connection")
+	var buf bytes.Buffer
+	req.Write(&buf)
+	stream.Write(buf.Bytes())
+	relay.CountingRelay(stream, conn, &a.downBytes, &a.upBytes)
+}
+
+func (a *App) healthCheck() {
+	for {
+		time.Sleep(5 * time.Second)
+		a.mu.RLock()
+		p := a.pool
+		id := a.activeID
+		a.mu.RUnlock()
+		if p == nil || id < 0 {
+			continue
+		}
+		p.mu.Lock()
+		conn := p.conn
+		p.mu.Unlock()
+		if conn == nil || !conn.IsClosed() {
+			continue
+		}
+		log.Println("[health] reconnecting...")
+		ok := false
+		for retry := 0; retry < 5; retry++ {
+			if retry > 0 {
+				time.Sleep(time.Duration(2<<retry) * time.Second)
+			}
+			mx, err := p.dial()
+			if err != nil {
+				continue
+			}
+			p.mu.Lock()
+			p.conn = mx
+			p.mu.Unlock()
+			ok = true
+			break
+		}
+		if !ok {
+			a.Disconnect()
+		}
+	}
+}
+
+// ---------- system proxy ----------
+
+func setSystemProxy(addr string) {
+	regPath := `HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings`
+	run := func(args ...string) { exec.Command("reg", args...).Run() }
+	run("add", regPath, "/v", "AutoConfigURL", "/t", "REG_SZ", "/d", "", "/f")
+	run("add", regPath, "/v", "ProxyEnable", "/t", "REG_DWORD", "/d", "1", "/f")
+	run("add", regPath, "/v", "ProxyServer", "/t", "REG_SZ", "/d", addr, "/f")
+	run("add", regPath, "/v", "ProxyOverride", "/t", "REG_SZ", "/d",
+		"localhost;127.*;10.*;192.168.*;<local>", "/f")
+	refreshProxy()
+}
+
+func clearSystemProxy() {
+	regPath := `HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings`
+	exec.Command("reg", "add", regPath, "/v", "ProxyEnable", "/t", "REG_DWORD", "/d", "0", "/f").Run()
+	refreshProxy()
+}
+
+func refreshProxy() {
+	wininet := syscall.NewLazyDLL("wininet.dll")
+	set := wininet.NewProc("InternetSetOptionW")
+	set.Call(0, 39, 0, 0)
+	set.Call(0, 37, 0, 0)
+}
+
+// ---------- websocket dial ----------
+
+func dialWS(cfg serverConfig) (*websocket.Conn, error) {
+	wsPath := proto.DynamicPath(cfg.PSK, 0)
+	remoteURL := "wss://" + cfg.Addr + wsPath
+	u, _ := url.Parse(remoteURL)
+	serverHost := u.Hostname()
+	serverPort := u.Port()
+	if serverPort == "" {
+		serverPort = "443"
+	}
+	dialAddr := serverHost + ":" + serverPort
+	if cfg.IP != "" {
+		dialAddr = cfg.IP + ":" + serverPort
+	}
+	dialer := &websocket.Dialer{
+		Proxy:            func(*http.Request) (*url.URL, error) { return nil, nil },
+		HandshakeTimeout: 15 * time.Second,
+		NetDialTLSContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+			tcpConn, err := net.DialTimeout(network, dialAddr, 15*time.Second)
+			if err != nil {
+				return nil, err
+			}
+			tlsCfg := &utls.Config{ServerName: serverHost}
+			spec, err := utls.UTLSIdToSpec(utls.HelloChrome_Auto)
+			if err != nil {
+				tcpConn.Close()
+				return nil, err
+			}
+			for _, ext := range spec.Extensions {
+				if alpn, ok := ext.(*utls.ALPNExtension); ok {
+					alpn.AlpnProtocols = []string{"http/1.1"}
+					break
+				}
+			}
+			tlsConn := utls.UClient(tcpConn, tlsCfg, utls.HelloCustom)
+			if err := tlsConn.ApplyPreset(&spec); err != nil {
+				tcpConn.Close()
+				return nil, err
+			}
+			if err := tlsConn.Handshake(); err != nil {
+				tcpConn.Close()
+				return nil, err
+			}
+			return tlsConn, nil
+		},
+	}
+	headers := http.Header{}
+	headers.Set("User-Agent", uaPool[rand.Intn(len(uaPool))])
+	ws, _, err := dialer.Dial(remoteURL, headers)
+	return ws, err
+}
