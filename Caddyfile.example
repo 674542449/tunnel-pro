@@ -1,0 +1,11 @@
+# 替换 your-domain.com 为你的真实域名
+# Caddy 会自动申请 Let's Encrypt 证书
+
+your-domain.com {
+    # WebSocket 路径反向代理到 Go 服务端
+    reverse_proxy /ws/feed 127.0.0.1:8080
+
+    # 其余请求返回真实网站（伪装）
+    root * /var/www/html
+    file_server
+}

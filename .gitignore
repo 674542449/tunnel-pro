@@ -1,0 +1,29 @@
+# Binaries
+*.exe
+*.exe~
+*-linux-amd64
+*-linux-arm64
+
+# Config with credentials
+auth.json
+client.json
+servers.json
+deploy/server.json
+deploy/api.json
+deploy/deploy_node.py
+deploy/*-linux-*
+deploy/*.exe
+
+# Python
+__pycache__/
+*.pyc
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
