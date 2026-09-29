@@ -1306,151 +1306,13 @@ func (a *API) handleDeployScript(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	script := fmt.Sprintf(`#!/bin/bash
-set -e
-
-DOMAIN=%q
-DEPLOY_DIR=/opt/tunnel
-BASE_URL=%q
-
-echo "=============================="
-echo "  Tunnel 节点一键部署"
-echo "  节点: %s (ID:%d)"
-echo "  域名: $DOMAIN"
-echo "=============================="
-
-# 检测架构
-ARCH=$(uname -m)
-case "$ARCH" in
-    x86_64|amd64) BIN_SUFFIX="amd64" ;;
-    aarch64|arm64) BIN_SUFFIX="arm64" ;;
-    *) echo "不支持的架构: $ARCH"; exit 1 ;;
-esac
-echo "  架构: $ARCH ($BIN_SUFFIX)"
-
-# 1. 安装依赖
-if ! command -v curl &> /dev/null; then
-    echo "[1/6] 安装依赖..."
-    apt-get update -qq && apt-get install -y -qq curl ca-certificates
-else
-    echo "[1/6] 依赖已就绪"
-fi
-
-# 2. 安装 Caddy
-if ! command -v caddy &> /dev/null; then
-    echo "[2/6] 安装 Caddy..."
-    apt-get install -y -qq debian-keyring debian-archive-keyring apt-transport-https
-    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
-    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
-    apt-get update -qq && apt-get install -y -qq caddy
-else
-    echo "[2/6] Caddy 已安装，跳过"
-fi
-
-# 3. 配置 Caddy
-echo "[3/6] 配置 Caddy..."
-cat > /etc/caddy/Caddyfile << 'CADDYEOF'
-%s {
-    reverse_proxy 127.0.0.1:8080
-}
-CADDYEOF
-
-mkdir -p /var/www/html
-cat > /var/www/html/index.html << 'HTMLEOF'
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>Welcome</title></head>
-<body><h1>It works!</h1><p>Server is running normally.</p></body></html>
-HTMLEOF
-
-# 4. 开放防火墙端口
-echo "[4/7] 配置防火墙 (80/443 TCP+UDP)..."
-if command -v ufw &> /dev/null && ufw status | grep -q "active"; then
-    ufw allow 80/tcp >/dev/null 2>&1
-    ufw allow 443/tcp >/dev/null 2>&1
-    ufw allow 80/udp >/dev/null 2>&1
-    ufw allow 443/udp >/dev/null 2>&1
-    echo "  ufw: 已放行"
-else
-    iptables -I INPUT -p tcp --dport 80 -j ACCEPT 2>/dev/null || true
-    iptables -I INPUT -p tcp --dport 443 -j ACCEPT 2>/dev/null || true
-    iptables -I INPUT -p udp --dport 80 -j ACCEPT 2>/dev/null || true
-    iptables -I INPUT -p udp --dport 443 -j ACCEPT 2>/dev/null || true
-    ip6tables -I INPUT -p tcp --dport 80 -j ACCEPT 2>/dev/null || true
-    ip6tables -I INPUT -p tcp --dport 443 -j ACCEPT 2>/dev/null || true
-    ip6tables -I INPUT -p udp --dport 80 -j ACCEPT 2>/dev/null || true
-    ip6tables -I INPUT -p udp --dport 443 -j ACCEPT 2>/dev/null || true
-    if command -v netfilter-persistent &> /dev/null; then
-        netfilter-persistent save 2>/dev/null || true
-    fi
-    echo "  iptables: 已放行"
-fi
-
-# 5. 下载服务端
-echo "[5/7] 下载服务端程序 ($BIN_SUFFIX)..."
-mkdir -p $DEPLOY_DIR
-systemctl stop tunnel 2>/dev/null || true
-rm -f $DEPLOY_DIR/tunnel-server
-if ! curl -fSL -k "$BASE_URL/download/tunnel-server-$BIN_SUFFIX" -o $DEPLOY_DIR/tunnel-server; then
-    echo "  下载失败! 请检查网络或手动下载"
-    echo "  URL: $BASE_URL/download/tunnel-server-$BIN_SUFFIX"
-    exit 1
-fi
-chmod +x $DEPLOY_DIR/tunnel-server
-echo "  下载完成: $(ls -lh $DEPLOY_DIR/tunnel-server | awk '{print $5}')"
-
-# 6. 写入配置
-echo "[6/7] 写入配置..."
-cat > $DEPLOY_DIR/server.json << 'JSONEOF'
-{
-    "listen": "127.0.0.1:8080",
-    "psk": %q,
-    "web_root": "/var/www/html",
-    "api_url": %q,
-    "node_id": %d,
-    "report_key": %q
-}
-JSONEOF
-
-# 7. 配置 systemd 并启动
-echo "[7/7] 配置并启动服务..."
-cat > /etc/systemd/system/tunnel.service << 'SVCEOF'
-[Unit]
-Description=Tunnel Server
-After=network.target
-
-[Service]
-ExecStart=/opt/tunnel/tunnel-server -c /opt/tunnel/server.json
-Restart=always
-RestartSec=3
-
-[Install]
-WantedBy=multi-user.target
-SVCEOF
-
-systemctl daemon-reload
-systemctl enable tunnel
-systemctl restart tunnel
-systemctl restart caddy
-
-# 开启 BBR
-if ! sysctl net.ipv4.tcp_congestion_control 2>/dev/null | grep -q bbr; then
-    echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
-    echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
-    sysctl -p 2>/dev/null
-    echo "  BBR 已开启"
-fi
-
-sleep 2
-echo ""
-echo "=============================="
-echo "  部署完成!"
-echo "=============================="
-systemctl is-active tunnel && echo "  tunnel: 运行中" || echo "  tunnel: 未运行!"
-systemctl is-active caddy  && echo "  caddy:  运行中" || echo "  caddy:  未运行!"
-echo ""
-`, node.Addr, a.config.SiteURL, node.Name, node.ID, node.Addr, node.PSK, a.config.SiteURL, node.ID, a.config.NodeReportKey)
+	cmd := fmt.Sprintf(
+		`curl -fsSL https://raw.githubusercontent.com/674542449/tunnel-pro/master/scripts/tunnel-node.sh | bash -s install --domain %s --psk %s --api-url %s --node-id %d --report-key %s`,
+		node.Addr, node.PSK, a.config.SiteURL, node.ID, a.config.NodeReportKey,
+	)
 
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	w.Write([]byte(script))
+	w.Write([]byte(cmd))
 }
 
 func (a *API) adminNodeStatus(w http.ResponseWriter, r *http.Request) {
@@ -1897,8 +1759,9 @@ tr:last-child td{border:none}
     <h3>一键部署命令</h3>
     <div class="form-row"><label>节点</label><span id="deployNodeName" style="color:#e2e8f0"></span></div>
     <div class="form-row"><label>域名</label><span id="deployDomain" style="color:#e2e8f0"></span></div>
-    <p style="font-size:12px;color:#94a3b8;margin:8px 0">在新服务器上以 root 执行以下命令，将自动安装 Caddy、部署服务端、配置 BBR 并对接心跳上报：</p>
-    <textarea id="deployCmd" readonly rows="3" style="width:100%;background:#1e1e2e;color:#a5f3fc;border:1px solid #334155;border-radius:6px;padding:10px;font-family:monospace;font-size:13px;resize:none"></textarea>
+    <p style="font-size:12px;color:#94a3b8;margin:8px 0">在新服务器上以 root 执行以下命令，将从 GitHub 下载脚本并自动安装：</p>
+    <textarea id="deployCmd" readonly rows="4" style="width:100%;background:#1e1e2e;color:#a5f3fc;border:1px solid #334155;border-radius:6px;padding:10px;font-family:monospace;font-size:13px;resize:none;word-break:break-all"></textarea>
+    <p style="font-size:11px;color:#64748b;margin:4px 0">安装后可运行 <code style="background:#1e1e2e;padding:2px 6px;border-radius:3px;color:#a5f3fc">tunnel-node.sh menu</code> 进入管理菜单</p>
     <div class="modal-footer">
       <button class="btn" style="background:#2a2a45;color:#94a3b8" onclick="document.getElementById('deployModal').classList.remove('show')">关闭</button>
       <button class="btn btn-sm" style="background:#059669" onclick="copyDeployCmd()">复制命令</button>
@@ -2160,14 +2023,15 @@ function delNode(id){
 function showDeploy(id){
   var n=nodes.find(function(x){return x.id===id});
   if(!n){toast("请先刷新节点列表","err");return}
-  var origin=location.origin;
   H("settings").then(function(s){
     var rk=s.node_report_key||"YOUR_REPORT_KEY";
-    var cmd="bash <(curl -sk '"+origin+"/api/node/deploy-script?id="+id+"&key="+rk+"')";
-    document.getElementById("deployNodeName").textContent=n.name+" (ID:"+n.id+")";
-    document.getElementById("deployDomain").textContent=n.addr;
-    document.getElementById("deployCmd").value=cmd;
-    document.getElementById("deployModal").classList.add("show")
+    var origin=location.origin;
+    fetch(origin+"/api/node/deploy-script?id="+id+"&key="+rk).then(function(r){return r.text()}).then(function(cmd){
+      document.getElementById("deployNodeName").textContent=n.name+" (ID:"+n.id+")";
+      document.getElementById("deployDomain").textContent=n.addr;
+      document.getElementById("deployCmd").value=cmd;
+      document.getElementById("deployModal").classList.add("show")
+    })
   }).catch(function(){})
 }
 
