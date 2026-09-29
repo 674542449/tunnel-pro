@@ -4,6 +4,8 @@ import {main} from '../models';
 
 export function ActivateTrial():Promise<void>;
 
+export function CheckUpdate():Promise<main.UpdateInfo>;
+
 export function Connect(arg1:number):Promise<void>;
 
 export function Disconnect():Promise<void>;
@@ -18,14 +20,20 @@ export function GetUser():Promise<string>;
 
 export function GuestLogin():Promise<void>;
 
+export function HideWindow():Promise<void>;
+
 export function IsLoggedIn():Promise<boolean>;
 
 export function Login(arg1:string,arg2:string):Promise<void>;
 
 export function Logout():Promise<void>;
 
+export function OpenURL(arg1:string):Promise<void>;
+
 export function Register(arg1:string,arg2:string):Promise<void>;
 
 export function ResetSpeed():Promise<void>;
+
+export function ShowWindow():Promise<void>;
 
 export function TestLatency(arg1:number):Promise<number>;

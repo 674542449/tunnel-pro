@@ -5,7 +5,7 @@
       <div class="titlebar-title">Tunnel Pro</div>
       <div class="titlebar-buttons" style="--wails-draggable:no-drag">
         <button class="tb-btn" @click="minimize">&#x2013;</button>
-        <button class="tb-btn tb-close" @click="quit">&#x2715;</button>
+        <button class="tb-btn tb-close" @click="hideWindow">&#x2715;</button>
       </div>
     </div>
 
@@ -62,6 +62,11 @@
             <path d="M10 1v2M10 17v2M1 10h2M17 10h2M3.5 3.5l1.4 1.4M15.1 15.1l1.4 1.4M3.5 16.5l1.4-1.4M15.1 4.9l1.4-1.4"/>
           </svg>
         </button>
+      </div>
+
+      <!-- Update banner -->
+      <div v-if="updateInfo.available" class="update-banner" @click="openUpdate">
+        New version {{ updateInfo.version }} available — click to download
       </div>
 
       <!-- Settings dropdown -->
@@ -146,8 +151,8 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { Login, Register, GuestLogin, IsLoggedIn, Logout, GetNodes, Connect, Disconnect, GetStatus, GetSpeed, ResetSpeed, TestLatency } from '../wailsjs/go/main/App'
-import { WindowMinimise, Quit, EventsOn } from '../wailsjs/runtime/runtime'
+import { Login, Register, GuestLogin, IsLoggedIn, Logout, GetNodes, Connect, Disconnect, GetStatus, GetSpeed, ResetSpeed, TestLatency, HideWindow, OpenURL } from '../wailsjs/go/main/App'
+import { WindowMinimise, EventsOn } from '../wailsjs/runtime/runtime'
 
 const loggedIn = ref(false)
 const loginMode = ref('choose')
@@ -163,11 +168,13 @@ const speed = ref({ upload: 0, download: 0 })
 const connecting = ref(false)
 const connectingId = ref(-1)
 const showSettings = ref(false)
+const updateInfo = ref({ available: false, version: '', url: '' })
 
 let speedInterval = null
 
 function minimize() { WindowMinimise() }
-function quit() { Quit() }
+function hideWindow() { HideWindow() }
+function openUpdate() { if (updateInfo.value.url) OpenURL(updateInfo.value.url) }
 
 async function doAuth() {
   error.value = ''
@@ -281,6 +288,10 @@ onMounted(async () => {
     status.value = s
     connected.value = s.connected
     if (s.connected) currentNode.value = s.nodeName
+  })
+
+  EventsOn('update-available', (info) => {
+    updateInfo.value = info
   })
 
   speedInterval = setInterval(() => {
@@ -411,6 +422,20 @@ onUnmounted(() => {
   font-size: 13px;
   margin-top: 10px;
 }
+
+.update-banner {
+  margin: 0 18px 8px;
+  padding: 10px 14px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+  transition: background .2s;
+}
+.update-banner:hover { background: #bfdbfe; }
 
 .home-view {
   flex: 1;

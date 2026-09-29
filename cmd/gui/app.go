@@ -105,12 +105,19 @@ func (p *connPool) Get() (*mux.Mux, error) {
 	return m, nil
 }
 
+type UpdateInfo struct {
+	Available bool   `json:"available"`
+	Version   string `json:"version"`
+	URL       string `json:"url"`
+}
+
 type App struct {
-	ctx       context.Context
-	auth      AuthState
-	authPath  string
-	nodes     []serverConfig
-	mixedAddr string
+	ctx            context.Context
+	auth           AuthState
+	authPath       string
+	nodes          []serverConfig
+	mixedAddr      string
+	trayDisconnect interface{ Enable(); Disable() }
 
 	mu        sync.RWMutex
 	pool      *connPool
@@ -135,6 +142,8 @@ func (a *App) startup(ctx context.Context) {
 	a.loadAuth()
 	go a.startMixed()
 	go a.healthCheck()
+	go a.startTray()
+	go a.checkUpdateOnStart()
 }
 
 func (a *App) shutdown(ctx context.Context) {
@@ -167,6 +176,20 @@ func parseJWTUID(token string) int64 {
 	}
 	json.Unmarshal(data, &c)
 	return c.UID
+}
+
+func getMachineID() string {
+	out, err := exec.Command("wmic", "csproduct", "get", "UUID").Output()
+	if err != nil {
+		return fmt.Sprintf("win-%d", time.Now().UnixNano())
+	}
+	for _, line := range strings.Split(string(out), "\n") {
+		line = strings.TrimSpace(line)
+		if line != "" && line != "UUID" {
+			return line
+		}
+	}
+	return fmt.Sprintf("win-%d", time.Now().UnixNano())
 }
 
 // ---------- Wails bindings ----------
@@ -214,7 +237,9 @@ func (a *App) Register(email, pass string) error {
 }
 
 func (a *App) GuestLogin() error {
-	resp, err := http.Post(apiBase+"/api/guest", "application/json", strings.NewReader("{}"))
+	machineID := getMachineID()
+	body, _ := json.Marshal(map[string]string{"machine_id": machineID})
+	resp, err := http.Post(apiBase+"/api/guest", "application/json", bytes.NewReader(body))
 	if err != nil {
 		return fmt.Errorf("network error")
 	}
@@ -265,6 +290,54 @@ func (a *App) Logout() {
 	a.saveAuth()
 }
 
+func (a *App) HideWindow() {
+	wailsRT.WindowHide(a.ctx)
+}
+
+func (a *App) ShowWindow() {
+	wailsRT.WindowShow(a.ctx)
+}
+
+func (a *App) CheckUpdate() UpdateInfo {
+	resp, err := http.Get("https://api.github.com/repos/674542449/tunnel-pro/releases/latest")
+	if err != nil {
+		return UpdateInfo{}
+	}
+	defer resp.Body.Close()
+	var release struct {
+		TagName string `json:"tag_name"`
+		Assets  []struct {
+			Name               string `json:"name"`
+			BrowserDownloadURL string `json:"browser_download_url"`
+		} `json:"assets"`
+	}
+	json.NewDecoder(resp.Body).Decode(&release)
+	ver := strings.TrimPrefix(release.TagName, "v")
+	if ver != "" && ver != clientVersion {
+		dlURL := ""
+		for _, asset := range release.Assets {
+			if strings.HasSuffix(asset.Name, ".exe") {
+				dlURL = asset.BrowserDownloadURL
+				break
+			}
+		}
+		return UpdateInfo{Available: true, Version: ver, URL: dlURL}
+	}
+	return UpdateInfo{}
+}
+
+func (a *App) OpenURL(url string) {
+	exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
+}
+
+func (a *App) checkUpdateOnStart() {
+	time.Sleep(2 * time.Second)
+	info := a.CheckUpdate()
+	if info.Available {
+		wailsRT.EventsEmit(a.ctx, "update-available", info)
+	}
+}
+
 func (a *App) GetNodes() []NodeInfo {
 	req, _ := http.NewRequest("GET", apiBase+"/api/nodes", nil)
 	req.Header.Set("Authorization", "Bearer "+a.auth.Token)
@@ -275,13 +348,12 @@ func (a *App) GetNodes() []NodeInfo {
 	defer resp.Body.Close()
 	var result struct {
 		Nodes []struct {
-			ID      int64  `json:"id"`
-			Name    string `json:"name"`
-			Addr    string `json:"addr"`
-			IP      string `json:"ip"`
-			PSK     string `json:"psk"`
-			Region  string `json:"region"`
-			Enabled bool   `json:"enabled"`
+			ID     int64  `json:"id"`
+			Name   string `json:"name"`
+			Addr   string `json:"addr"`
+			IP     string `json:"ip"`
+			PSK    string `json:"psk"`
+			Region string `json:"region"`
 		} `json:"nodes"`
 	}
 	json.NewDecoder(resp.Body).Decode(&result)
@@ -289,9 +361,6 @@ func (a *App) GetNodes() []NodeInfo {
 	a.nodes = nil
 	var out []NodeInfo
 	for _, n := range result.Nodes {
-		if !n.Enabled {
-			continue
-		}
 		a.nodes = append(a.nodes, serverConfig{
 			Name: n.Name, Addr: n.Addr, IP: n.IP, PSK: n.PSK, ID: n.ID, Region: n.Region,
 		})
@@ -364,6 +433,7 @@ func (a *App) Connect(nodeID int64) error {
 	setSystemProxy(a.mixedAddr)
 	a.proxyOn = true
 
+	a.updateTrayTooltip(true, cfg.Name)
 	wailsRT.EventsEmit(a.ctx, "connection-changed", StatusInfo{Connected: true, NodeName: cfg.Name, NodeID: nodeID})
 	return nil
 }
@@ -384,6 +454,7 @@ func (a *App) Disconnect() {
 		a.proxyOn = false
 	}
 
+	a.updateTrayTooltip(false, "")
 	if a.ctx != nil {
 		wailsRT.EventsEmit(a.ctx, "connection-changed", StatusInfo{Connected: false})
 	}

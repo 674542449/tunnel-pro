@@ -6,6 +6,10 @@ export function ActivateTrial() {
   return window['go']['main']['App']['ActivateTrial']();
 }
 
+export function CheckUpdate() {
+  return window['go']['main']['App']['CheckUpdate']();
+}
+
 export function Connect(arg1) {
   return window['go']['main']['App']['Connect'](arg1);
 }
@@ -34,6 +38,10 @@ export function GuestLogin() {
   return window['go']['main']['App']['GuestLogin']();
 }
 
+export function HideWindow() {
+  return window['go']['main']['App']['HideWindow']();
+}
+
 export function IsLoggedIn() {
   return window['go']['main']['App']['IsLoggedIn']();
 }
@@ -46,12 +54,20 @@ export function Logout() {
   return window['go']['main']['App']['Logout']();
 }
 
+export function OpenURL(arg1) {
+  return window['go']['main']['App']['OpenURL'](arg1);
+}
+
 export function Register(arg1, arg2) {
   return window['go']['main']['App']['Register'](arg1, arg2);
 }
 
 export function ResetSpeed() {
   return window['go']['main']['App']['ResetSpeed']();
+}
+
+export function ShowWindow() {
+  return window['go']['main']['App']['ShowWindow']();
 }
 
 export function TestLatency(arg1) {
