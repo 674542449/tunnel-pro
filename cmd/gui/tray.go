@@ -17,14 +17,14 @@ func (a *App) startTray() {
 func (a *App) onTrayReady() {
 	systray.SetIcon(trayIcon)
 	systray.SetTitle("Tunnel Pro")
-	systray.SetTooltip("Tunnel Pro - Disconnected")
+	systray.SetTooltip("Tunnel Pro - 未连接")
 
-	mShow := systray.AddMenuItem("Show", "Show window")
+	mShow := systray.AddMenuItem("显示窗口", "显示主窗口")
 	systray.AddSeparator()
-	mDisconnect := systray.AddMenuItem("Disconnect", "Disconnect from node")
+	mDisconnect := systray.AddMenuItem("断开连接", "断开当前节点")
 	mDisconnect.Disable()
 	systray.AddSeparator()
-	mQuit := systray.AddMenuItem("Quit", "Quit Tunnel Pro")
+	mQuit := systray.AddMenuItem("退出", "退出 Tunnel Pro")
 
 	a.trayDisconnect = mDisconnect
 
@@ -48,12 +48,12 @@ func (a *App) onTrayReady() {
 
 func (a *App) updateTrayTooltip(connected bool, nodeName string) {
 	if connected {
-		systray.SetTooltip("Tunnel Pro - " + nodeName)
+		systray.SetTooltip("Tunnel Pro - 已连接: " + nodeName)
 		if a.trayDisconnect != nil {
 			a.trayDisconnect.Enable()
 		}
 	} else {
-		systray.SetTooltip("Tunnel Pro - Disconnected")
+		systray.SetTooltip("Tunnel Pro - 未连接")
 		if a.trayDisconnect != nil {
 			a.trayDisconnect.Disable()
 		}

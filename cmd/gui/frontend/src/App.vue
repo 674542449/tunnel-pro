@@ -20,24 +20,24 @@
           </svg>
         </div>
         <h2>Tunnel Pro</h2>
-        <p class="login-sub">Secure &amp; Fast Proxy</p>
+        <p class="login-sub">安全高速代理</p>
 
         <div v-if="loginMode === 'login' || loginMode === 'register'" class="login-form">
-          <input v-model="email" type="email" placeholder="Email" @keyup.enter="doAuth"/>
-          <input v-model="pass" type="password" placeholder="Password" @keyup.enter="doAuth"/>
+          <input v-model="email" type="email" placeholder="邮箱" @keyup.enter="doAuth"/>
+          <input v-model="pass" type="password" placeholder="密码" @keyup.enter="doAuth"/>
           <button class="btn-primary" @click="doAuth" :disabled="loading">
-            {{ loading ? '...' : (loginMode === 'login' ? 'Login' : 'Register') }}
+            {{ loading ? '...' : (loginMode === 'login' ? '登录' : '注册') }}
           </button>
           <div class="login-links">
-            <a v-if="loginMode === 'login'" @click="loginMode = 'register'">Create account</a>
-            <a v-else @click="loginMode = 'login'">Back to login</a>
+            <a v-if="loginMode === 'login'" @click="loginMode = 'register'">创建账号</a>
+            <a v-else @click="loginMode = 'login'">返回登录</a>
           </div>
         </div>
 
         <div v-else class="login-form">
-          <button class="btn-primary" @click="loginMode = 'login'">Email Login</button>
+          <button class="btn-primary" @click="loginMode = 'login'">邮箱登录</button>
           <button class="btn-outline" @click="doGuest" :disabled="loading">
-            {{ loading ? '...' : 'Guest Login' }}
+            {{ loading ? '...' : '游客登录' }}
           </button>
         </div>
 
@@ -52,7 +52,7 @@
         <div class="status-left">
           <div :class="['status-dot', connected ? 'on' : 'off']"></div>
           <div>
-            <div class="status-label">{{ connected ? 'Connected' : 'Disconnected' }}</div>
+            <div class="status-label">{{ connected ? '已连接' : '未连接' }}</div>
             <div class="status-node" v-if="connected">{{ currentNode }}</div>
           </div>
         </div>
@@ -66,33 +66,33 @@
 
       <!-- Update banner -->
       <div v-if="updateInfo.available" class="update-banner" @click="openUpdate">
-        New version {{ updateInfo.version }} available — click to download
+        发现新版本 {{ updateInfo.version }} — 点击下载
       </div>
 
       <!-- Settings dropdown -->
       <div v-if="showSettings" class="settings-panel">
         <div class="settings-item">
-          <span>Proxy Port</span>
+          <span>代理端口</span>
           <span class="settings-val">7890</span>
         </div>
         <div class="settings-item">
-          <span>Mode</span>
+          <span>协议</span>
           <span class="settings-val">SOCKS5 + HTTP</span>
         </div>
-        <button class="btn-logout" @click="logout">Logout</button>
+        <button class="btn-logout" @click="logout">退出登录</button>
       </div>
 
       <!-- Node list -->
       <div class="node-list">
         <div class="node-list-header">
-          <span>Nodes</span>
+          <span>节点列表</span>
           <button class="btn-text" @click="refreshNodes" :disabled="loading">
-            {{ loading ? 'Loading...' : 'Refresh' }}
+            {{ loading ? '加载中...' : '刷新' }}
           </button>
         </div>
 
         <div v-if="nodes.length === 0 && !loading" class="empty-state">
-          No available nodes
+          暂无可用节点
         </div>
 
         <div
@@ -102,21 +102,21 @@
           @click="toggleConnect(node)"
         >
           <div class="node-left">
-            <span class="node-flag">{{ node.flag }}</span>
+            <img class="node-flag" :src="flagUrl(node.region)" :alt="node.region" />
             <div>
               <div class="node-name">{{ node.name }}</div>
-              <div class="node-region">{{ node.region }}</div>
+              <div class="node-region">{{ regionName(node.region) }}</div>
             </div>
           </div>
           <div class="node-right">
             <span v-if="node.latency > 0" class="node-latency">{{ node.latency }}ms</span>
-            <span v-else-if="node.latency === -1" class="node-latency timeout">Timeout</span>
+            <span v-else-if="node.latency === -1" class="node-latency timeout">超时</span>
             <button
               v-if="status.nodeId === node.id && connected"
               class="btn-disconnect"
               @click.stop="disconnect"
             >
-              Disconnect
+              断开
             </button>
             <button
               v-else
@@ -124,7 +124,7 @@
               @click.stop="connectNode(node)"
               :disabled="connecting"
             >
-              {{ connecting && connectingId === node.id ? '...' : 'Connect' }}
+              {{ connecting && connectingId === node.id ? '...' : '连接' }}
             </button>
           </div>
         </div>
@@ -171,6 +171,20 @@ const showSettings = ref(false)
 const updateInfo = ref({ available: false, version: '', url: '' })
 
 let speedInterval = null
+
+const regionNameMap = {
+  JP: '日本', KR: '韩国', US: '美国', DE: '德国', SG: '新加坡',
+  HK: '香港', TW: '台湾', GB: '英国', FR: '法国', CA: '加拿大',
+  AU: '澳大利亚', NL: '荷兰', IN: '印度', RU: '俄罗斯', BR: '巴西', TR: '土耳其',
+}
+
+function flagUrl(region) {
+  const code = (region || '').toLowerCase()
+  return code ? `https://flagcdn.com/w40/${code}.svg` : ''
+}
+function regionName(region) {
+  return regionNameMap[(region || '').toUpperCase()] || region || ''
+}
 
 function minimize() { WindowMinimise() }
 function hideWindow() { HideWindow() }
@@ -227,7 +241,7 @@ async function connectNode(node) {
     await Connect(node.id)
   } catch (e) {
     error.value = e
-    alert('Connection failed: ' + e)
+    alert('连接失败: ' + e)
   }
   connecting.value = false
   connectingId.value = -1
@@ -583,8 +597,11 @@ onUnmounted(() => {
   gap: 12px;
 }
 .node-flag {
-  font-size: 26px;
-  line-height: 1;
+  width: 30px;
+  height: 22px;
+  border-radius: 3px;
+  object-fit: cover;
+  flex-shrink: 0;
 }
 .node-name {
   font-size: 14px;

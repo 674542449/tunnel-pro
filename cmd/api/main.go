@@ -1646,11 +1646,11 @@ tr:hover td{background:#fdf9f3}
     <div style="width:48px;height:48px;border-radius:12px;background:#da7756;display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12h10M14 6l6 6-6 6"/></svg>
     </div>
-    <h2>Tunnel Admin</h2>
-    <p>Enter admin key to continue</p>
+    <h2>Tunnel 管理后台</h2>
+    <p>输入管理员密钥继续</p>
     <div class="login-err" id="loginErr"></div>
-    <input type="password" id="loginKey" placeholder="Admin Key" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="btn btn-primary" onclick="doLogin()">Sign In</button>
+    <input type="password" id="loginKey" placeholder="管理员密钥" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn btn-primary" onclick="doLogin()">登录</button>
   </div>
 </div>
 
@@ -1663,35 +1663,35 @@ tr:hover td{background:#fdf9f3}
     <nav class="sidebar-nav">
       <button class="nav-item active" onclick="showTab('dash',this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        <span>Dashboard</span>
+        <span>仪表盘</span>
       </button>
       <button class="nav-item" onclick="showTab('users',this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
-        <span>Users</span>
+        <span>用户</span>
       </button>
       <button class="nav-item" onclick="showTab('nodes',this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-        <span>Nodes</span>
+        <span>节点</span>
       </button>
       <button class="nav-item" onclick="showTab('plans',this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
-        <span>Plans</span>
+        <span>套餐</span>
       </button>
       <button class="nav-item" onclick="showTab('orders',this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        <span>Orders</span>
+        <span>订单</span>
       </button>
       <button class="nav-item" onclick="showTab('traffic',this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        <span>Traffic</span>
+        <span>流量</span>
       </button>
       <button class="nav-item" onclick="showTab('settings',this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-        <span>Settings</span>
+        <span>设置</span>
       </button>
     </nav>
     <div class="sidebar-footer">
-      <button onclick="doLogout()">Sign Out</button>
+      <button onclick="doLogout()">退出登录</button>
     </div>
   </aside>
 
@@ -1700,16 +1700,16 @@ tr:hover td{background:#fdf9f3}
 
     <div class="panel active" id="p-dash">
       <div class="chart-grid">
-        <div class="chart-card"><h4>30-Day Registrations</h4><canvas id="chartReg"></canvas></div>
-        <div class="chart-card"><h4>30-Day Revenue</h4><canvas id="chartRev"></canvas></div>
-        <div class="chart-card"><h4>30-Day Traffic</h4><canvas id="chartTraffic"></canvas></div>
-        <div class="chart-card"><h4>Node Connections</h4><canvas id="chartNodes"></canvas></div>
+        <div class="chart-card"><h4>30天注册趋势</h4><canvas id="chartReg"></canvas></div>
+        <div class="chart-card"><h4>30天收入趋势</h4><canvas id="chartRev"></canvas></div>
+        <div class="chart-card"><h4>30天流量趋势</h4><canvas id="chartTraffic"></canvas></div>
+        <div class="chart-card"><h4>节点连接数</h4><canvas id="chartNodes"></canvas></div>
       </div>
     </div>
 
     <div class="panel" id="p-users">
       <div class="toolbar">
-        <input id="userSearch" placeholder="Search email / ID..." oninput="renderUsers()">
+        <input id="userSearch" placeholder="搜索邮箱 / ID..." oninput="renderUsers()">
         <span style="flex:1"></span>
         <span id="userCount" style="font-size:13px;color:#8b8077"></span>
       </div>
@@ -1718,14 +1718,14 @@ tr:hover td{background:#fdf9f3}
 
     <div class="panel" id="p-nodes">
       <div class="toolbar">
-        <button class="btn btn-primary" onclick="showAddNode()">+ Add Node</button>
+        <button class="btn btn-primary" onclick="showAddNode()">+ 添加节点</button>
       </div>
       <div class="card" id="nodeTable"></div>
     </div>
 
     <div class="panel" id="p-plans">
       <div class="toolbar">
-        <button class="btn btn-primary" onclick="showAddPlan()">+ Add Plan</button>
+        <button class="btn btn-primary" onclick="showAddPlan()">+ 添加套餐</button>
       </div>
       <div class="card" id="planTable"></div>
     </div>
@@ -1736,7 +1736,7 @@ tr:hover td{background:#fdf9f3}
 
     <div class="panel" id="p-traffic">
       <div class="toolbar">
-        <input id="trafficSearch" placeholder="Search email / ID..." oninput="renderTraffic()">
+        <input id="trafficSearch" placeholder="搜索邮箱 / ID..." oninput="renderTraffic()">
         <span style="flex:1"></span>
         <span id="trafficTotal" style="font-size:13px;color:#8b8077"></span>
       </div>
@@ -1745,21 +1745,21 @@ tr:hover td{background:#fdf9f3}
 
     <div class="panel" id="p-settings">
       <div class="settings-card">
-        <h3>EPay Configuration</h3>
-        <div class="form-row"><label>API URL</label><input id="epayURL" placeholder="https://pay.example.com"></div>
-        <div class="form-row"><label>PID</label><input id="epayPID" placeholder="Merchant PID"></div>
-        <div class="form-row"><label>Key</label><input id="epayKey" placeholder="Merchant Key"></div>
+        <h3>支付配置 (EPay)</h3>
+        <div class="form-row"><label>接口地址</label><input id="epayURL" placeholder="https://pay.example.com"></div>
+        <div class="form-row"><label>商户 PID</label><input id="epayPID" placeholder="商户 PID"></div>
+        <div class="form-row"><label>商户密钥</label><input id="epayKey" placeholder="商户密钥"></div>
         <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">
-          <button class="btn btn-primary" onclick="saveEPay()">Save</button>
+          <button class="btn btn-primary" onclick="saveEPay()">保存</button>
         </div>
       </div>
       <div class="settings-card">
-        <h3>Client Version</h3>
-        <div class="form-row"><label>Version</label><input id="verNum" placeholder="e.g. 1.0.1"></div>
-        <div class="form-row"><label>Download</label><input id="verURL" placeholder="https://example.com/client.exe"></div>
-        <div class="form-row"><label>Changelog</label><input id="verLog" placeholder="Optional"></div>
+        <h3>客户端版本</h3>
+        <div class="form-row"><label>版本号</label><input id="verNum" placeholder="如 1.0.1"></div>
+        <div class="form-row"><label>下载地址</label><input id="verURL" placeholder="https://example.com/client.exe"></div>
+        <div class="form-row"><label>更新日志</label><input id="verLog" placeholder="可选"></div>
         <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">
-          <button class="btn btn-primary" onclick="saveVersion()">Save</button>
+          <button class="btn btn-primary" onclick="saveVersion()">保存</button>
         </div>
       </div>
     </div>
@@ -1768,71 +1768,71 @@ tr:hover td{background:#fdf9f3}
 
 <div class="modal" id="extendModal" onclick="if(event.target===this)this.classList.remove('show')">
   <div class="modal-box">
-    <h3>Add Days</h3>
-    <div class="form-row"><label>User</label><input id="extUser" disabled></div>
-    <div class="form-row"><label>Days</label><input id="extDays" type="number" value="30" min="1"></div>
+    <h3>续期</h3>
+    <div class="form-row"><label>用户</label><input id="extUser" disabled></div>
+    <div class="form-row"><label>天数</label><input id="extDays" type="number" value="30" min="1"></div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="document.getElementById('extendModal').classList.remove('show')">Cancel</button>
-      <button class="btn btn-primary" onclick="doExtend()">Confirm</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('extendModal').classList.remove('show')">取消</button>
+      <button class="btn btn-primary" onclick="doExtend()">确认</button>
     </div>
   </div>
 </div>
 
 <div class="modal" id="nodeModal" onclick="if(event.target===this)this.classList.remove('show')">
   <div class="modal-box">
-    <h3 id="nodeModalTitle">Add Node</h3>
+    <h3 id="nodeModalTitle">添加节点</h3>
     <input type="hidden" id="nodeEditId">
-    <div class="form-row"><label>Name</label><input id="nName" placeholder="Display name"></div>
-    <div class="form-row"><label>Domain</label><input id="nAddr" placeholder="example.com"></div>
-    <div class="form-row"><label>IP</label><input id="nIP" placeholder="Optional"></div>
-    <div class="form-row"><label>PSK</label><input id="nPSK" placeholder="Pre-shared key"></div>
-    <div class="form-row"><label>Region</label><input id="nRegion" placeholder="e.g. US, JP"></div>
-    <div class="form-row"><label>Sort</label><input id="nSort" type="number" value="0"></div>
+    <div class="form-row"><label>名称</label><input id="nName" placeholder="显示名称"></div>
+    <div class="form-row"><label>域名</label><input id="nAddr" placeholder="example.com"></div>
+    <div class="form-row"><label>IP</label><input id="nIP" placeholder="可选"></div>
+    <div class="form-row"><label>PSK</label><input id="nPSK" placeholder="预共享密钥"></div>
+    <div class="form-row"><label>地区</label><input id="nRegion" placeholder="如 US, JP, KR"></div>
+    <div class="form-row"><label>排序</label><input id="nSort" type="number" value="0"></div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="document.getElementById('nodeModal').classList.remove('show')">Cancel</button>
-      <button class="btn btn-primary" onclick="doSaveNode()">Save</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('nodeModal').classList.remove('show')">取消</button>
+      <button class="btn btn-primary" onclick="doSaveNode()">保存</button>
     </div>
   </div>
 </div>
 
 <div class="modal" id="deployModal" onclick="if(event.target===this)this.classList.remove('show')">
   <div class="modal-box" style="max-width:620px">
-    <h3>Deploy Command</h3>
-    <div class="form-row"><label>Node</label><span id="deployNodeName" style="color:#2d2b27;font-weight:500"></span></div>
-    <div class="form-row"><label>Domain</label><span id="deployDomain" style="color:#2d2b27"></span></div>
-    <p style="font-size:12px;color:#8b8077;margin:10px 0">Run as root on the target server. Downloads script from GitHub and auto-installs:</p>
+    <h3>部署命令</h3>
+    <div class="form-row"><label>节点</label><span id="deployNodeName" style="color:#2d2b27;font-weight:500"></span></div>
+    <div class="form-row"><label>域名</label><span id="deployDomain" style="color:#2d2b27"></span></div>
+    <p style="font-size:12px;color:#8b8077;margin:10px 0">在目标服务器上以 root 身份运行，自动从 GitHub 下载并安装：</p>
     <textarea id="deployCmd" readonly rows="4" style="width:100%;background:#1a1a2e;color:#a5f3fc;border:1px solid #e8e0d4;border-radius:8px;padding:12px;font-family:'SF Mono',monospace;font-size:12px;resize:none;word-break:break-all"></textarea>
-    <p style="font-size:11px;color:#8b8077;margin:6px 0">After install, run <code style="background:#f5f0e8;padding:2px 8px;border-radius:4px;color:#da7756;font-size:11px">tunnel-node.sh menu</code> for management</p>
+    <p style="font-size:11px;color:#8b8077;margin:6px 0">安装后运行 <code style="background:#f5f0e8;padding:2px 8px;border-radius:4px;color:#da7756;font-size:11px">tunnel-node.sh menu</code> 进入管理菜单</p>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="document.getElementById('deployModal').classList.remove('show')">Close</button>
-      <button class="btn btn-success" onclick="copyDeployCmd()">Copy Command</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('deployModal').classList.remove('show')">关闭</button>
+      <button class="btn btn-success" onclick="copyDeployCmd()">复制命令</button>
     </div>
   </div>
 </div>
 
 <div class="modal" id="resetPwdModal" onclick="if(event.target===this)this.classList.remove('show')">
   <div class="modal-box">
-    <h3>Reset Password</h3>
-    <div class="form-row"><label>User</label><input id="rpUser" disabled></div>
-    <div class="form-row"><label>Password</label><input id="rpPwd" type="text" placeholder="Min 6 chars"></div>
+    <h3>重置密码</h3>
+    <div class="form-row"><label>用户</label><input id="rpUser" disabled></div>
+    <div class="form-row"><label>新密码</label><input id="rpPwd" type="text" placeholder="最少6位"></div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="document.getElementById('resetPwdModal').classList.remove('show')">Cancel</button>
-      <button class="btn btn-primary" onclick="doResetPwd()">Reset</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('resetPwdModal').classList.remove('show')">取消</button>
+      <button class="btn btn-primary" onclick="doResetPwd()">确认重置</button>
     </div>
   </div>
 </div>
 
 <div class="modal" id="planModal" onclick="if(event.target===this)this.classList.remove('show')">
   <div class="modal-box">
-    <h3 id="planModalTitle">Add Plan</h3>
+    <h3 id="planModalTitle">添加套餐</h3>
     <input type="hidden" id="planEditId">
-    <div class="form-row"><label>Name</label><input id="pName" placeholder="e.g. Monthly"></div>
-    <div class="form-row"><label>Days</label><input id="pDays" type="number" placeholder="30" min="1"></div>
-    <div class="form-row"><label>Price</label><input id="pPrice" type="number" placeholder="15" min="0.01" step="0.01"></div>
-    <div class="form-row"><label>Status</label><select id="pEnabled" style="flex:1;background:#fff;border:1px solid #e8e0d4;color:#2d2b27;padding:9px 14px;border-radius:8px;font-size:13px;font-family:inherit"><option value="1">Enabled</option><option value="0">Disabled</option></select></div>
+    <div class="form-row"><label>名称</label><input id="pName" placeholder="如 月付套餐"></div>
+    <div class="form-row"><label>天数</label><input id="pDays" type="number" placeholder="30" min="1"></div>
+    <div class="form-row"><label>价格</label><input id="pPrice" type="number" placeholder="15" min="0.01" step="0.01"></div>
+    <div class="form-row"><label>状态</label><select id="pEnabled" style="flex:1;background:#fff;border:1px solid #e8e0d4;color:#2d2b27;padding:9px 14px;border-radius:8px;font-size:13px;font-family:inherit"><option value="1">启用</option><option value="0">停用</option></select></div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="document.getElementById('planModal').classList.remove('show')">Cancel</button>
-      <button class="btn btn-primary" onclick="doSavePlan()">Save</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('planModal').classList.remove('show')">取消</button>
+      <button class="btn btn-primary" onclick="doSavePlan()">保存</button>
     </div>
   </div>
 </div>
@@ -1863,7 +1863,7 @@ function doLogin(){
     TOKEN=d.token;
     localStorage.setItem("admin_token",TOKEN);
     showMain()
-  }).catch(function(){errEl.textContent="Network error";errEl.style.display="block"})
+  }).catch(function(){errEl.textContent="网络错误";errEl.style.display="block"})
 }
 
 function doLogout(){
@@ -1899,14 +1899,14 @@ function fmtBytes(b){if(!b||b===0)return"0 B";var u=["B","KB","MB","GB","TB"];va
 
 function loadStats(){
   H("stats").then(function(d){
-    var h='<div class="stat"><div class="stat-num">'+d.total_users+'</div><div class="stat-label">Total Users</div></div>'+
-      '<div class="stat"><div class="stat-num">'+d.active_users+'</div><div class="stat-label">Active</div></div>'+
-      '<div class="stat"><div class="stat-num">'+d.total_orders+'</div><div class="stat-label">Orders</div></div>'+
-      '<div class="stat"><div class="stat-num">'+d.total_nodes+'</div><div class="stat-label">Nodes</div></div>';
+    var h='<div class="stat"><div class="stat-num">'+d.total_users+'</div><div class="stat-label">总用户</div></div>'+
+      '<div class="stat"><div class="stat-num">'+d.active_users+'</div><div class="stat-label">活跃用户</div></div>'+
+      '<div class="stat"><div class="stat-num">'+d.total_orders+'</div><div class="stat-label">订单数</div></div>'+
+      '<div class="stat"><div class="stat-num">'+d.total_nodes+'</div><div class="stat-label">节点数</div></div>';
     document.getElementById("stats").innerHTML=h;
     H("dashboard").then(function(dd){
-      h+='<div class="stat"><div class="stat-num">'+dd.online_nodes+'</div><div class="stat-label">Online</div></div>';
-      h+='<div class="stat"><div class="stat-num">'+fmtBytes(dd.today_traffic)+'</div><div class="stat-label">Today Traffic</div></div>';
+      h+='<div class="stat"><div class="stat-num">'+dd.online_nodes+'</div><div class="stat-label">在线节点</div></div>';
+      h+='<div class="stat"><div class="stat-num">'+fmtBytes(dd.today_traffic)+'</div><div class="stat-label">今日流量</div></div>';
       document.getElementById("stats").innerHTML=h
     }).catch(function(){})
   }).catch(function(){})
@@ -1919,26 +1919,26 @@ function loadUsers(){
 function renderUsers(){
   var q=document.getElementById("userSearch").value.toLowerCase();
   var f=users.filter(function(u){return !q||String(u.id).indexOf(q)>=0||(u.email||"").toLowerCase().indexOf(q)>=0||(u.machine_id||"").toLowerCase().indexOf(q)>=0});
-  document.getElementById("userCount").textContent=f.length+"/"+users.length+" users";
-  if(f.length===0){document.getElementById("userTable").innerHTML='<div class="empty">No users</div>';return}
+  document.getElementById("userCount").textContent=f.length+"/"+users.length+" 用户";
+  if(f.length===0){document.getElementById("userTable").innerHTML='<div class="empty">暂无用户</div>';return}
   var now=Math.floor(Date.now()/1000);
-  var h='<table><tr><th>ID</th><th>Email</th><th>Status</th><th>Expires</th><th>Created</th><th>Actions</th></tr>';
+  var h='<table><tr><th>ID</th><th>邮箱</th><th>状态</th><th>到期时间</th><th>注册时间</th><th>操作</th></tr>';
   f.forEach(function(u){
-    var label=u.email||(u.machine_id?"Guest:"+u.machine_id.substring(0,8)+"...":"Unknown");
-    var st=u.disabled?"Disabled":(u.expires_at>now?"Active":"Expired");
+    var label=u.email||(u.machine_id?"游客:"+u.machine_id.substring(0,8)+"...":"未知");
+    var st=u.disabled?"已禁用":(u.expires_at>now?"活跃":"已过期");
     var cls=u.disabled?"badge-exp":(u.expires_at>now?"badge-ok":"badge-exp");
     h+="<tr><td>"+u.id+"</td><td>"+label+"</td>";
     h+='<td><span class="badge '+cls+'">'+st+"</span></td>";
     h+="<td>"+fmtTime(u.expires_at)+"</td><td>"+fmtTime(u.created_at)+"</td>";
     h+='<td style="white-space:nowrap">';
-    h+='<button class="btn btn-sm" onclick="showExtend('+u.id+",'"+label.replace(/'/g,"")+"')\">+Days</button> ";
+    h+='<button class="btn btn-sm" onclick="showExtend('+u.id+",'"+label.replace(/'/g,"")+"')\">续期</button> ";
     if(u.disabled){
-      h+='<button class="btn btn-success" onclick="toggleUser('+u.id+',false)">Enable</button> '
+      h+='<button class="btn btn-success" onclick="toggleUser('+u.id+',false)">启用</button> '
     }else{
-      h+='<button class="btn btn-ghost" onclick="toggleUser('+u.id+',true)">Disable</button> '
+      h+='<button class="btn btn-ghost" onclick="toggleUser('+u.id+',true)">禁用</button> '
     }
-    if(u.email){h+='<button class="btn btn-ghost" onclick="showResetPwd('+u.id+",'"+label.replace(/'/g,"")+"')\">Reset Pwd</button> "}
-    h+='<button class="btn btn-danger" onclick="delUser('+u.id+')">Delete</button>';
+    if(u.email){h+='<button class="btn btn-ghost" onclick="showResetPwd('+u.id+",'"+label.replace(/'/g,"")+"')\">重置密码</button> "}
+    h+='<button class="btn btn-danger" onclick="delUser('+u.id+')">删除</button>';
     h+="</td></tr>"
   });
   h+="</table>";
@@ -1956,23 +1956,23 @@ function doExtend(){
   var uid=parseInt(document.getElementById("extendModal").dataset.uid);
   var days=parseInt(document.getElementById("extDays").value);
   H("extend",{method:"POST",body:JSON.stringify({user_id:uid,days:days})}).then(function(d){
-    if(d.error){toast(d.error,"err")}else{toast("Days added","ok");loadUsers();loadStats()}
+    if(d.error){toast(d.error,"err")}else{toast("续期成功","ok");loadUsers();loadStats()}
     document.getElementById("extendModal").classList.remove("show")
   }).catch(function(){})
 }
 
 function toggleUser(uid,disabled){
-  var msg=disabled?"Disable this user?":"Enable this user?";
+  var msg=disabled?"确定禁用此用户？":"确定启用此用户？";
   if(!confirm(msg))return;
   H("toggle-user",{method:"POST",body:JSON.stringify({user_id:uid,disabled:disabled})}).then(function(d){
-    if(d.error){toast(d.error,"err")}else{toast(disabled?"Disabled":"Enabled","ok");loadUsers()}
+    if(d.error){toast(d.error,"err")}else{toast(disabled?"已禁用":"已启用","ok");loadUsers()}
   }).catch(function(){})
 }
 
 function delUser(uid){
-  if(!confirm("Delete this user? This cannot be undone!"))return;
+  if(!confirm("确定删除此用户？此操作不可撤销！"))return;
   H("users?id="+uid,{method:"DELETE"}).then(function(d){
-    if(d.error){toast(d.error,"err")}else{toast("Deleted","ok");loadUsers();loadStats()}
+    if(d.error){toast(d.error,"err")}else{toast("已删除","ok");loadUsers();loadStats()}
   }).catch(function(){})
 }
 
@@ -1986,9 +1986,9 @@ function showResetPwd(uid,label){
 function doResetPwd(){
   var uid=parseInt(document.getElementById("resetPwdModal").dataset.uid);
   var pwd=document.getElementById("rpPwd").value;
-  if(pwd.length<6){toast("Min 6 characters","err");return}
+  if(pwd.length<6){toast("密码至少6位","err");return}
   H("reset-password",{method:"POST",body:JSON.stringify({user_id:uid,password:pwd})}).then(function(d){
-    if(d.error){toast(d.error,"err")}else{toast("Password reset","ok")}
+    if(d.error){toast(d.error,"err")}else{toast("密码已重置","ok")}
     document.getElementById("resetPwdModal").classList.remove("show")
   }).catch(function(){})
 }
@@ -2000,24 +2000,24 @@ function loadNodes(){
 }
 
 function renderNodes(){
-  if(nodes.length===0){document.getElementById("nodeTable").innerHTML='<div class="empty">No nodes</div>';return}
-  var h='<table><tr><th>ID</th><th>Name</th><th>Domain</th><th>Status</th><th>Conns</th><th>Region</th><th>Enabled</th><th>Actions</th></tr>';
+  if(nodes.length===0){document.getElementById("nodeTable").innerHTML='<div class="empty">暂无节点</div>';return}
+  var h='<table><tr><th>ID</th><th>名称</th><th>域名</th><th>状态</th><th>连接数</th><th>地区</th><th>启用</th><th>操作</th></tr>';
   nodes.forEach(function(n){
     var online=n.online;
-    var dot='<span class="online-dot '+(online?"on":"off")+'"></span>'+(online?"Online":"Offline");
+    var dot='<span class="online-dot '+(online?"on":"off")+'"></span>'+(online?"在线":"离线");
     h+="<tr><td>"+n.id+"</td><td>"+n.name+"</td><td style='color:#8b8077;font-size:12px'>"+n.addr+"</td>";
     h+="<td>"+dot+"</td><td>"+(n.conn_count||0)+"</td><td>"+(n.region||"-")+"</td>";
     h+='<td><span class="badge '+(n.enabled?"badge-ok":"badge-exp")+'">'+(n.enabled?"On":"Off")+"</span></td>";
-    h+='<td style="white-space:nowrap"><button class="btn btn-sm" onclick="showEditNode('+n.id+')">Edit</button> ';
-    h+='<button class="btn btn-success" onclick="showDeploy('+n.id+')">Deploy</button> ';
-    h+='<button class="btn btn-danger" onclick="delNode('+n.id+')">Del</button></td></tr>'
+    h+='<td style="white-space:nowrap"><button class="btn btn-sm" onclick="showEditNode('+n.id+')">编辑</button> ';
+    h+='<button class="btn btn-success" onclick="showDeploy('+n.id+')">部署</button> ';
+    h+='<button class="btn btn-danger" onclick="delNode('+n.id+')">删除</button></td></tr>'
   });
   h+="</table>";
   document.getElementById("nodeTable").innerHTML=h
 }
 
 function showAddNode(){
-  document.getElementById("nodeModalTitle").textContent="Add Node";
+  document.getElementById("nodeModalTitle").textContent="添加节点";
   document.getElementById("nodeEditId").value="";
   ["nName","nAddr","nIP","nPSK","nRegion"].forEach(function(id){document.getElementById(id).value=""});
   document.getElementById("nSort").value="0";
@@ -2026,7 +2026,7 @@ function showAddNode(){
 
 function showEditNode(id){
   var n=nodes.find(function(x){return x.id===id});if(!n)return;
-  document.getElementById("nodeModalTitle").textContent="Edit Node";
+  document.getElementById("nodeModalTitle").textContent="编辑节点";
   document.getElementById("nodeEditId").value=id;
   document.getElementById("nName").value=n.name;
   document.getElementById("nAddr").value=n.addr;
@@ -2043,27 +2043,27 @@ function doSaveNode(){
   if(editId){
     data.id=parseInt(editId);
     H("nodes",{method:"PUT",body:JSON.stringify(data)}).then(function(d){
-      if(d.error){toast(d.error,"err")}else{toast("Updated","ok");loadNodes()}
+      if(d.error){toast(d.error,"err")}else{toast("已更新","ok");loadNodes()}
       document.getElementById("nodeModal").classList.remove("show")
     }).catch(function(){})
   }else{
     H("nodes",{method:"POST",body:JSON.stringify(data)}).then(function(d){
-      if(d.error){toast(d.error,"err")}else{toast("Added","ok");loadNodes();loadStats();if(d.node)showDeploy(d.node.id)}
+      if(d.error){toast(d.error,"err")}else{toast("已添加","ok");loadNodes();loadStats();if(d.node)showDeploy(d.node.id)}
       document.getElementById("nodeModal").classList.remove("show")
     }).catch(function(){})
   }
 }
 
 function delNode(id){
-  if(!confirm("Delete this node?"))return;
+  if(!confirm("确定删除此节点？"))return;
   H("nodes?id="+id,{method:"DELETE"}).then(function(d){
-    if(d.error){toast(d.error,"err")}else{toast("Deleted","ok");loadNodes();loadStats()}
+    if(d.error){toast(d.error,"err")}else{toast("已删除","ok");loadNodes();loadStats()}
   }).catch(function(){})
 }
 
 function showDeploy(id){
   var n=nodes.find(function(x){return x.id===id});
-  if(!n){toast("Refresh nodes first","err");return}
+  if(!n){toast("请先刷新节点列表","err");return}
   H("settings").then(function(s){
     var rk=s.node_report_key||"YOUR_REPORT_KEY";
     var origin=location.origin;
@@ -2079,7 +2079,7 @@ function showDeploy(id){
 function copyDeployCmd(){
   var t=document.getElementById("deployCmd");
   t.select();document.execCommand("copy");
-  toast("Copied","ok")
+  toast("已复制","ok")
 }
 
 function loadOrders(){
@@ -2087,8 +2087,8 @@ function loadOrders(){
 }
 
 function renderOrders(){
-  if(orders.length===0){document.getElementById("orderTable").innerHTML='<div class="empty">No orders</div>';return}
-  var h='<table><tr><th>ID</th><th>User</th><th>Plan</th><th>Amount</th><th>Method</th><th>Status</th><th>Time</th></tr>';
+  if(orders.length===0){document.getElementById("orderTable").innerHTML='<div class="empty">暂无订单</div>';return}
+  var h='<table><tr><th>ID</th><th>用户</th><th>套餐</th><th>金额</th><th>支付方式</th><th>状态</th><th>时间</th></tr>';
   orders.forEach(function(o){
     h+="<tr><td>"+o.id+"</td><td>"+(o.user_email||"ID:"+o.user_id)+"</td><td>"+o.plan+"</td>";
     h+="<td>"+(o.amount>0?"¥"+o.amount:"-")+"</td><td>"+(o.method||"-")+"</td>";
@@ -2104,20 +2104,20 @@ function loadPlans(){
 }
 
 function renderPlans(){
-  if(plans.length===0){document.getElementById("planTable").innerHTML='<div class="empty">No plans</div>';return}
-  var h='<table><tr><th>ID</th><th>Name</th><th>Days</th><th>Price</th><th>Status</th><th>Actions</th></tr>';
+  if(plans.length===0){document.getElementById("planTable").innerHTML='<div class="empty">暂无套餐</div>';return}
+  var h='<table><tr><th>ID</th><th>名称</th><th>天数</th><th>价格</th><th>状态</th><th>操作</th></tr>';
   plans.forEach(function(p){
     h+="<tr><td>"+p.id+"</td><td>"+p.name+"</td><td>"+p.days+"d</td><td>¥"+p.price+"</td>";
     h+='<td><span class="badge '+(p.enabled?"badge-ok":"badge-exp")+'">'+(p.enabled?"On":"Off")+"</span></td>";
-    h+='<td><button class="btn btn-sm" onclick="showEditPlan('+p.id+')">Edit</button> ';
-    h+='<button class="btn btn-danger" onclick="delPlan('+p.id+')">Del</button></td></tr>'
+    h+='<td><button class="btn btn-sm" onclick="showEditPlan('+p.id+')">编辑</button> ';
+    h+='<button class="btn btn-danger" onclick="delPlan('+p.id+')">删除</button></td></tr>'
   });
   h+="</table>";
   document.getElementById("planTable").innerHTML=h
 }
 
 function showAddPlan(){
-  document.getElementById("planModalTitle").textContent="Add Plan";
+  document.getElementById("planModalTitle").textContent="添加套餐";
   document.getElementById("planEditId").value="";
   document.getElementById("pName").value="";
   document.getElementById("pDays").value="";
@@ -2128,7 +2128,7 @@ function showAddPlan(){
 
 function showEditPlan(id){
   var p=plans.find(function(x){return x.id===id});if(!p)return;
-  document.getElementById("planModalTitle").textContent="Edit Plan";
+  document.getElementById("planModalTitle").textContent="编辑套餐";
   document.getElementById("planEditId").value=id;
   document.getElementById("pName").value=p.name;
   document.getElementById("pDays").value=p.days;
@@ -2140,25 +2140,25 @@ function showEditPlan(id){
 function doSavePlan(){
   var editId=document.getElementById("planEditId").value;
   var data={name:document.getElementById("pName").value.trim(),days:parseInt(document.getElementById("pDays").value)||0,price:parseFloat(document.getElementById("pPrice").value)||0,enabled:document.getElementById("pEnabled").value==="1"};
-  if(!data.name||data.days<=0||data.price<=0){toast("Fill all fields","err");return}
+  if(!data.name||data.days<=0||data.price<=0){toast("请填写所有字段","err");return}
   if(editId){
     data.id=parseInt(editId);
     H("plans",{method:"PUT",body:JSON.stringify(data)}).then(function(d){
-      if(d.error){toast(d.error,"err")}else{toast("Updated","ok");loadPlans()}
+      if(d.error){toast(d.error,"err")}else{toast("已更新","ok");loadPlans()}
       document.getElementById("planModal").classList.remove("show")
     }).catch(function(){})
   }else{
     H("plans",{method:"POST",body:JSON.stringify(data)}).then(function(d){
-      if(d.error){toast(d.error,"err")}else{toast("Added","ok");loadPlans()}
+      if(d.error){toast(d.error,"err")}else{toast("已添加","ok");loadPlans()}
       document.getElementById("planModal").classList.remove("show")
     }).catch(function(){})
   }
 }
 
 function delPlan(id){
-  if(!confirm("Delete this plan?"))return;
+  if(!confirm("确定删除此套餐？"))return;
   H("plans?id="+id,{method:"DELETE"}).then(function(d){
-    if(d.error){toast(d.error,"err")}else{toast("Deleted","ok");loadPlans()}
+    if(d.error){toast(d.error,"err")}else{toast("已删除","ok");loadPlans()}
   }).catch(function(){})
 }
 
@@ -2180,14 +2180,14 @@ function loadSettings(){
 function saveEPay(){
   var data={epay:{url:document.getElementById("epayURL").value.trim(),pid:document.getElementById("epayPID").value.trim(),key:document.getElementById("epayKey").value.trim()}};
   H("settings",{method:"PUT",body:JSON.stringify(data)}).then(function(d){
-    if(d.error){toast(d.error,"err")}else{toast("Saved","ok")}
+    if(d.error){toast(d.error,"err")}else{toast("已保存","ok")}
   }).catch(function(){})
 }
 
 function saveVersion(){
   var data={version:{version:document.getElementById("verNum").value.trim(),download_url:document.getElementById("verURL").value.trim(),changelog:document.getElementById("verLog").value.trim()}};
   H("settings",{method:"PUT",body:JSON.stringify(data)}).then(function(d){
-    if(d.error){toast(d.error,"err")}else{toast("Saved","ok")}
+    if(d.error){toast(d.error,"err")}else{toast("已保存","ok")}
   }).catch(function(){})
 }
 
@@ -2214,7 +2214,7 @@ function loadDashboard(){
       if(onNodes.length>0){
         charts.nodes=new Chart(document.getElementById("chartNodes"),{type:"doughnut",data:{labels:onNodes.map(function(n){return n.name}),datasets:[{data:onNodes.map(function(n){return n.conn_count||0}),backgroundColor:["#da7756","#16a34a","#f59e0b","#dc2626","#8b5cf6","#06b6d4"]}]},options:{responsive:true,plugins:{legend:{position:"bottom",labels:{color:"#8b8077"}}}}})
       }else{
-        document.getElementById("chartNodes").parentElement.innerHTML="<h4>Node Connections</h4><div class='empty'>No online nodes</div>"
+        document.getElementById("chartNodes").parentElement.innerHTML="<h4>节点连接数</h4><div class='empty'>暂无在线节点</div>"
       }
     }).catch(function(){})
   }).catch(function(){})
@@ -2229,11 +2229,11 @@ function renderTraffic(){
   var f=trafficData.filter(function(t){return !q||String(t.user_id).indexOf(q)>=0||(t.email||"").toLowerCase().indexOf(q)>=0});
   var totalUp=0,totalDown=0;
   f.forEach(function(t){totalUp+=t.upload;totalDown+=t.download});
-  document.getElementById("trafficTotal").textContent="Up "+fmtBytes(totalUp)+"  Down "+fmtBytes(totalDown);
-  if(f.length===0){document.getElementById("trafficTable").innerHTML='<div class="empty">No traffic data</div>';return}
-  var h='<table><tr><th>User ID</th><th>Email</th><th>Upload</th><th>Download</th><th>Total</th></tr>';
+  document.getElementById("trafficTotal").textContent="上传 "+fmtBytes(totalUp)+"  下载 "+fmtBytes(totalDown);
+  if(f.length===0){document.getElementById("trafficTable").innerHTML='<div class="empty">暂无流量数据</div>';return}
+  var h='<table><tr><th>用户ID</th><th>邮箱</th><th>上传</th><th>下载</th><th>合计</th></tr>';
   f.forEach(function(t){
-    h+="<tr><td>"+t.user_id+"</td><td>"+(t.email||"Guest")+"</td>";
+    h+="<tr><td>"+t.user_id+"</td><td>"+(t.email||"游客")+"</td>";
     h+="<td>"+fmtBytes(t.upload)+"</td><td>"+fmtBytes(t.download)+"</td>";
     h+="<td>"+fmtBytes(t.upload+t.download)+"</td></tr>"
   });
