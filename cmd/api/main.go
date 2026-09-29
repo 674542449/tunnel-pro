@@ -1553,173 +1553,214 @@ const adminHTML = `<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="color-scheme" content="dark">
 <title>Tunnel Admin</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,` + "%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%236366f1'/%3E%3Cpath d='M16 24h18M29 18l7 6-7 6' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" + `">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif;background:#0c0c1d;color:#e2e8f0;min-height:100vh}
-.app{max-width:960px;margin:0 auto;padding:20px 16px}
-.header{display:flex;align-items:center;gap:12px;margin-bottom:24px}
-.header h1{font-size:22px;background:linear-gradient(135deg,#6366f1,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.header-right{margin-left:auto;display:flex;align-items:center;gap:10px}
-.tabs{display:flex;gap:4px;margin-bottom:20px;background:#1a1a2e;border-radius:10px;padding:4px}
-.tab{padding:8px 18px;border-radius:8px;border:none;background:transparent;color:#94a3b8;cursor:pointer;font-size:14px;font-family:inherit;transition:all .2s}
-.tab.active{background:#6366f1;color:#fff}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px}
-.stat{background:#1a1a2e;border-radius:12px;padding:16px;text-align:center;border:1px solid #2a2a45}
-.stat-num{font-size:28px;font-weight:700;color:#6366f1}
-.stat-label{font-size:12px;color:#64748b;margin-top:4px}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#f5f0e8;color:#2d2b27;min-height:100vh}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:220px;background:#1a1a2e;color:#c4b5a0;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100}
+.sidebar-brand{padding:24px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #2a2a45}
+.sidebar-brand h1{font-size:16px;font-weight:600;color:#f5f0e8}
+.sidebar-brand .dot{width:10px;height:10px;border-radius:50%;background:#da7756}
+.sidebar-nav{flex:1;padding:12px 8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;cursor:pointer;font-size:14px;color:#8b8077;transition:all .15s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;font-family:inherit}
+.nav-item:hover{background:#252540;color:#e8dfd3}
+.nav-item.active{background:#da775620;color:#da7756;font-weight:500}
+.nav-item svg{width:18px;height:18px;flex-shrink:0}
+.sidebar-footer{padding:16px 20px;border-top:1px solid #2a2a45}
+.sidebar-footer button{background:none;border:1px solid #3a3a55;color:#8b8077;padding:8px 0;border-radius:8px;width:100%;cursor:pointer;font-size:13px;font-family:inherit;transition:all .15s}
+.sidebar-footer button:hover{border-color:#da7756;color:#da7756}
+.main{flex:1;margin-left:220px;padding:28px 32px;min-height:100vh}
+.main-header{margin-bottom:24px}
+.main-header h2{font-size:22px;font-weight:600;color:#2d2b27}
+.main-header p{font-size:13px;color:#8b8077;margin-top:4px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:24px}
+.stat{background:#fff;border-radius:12px;padding:18px;border:1px solid #e8e0d4;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.stat-num{font-size:28px;font-weight:700;color:#da7756}
+.stat-label{font-size:12px;color:#8b8077;margin-top:4px}
 .panel{display:none}
 .panel.active{display:block}
-table{width:100%;border-collapse:collapse;background:#1a1a2e;border-radius:12px;overflow:hidden;border:1px solid #2a2a45}
-th,td{padding:10px 14px;text-align:left;font-size:13px;border-bottom:1px solid #1e293b}
-th{background:#151528;color:#94a3b8;font-weight:500}
+.card{background:#fff;border-radius:12px;border:1px solid #e8e0d4;box-shadow:0 1px 3px rgba(0,0,0,.04);overflow:hidden}
+table{width:100%;border-collapse:collapse}
+th,td{padding:11px 16px;text-align:left;font-size:13px;border-bottom:1px solid #f0e8dc}
+th{background:#faf6f0;color:#8b8077;font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
 tr:last-child td{border:none}
-.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
-.badge-ok{background:#22c55e20;color:#22c55e}
-.badge-exp{background:#ef444420;color:#ef4444}
-.btn{padding:6px 14px;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;transition:all .2s}
-.btn-sm{background:#6366f1;color:#fff}
-.btn-sm:hover{background:#818cf8}
-.btn-danger{background:#ef444420;color:#ef4444}
-.btn-danger:hover{background:#ef444440}
-.btn-ghost{background:transparent;color:#94a3b8;border:1px solid #2a2a45}
-.btn-ghost:hover{border-color:#6366f1;color:#e2e8f0}
+tr:hover td{background:#fdf9f3}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-ok{background:#dcfce7;color:#16a34a}
+.badge-exp{background:#fee2e2;color:#dc2626}
+.btn{padding:7px 16px;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-family:inherit;font-weight:500;transition:all .15s}
+.btn-primary{background:#da7756;color:#fff}
+.btn-primary:hover{background:#c4623e}
+.btn-sm{background:#da7756;color:#fff}
+.btn-sm:hover{background:#c4623e}
+.btn-danger{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
+.btn-danger:hover{background:#fee2e2}
+.btn-ghost{background:#f5f0e8;color:#6b6560;border:1px solid #e8e0d4}
+.btn-ghost:hover{border-color:#da7756;color:#da7756}
+.btn-success{background:#dcfce7;color:#16a34a;border:1px solid #bbf7d0}
+.btn-success:hover{background:#bbf7d0}
 .toolbar{display:flex;gap:10px;margin-bottom:16px;align-items:center}
-.toolbar input,.toolbar select{background:#0c0c1d;border:1px solid #2a2a45;color:#e2e8f0;padding:8px 12px;border-radius:8px;font-size:13px;font-family:inherit;outline:none}
-.toolbar input:focus{border-color:#6366f1}
+.toolbar input{background:#fff;border:1px solid #e8e0d4;color:#2d2b27;padding:9px 14px;border-radius:8px;font-size:13px;font-family:inherit;outline:none;min-width:200px}
+.toolbar input:focus{border-color:#da7756;box-shadow:0 0 0 3px #da775615}
 .form-row{display:flex;gap:10px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
-.form-row label{width:80px;font-size:13px;color:#94a3b8;flex-shrink:0}
-.form-row input{flex:1;min-width:120px;background:#0c0c1d;border:1px solid #2a2a45;color:#e2e8f0;padding:8px 12px;border-radius:8px;font-size:13px;outline:none}
-.form-row input:focus{border-color:#6366f1}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);z-index:1000;justify-content:center;align-items:center}
+.form-row label{width:80px;font-size:13px;color:#8b8077;flex-shrink:0;font-weight:500}
+.form-row input,.form-row select{flex:1;min-width:120px;background:#fff;border:1px solid #e8e0d4;color:#2d2b27;padding:9px 14px;border-radius:8px;font-size:13px;font-family:inherit;outline:none}
+.form-row input:focus,.form-row select:focus{border-color:#da7756;box-shadow:0 0 0 3px #da775615}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(4px);z-index:1000;justify-content:center;align-items:center}
 .modal.show{display:flex}
-.modal-box{background:#1a1a2e;border:1px solid #2a2a45;border-radius:16px;padding:24px;width:92%;max-width:500px}
-.modal-box h3{margin-bottom:16px;font-size:17px}
-.modal-footer{display:flex;gap:10px;margin-top:18px;justify-content:flex-end}
-.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:10px 22px;border-radius:12px;font-size:14px;transition:transform .3s;z-index:2000}
+.modal-box{background:#fff;border-radius:16px;padding:28px;width:92%;max-width:500px;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.modal-box h3{margin-bottom:20px;font-size:17px;font-weight:600;color:#2d2b27}
+.modal-footer{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:#fff;border:1px solid #e8e0d4;color:#2d2b27;padding:10px 24px;border-radius:12px;font-size:14px;transition:transform .3s;z-index:2000;box-shadow:0 4px 12px rgba(0,0,0,.1)}
 .toast.show{transform:translateX(-50%) translateY(0)}
-.toast.ok{border-color:#22c55e;color:#22c55e}
-.toast.err{border-color:#ef4444;color:#ef4444}
-.empty{text-align:center;padding:40px;color:#475569;font-size:14px}
-.login-wrap{display:flex;justify-content:center;align-items:center;min-height:80vh}
-.login-box{background:#1a1a2e;border:1px solid #2a2a45;border-radius:16px;padding:32px;width:92%;max-width:380px;text-align:center}
-.login-box h2{font-size:20px;margin-bottom:8px;background:linear-gradient(135deg,#6366f1,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.login-box p{color:#64748b;font-size:13px;margin-bottom:24px}
-.login-box input{width:100%;background:#0c0c1d;border:1px solid #2a2a45;color:#e2e8f0;padding:10px 14px;border-radius:8px;font-size:14px;outline:none;margin-bottom:16px;text-align:center;letter-spacing:1px}
-.login-box input:focus{border-color:#6366f1}
-.login-box .btn{width:100%;padding:10px;font-size:14px}
-.login-err{color:#ef4444;font-size:13px;margin-bottom:12px;display:none}
-.settings-card{background:#1a1a2e;border:1px solid #2a2a45;border-radius:12px;padding:20px;margin-bottom:16px}
-.settings-card h3{font-size:15px;margin-bottom:16px;color:#a78bfa}
+.toast.ok{border-color:#16a34a;color:#16a34a}
+.toast.err{border-color:#dc2626;color:#dc2626}
+.empty{text-align:center;padding:48px;color:#8b8077;font-size:14px}
+.login-wrap{display:flex;justify-content:center;align-items:center;min-height:100vh;background:#f5f0e8}
+.login-box{background:#fff;border:1px solid #e8e0d4;border-radius:20px;padding:40px;width:92%;max-width:380px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.06)}
+.login-box h2{font-size:20px;font-weight:600;margin-bottom:6px;color:#2d2b27}
+.login-box p{color:#8b8077;font-size:13px;margin-bottom:28px}
+.login-box input{width:100%;background:#faf6f0;border:1px solid #e8e0d4;color:#2d2b27;padding:12px 16px;border-radius:10px;font-size:14px;outline:none;margin-bottom:16px;text-align:center;letter-spacing:1px;font-family:inherit}
+.login-box input:focus{border-color:#da7756;box-shadow:0 0 0 3px #da775615}
+.login-box .btn{width:100%;padding:12px;font-size:14px}
+.login-err{color:#dc2626;font-size:13px;margin-bottom:12px;display:none}
+.settings-card{background:#fff;border:1px solid #e8e0d4;border-radius:12px;padding:24px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.settings-card h3{font-size:15px;margin-bottom:18px;color:#da7756;font-weight:600}
 .chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-@media(max-width:700px){.chart-grid{grid-template-columns:1fr}}
-.chart-card{background:#1a1a2e;border:1px solid #2a2a45;border-radius:12px;padding:16px}
-.chart-card h4{font-size:13px;color:#94a3b8;margin-bottom:12px}
+@media(max-width:900px){.chart-grid{grid-template-columns:1fr}.sidebar{width:60px}.sidebar-brand h1,.nav-item span{display:none}.sidebar-brand{padding:16px 12px;justify-content:center}.nav-item{padding:10px;justify-content:center}.main{margin-left:60px;padding:20px 16px}}
+.chart-card{background:#fff;border:1px solid #e8e0d4;border-radius:12px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.chart-card h4{font-size:13px;color:#8b8077;margin-bottom:12px;font-weight:500}
 .chart-card canvas{width:100%!important;max-height:220px}
 .online-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
-.online-dot.on{background:#22c55e;box-shadow:0 0 6px #22c55e}
-.online-dot.off{background:#ef4444}
+.online-dot.on{background:#16a34a;box-shadow:0 0 6px #16a34a}
+.online-dot.off{background:#dc2626}
 </style>
 </head>
 <body>
 
 <div id="loginPage" class="login-wrap" style="display:none">
   <div class="login-box">
-    <svg width="48" height="48" viewBox="0 0 48 48" style="margin-bottom:16px"><defs><linearGradient id="g" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs><rect width="48" height="48" rx="12" fill="url(#g)"/><path d="M16 24h18M29 18l7 6-7 6" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div style="width:48px;height:48px;border-radius:12px;background:#da7756;display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12h10M14 6l6 6-6 6"/></svg>
+    </div>
     <h2>Tunnel Admin</h2>
-    <p>请输入管理员密钥登录</p>
+    <p>Enter admin key to continue</p>
     <div class="login-err" id="loginErr"></div>
-    <input type="password" id="loginKey" placeholder="管理员密钥" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="btn btn-sm" onclick="doLogin()">登 录</button>
+    <input type="password" id="loginKey" placeholder="Admin Key" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn btn-primary" onclick="doLogin()">Sign In</button>
   </div>
 </div>
 
-<div id="mainPage" class="app" style="display:none">
-  <div class="header">
-    <svg width="36" height="36" viewBox="0 0 48 48"><defs><linearGradient id="g2" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs><rect width="48" height="48" rx="12" fill="url(#g2)"/><path d="M16 24h18M29 18l7 6-7 6" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <h1>Tunnel Admin</h1>
-    <div class="header-right">
-      <button class="btn btn-ghost" onclick="doLogout()">退出</button>
+<div id="mainPage" class="layout" style="display:none">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="dot"></div>
+      <h1>Tunnel</h1>
     </div>
-  </div>
-
-  <div class="stats" id="stats"></div>
-
-  <div class="tabs">
-    <button class="tab active" onclick="showTab('dash',this)">仪表盘</button>
-    <button class="tab" onclick="showTab('users',this)">用户</button>
-    <button class="tab" onclick="showTab('nodes',this)">节点</button>
-    <button class="tab" onclick="showTab('plans',this)">套餐</button>
-    <button class="tab" onclick="showTab('orders',this)">订单</button>
-    <button class="tab" onclick="showTab('traffic',this)">流量</button>
-    <button class="tab" onclick="showTab('settings',this)">设置</button>
-  </div>
-
-  <div class="panel active" id="p-dash">
-    <div class="chart-grid">
-      <div class="chart-card"><h4>30天注册趋势</h4><canvas id="chartReg"></canvas></div>
-      <div class="chart-card"><h4>30天收入趋势 (¥)</h4><canvas id="chartRev"></canvas></div>
-      <div class="chart-card"><h4>30天流量趋势</h4><canvas id="chartTraffic"></canvas></div>
-      <div class="chart-card"><h4>节点连接分布</h4><canvas id="chartNodes"></canvas></div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" onclick="showTab('dash',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span>Dashboard</span>
+      </button>
+      <button class="nav-item" onclick="showTab('users',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        <span>Users</span>
+      </button>
+      <button class="nav-item" onclick="showTab('nodes',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+        <span>Nodes</span>
+      </button>
+      <button class="nav-item" onclick="showTab('plans',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+        <span>Plans</span>
+      </button>
+      <button class="nav-item" onclick="showTab('orders',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span>Orders</span>
+      </button>
+      <button class="nav-item" onclick="showTab('traffic',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span>Traffic</span>
+      </button>
+      <button class="nav-item" onclick="showTab('settings',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <span>Settings</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <button onclick="doLogout()">Sign Out</button>
     </div>
-  </div>
+  </aside>
 
-  <div class="panel" id="p-users">
-    <div class="toolbar">
-      <input id="userSearch" placeholder="搜索邮箱/ID..." oninput="renderUsers()">
-      <span style="flex:1"></span>
-      <span id="userCount" style="font-size:13px;color:#64748b"></span>
-    </div>
-    <div id="userTable"></div>
-  </div>
+  <div class="main">
+    <div class="stats" id="stats"></div>
 
-  <div class="panel" id="p-nodes">
-    <div class="toolbar">
-      <button class="btn btn-sm" onclick="showAddNode()">+ 添加节点</button>
-    </div>
-    <div id="nodeTable"></div>
-  </div>
-
-  <div class="panel" id="p-plans">
-    <div class="toolbar">
-      <button class="btn btn-sm" onclick="showAddPlan()">+ 添加套餐</button>
-    </div>
-    <div id="planTable"></div>
-  </div>
-
-  <div class="panel" id="p-orders">
-    <div id="orderTable"></div>
-  </div>
-
-  <div class="panel" id="p-traffic">
-    <div class="toolbar">
-      <input id="trafficSearch" placeholder="搜索邮箱/ID..." oninput="renderTraffic()">
-      <span style="flex:1"></span>
-      <span id="trafficTotal" style="font-size:13px;color:#64748b"></span>
-    </div>
-    <div id="trafficTable"></div>
-  </div>
-
-  <div class="panel" id="p-settings">
-    <div class="settings-card">
-      <h3>易支付 (EPay) 配置</h3>
-      <div class="form-row"><label>接口地址</label><input id="epayURL" placeholder="https://pay.example.com"></div>
-      <div class="form-row"><label>商户ID</label><input id="epayPID" placeholder="商户PID"></div>
-      <div class="form-row"><label>商户密钥</label><input id="epayKey" placeholder="商户Key"></div>
-      <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">
-        <button class="btn btn-sm" onclick="saveEPay()">保存配置</button>
+    <div class="panel active" id="p-dash">
+      <div class="chart-grid">
+        <div class="chart-card"><h4>30-Day Registrations</h4><canvas id="chartReg"></canvas></div>
+        <div class="chart-card"><h4>30-Day Revenue</h4><canvas id="chartRev"></canvas></div>
+        <div class="chart-card"><h4>30-Day Traffic</h4><canvas id="chartTraffic"></canvas></div>
+        <div class="chart-card"><h4>Node Connections</h4><canvas id="chartNodes"></canvas></div>
       </div>
     </div>
-    <div class="settings-card">
-      <h3>客户端版本管理</h3>
-      <div class="form-row"><label>版本号</label><input id="verNum" placeholder="如 1.0.1"></div>
-      <div class="form-row"><label>下载地址</label><input id="verURL" placeholder="https://example.com/client.exe"></div>
-      <div class="form-row"><label>更新说明</label><input id="verLog" placeholder="可选，更新内容"></div>
-      <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">
-        <button class="btn btn-sm" onclick="saveVersion()">保存版本</button>
+
+    <div class="panel" id="p-users">
+      <div class="toolbar">
+        <input id="userSearch" placeholder="Search email / ID..." oninput="renderUsers()">
+        <span style="flex:1"></span>
+        <span id="userCount" style="font-size:13px;color:#8b8077"></span>
+      </div>
+      <div class="card" id="userTable"></div>
+    </div>
+
+    <div class="panel" id="p-nodes">
+      <div class="toolbar">
+        <button class="btn btn-primary" onclick="showAddNode()">+ Add Node</button>
+      </div>
+      <div class="card" id="nodeTable"></div>
+    </div>
+
+    <div class="panel" id="p-plans">
+      <div class="toolbar">
+        <button class="btn btn-primary" onclick="showAddPlan()">+ Add Plan</button>
+      </div>
+      <div class="card" id="planTable"></div>
+    </div>
+
+    <div class="panel" id="p-orders">
+      <div class="card" id="orderTable"></div>
+    </div>
+
+    <div class="panel" id="p-traffic">
+      <div class="toolbar">
+        <input id="trafficSearch" placeholder="Search email / ID..." oninput="renderTraffic()">
+        <span style="flex:1"></span>
+        <span id="trafficTotal" style="font-size:13px;color:#8b8077"></span>
+      </div>
+      <div class="card" id="trafficTable"></div>
+    </div>
+
+    <div class="panel" id="p-settings">
+      <div class="settings-card">
+        <h3>EPay Configuration</h3>
+        <div class="form-row"><label>API URL</label><input id="epayURL" placeholder="https://pay.example.com"></div>
+        <div class="form-row"><label>PID</label><input id="epayPID" placeholder="Merchant PID"></div>
+        <div class="form-row"><label>Key</label><input id="epayKey" placeholder="Merchant Key"></div>
+        <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">
+          <button class="btn btn-primary" onclick="saveEPay()">Save</button>
+        </div>
+      </div>
+      <div class="settings-card">
+        <h3>Client Version</h3>
+        <div class="form-row"><label>Version</label><input id="verNum" placeholder="e.g. 1.0.1"></div>
+        <div class="form-row"><label>Download</label><input id="verURL" placeholder="https://example.com/client.exe"></div>
+        <div class="form-row"><label>Changelog</label><input id="verLog" placeholder="Optional"></div>
+        <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">
+          <button class="btn btn-primary" onclick="saveVersion()">Save</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1727,71 +1768,71 @@ tr:last-child td{border:none}
 
 <div class="modal" id="extendModal" onclick="if(event.target===this)this.classList.remove('show')">
   <div class="modal-box">
-    <h3>充值天数</h3>
-    <div class="form-row"><label>用户</label><input id="extUser" disabled></div>
-    <div class="form-row"><label>天数</label><input id="extDays" type="number" value="30" min="1"></div>
+    <h3>Add Days</h3>
+    <div class="form-row"><label>User</label><input id="extUser" disabled></div>
+    <div class="form-row"><label>Days</label><input id="extDays" type="number" value="30" min="1"></div>
     <div class="modal-footer">
-      <button class="btn" style="background:#2a2a45;color:#94a3b8" onclick="document.getElementById('extendModal').classList.remove('show')">取消</button>
-      <button class="btn btn-sm" onclick="doExtend()">确认充值</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('extendModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-primary" onclick="doExtend()">Confirm</button>
     </div>
   </div>
 </div>
 
 <div class="modal" id="nodeModal" onclick="if(event.target===this)this.classList.remove('show')">
   <div class="modal-box">
-    <h3 id="nodeModalTitle">添加节点</h3>
+    <h3 id="nodeModalTitle">Add Node</h3>
     <input type="hidden" id="nodeEditId">
-    <div class="form-row"><label>名称</label><input id="nName" placeholder="显示名称"></div>
-    <div class="form-row"><label>域名</label><input id="nAddr" placeholder="example.com"></div>
-    <div class="form-row"><label>IP</label><input id="nIP" placeholder="可选，直连IP"></div>
-    <div class="form-row"><label>PSK</label><input id="nPSK" placeholder="预共享密钥"></div>
-    <div class="form-row"><label>地区</label><input id="nRegion" placeholder="可选，如 美国"></div>
-    <div class="form-row"><label>排序</label><input id="nSort" type="number" value="0"></div>
+    <div class="form-row"><label>Name</label><input id="nName" placeholder="Display name"></div>
+    <div class="form-row"><label>Domain</label><input id="nAddr" placeholder="example.com"></div>
+    <div class="form-row"><label>IP</label><input id="nIP" placeholder="Optional"></div>
+    <div class="form-row"><label>PSK</label><input id="nPSK" placeholder="Pre-shared key"></div>
+    <div class="form-row"><label>Region</label><input id="nRegion" placeholder="e.g. US, JP"></div>
+    <div class="form-row"><label>Sort</label><input id="nSort" type="number" value="0"></div>
     <div class="modal-footer">
-      <button class="btn" style="background:#2a2a45;color:#94a3b8" onclick="document.getElementById('nodeModal').classList.remove('show')">取消</button>
-      <button class="btn btn-sm" onclick="doSaveNode()">保存</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('nodeModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-primary" onclick="doSaveNode()">Save</button>
     </div>
   </div>
 </div>
 
 <div class="modal" id="deployModal" onclick="if(event.target===this)this.classList.remove('show')">
-  <div class="modal-box" style="max-width:600px">
-    <h3>一键部署命令</h3>
-    <div class="form-row"><label>节点</label><span id="deployNodeName" style="color:#e2e8f0"></span></div>
-    <div class="form-row"><label>域名</label><span id="deployDomain" style="color:#e2e8f0"></span></div>
-    <p style="font-size:12px;color:#94a3b8;margin:8px 0">在新服务器上以 root 执行以下命令，将从 GitHub 下载脚本并自动安装：</p>
-    <textarea id="deployCmd" readonly rows="4" style="width:100%;background:#1e1e2e;color:#a5f3fc;border:1px solid #334155;border-radius:6px;padding:10px;font-family:monospace;font-size:13px;resize:none;word-break:break-all"></textarea>
-    <p style="font-size:11px;color:#64748b;margin:4px 0">安装后可运行 <code style="background:#1e1e2e;padding:2px 6px;border-radius:3px;color:#a5f3fc">tunnel-node.sh menu</code> 进入管理菜单</p>
+  <div class="modal-box" style="max-width:620px">
+    <h3>Deploy Command</h3>
+    <div class="form-row"><label>Node</label><span id="deployNodeName" style="color:#2d2b27;font-weight:500"></span></div>
+    <div class="form-row"><label>Domain</label><span id="deployDomain" style="color:#2d2b27"></span></div>
+    <p style="font-size:12px;color:#8b8077;margin:10px 0">Run as root on the target server. Downloads script from GitHub and auto-installs:</p>
+    <textarea id="deployCmd" readonly rows="4" style="width:100%;background:#1a1a2e;color:#a5f3fc;border:1px solid #e8e0d4;border-radius:8px;padding:12px;font-family:'SF Mono',monospace;font-size:12px;resize:none;word-break:break-all"></textarea>
+    <p style="font-size:11px;color:#8b8077;margin:6px 0">After install, run <code style="background:#f5f0e8;padding:2px 8px;border-radius:4px;color:#da7756;font-size:11px">tunnel-node.sh menu</code> for management</p>
     <div class="modal-footer">
-      <button class="btn" style="background:#2a2a45;color:#94a3b8" onclick="document.getElementById('deployModal').classList.remove('show')">关闭</button>
-      <button class="btn btn-sm" style="background:#059669" onclick="copyDeployCmd()">复制命令</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('deployModal').classList.remove('show')">Close</button>
+      <button class="btn btn-success" onclick="copyDeployCmd()">Copy Command</button>
     </div>
   </div>
 </div>
 
 <div class="modal" id="resetPwdModal" onclick="if(event.target===this)this.classList.remove('show')">
   <div class="modal-box">
-    <h3>重置密码</h3>
-    <div class="form-row"><label>用户</label><input id="rpUser" disabled></div>
-    <div class="form-row"><label>新密码</label><input id="rpPwd" type="text" placeholder="至少6位"></div>
+    <h3>Reset Password</h3>
+    <div class="form-row"><label>User</label><input id="rpUser" disabled></div>
+    <div class="form-row"><label>Password</label><input id="rpPwd" type="text" placeholder="Min 6 chars"></div>
     <div class="modal-footer">
-      <button class="btn" style="background:#2a2a45;color:#94a3b8" onclick="document.getElementById('resetPwdModal').classList.remove('show')">取消</button>
-      <button class="btn btn-sm" onclick="doResetPwd()">确认重置</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('resetPwdModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-primary" onclick="doResetPwd()">Reset</button>
     </div>
   </div>
 </div>
 
 <div class="modal" id="planModal" onclick="if(event.target===this)this.classList.remove('show')">
   <div class="modal-box">
-    <h3 id="planModalTitle">添加套餐</h3>
+    <h3 id="planModalTitle">Add Plan</h3>
     <input type="hidden" id="planEditId">
-    <div class="form-row"><label>名称</label><input id="pName" placeholder="如：月卡"></div>
-    <div class="form-row"><label>天数</label><input id="pDays" type="number" placeholder="30" min="1"></div>
-    <div class="form-row"><label>价格(¥)</label><input id="pPrice" type="number" placeholder="15" min="0.01" step="0.01"></div>
-    <div class="form-row"><label>启用</label><select id="pEnabled" style="flex:1;background:#0c0c1d;border:1px solid #2a2a45;color:#e2e8f0;padding:8px 12px;border-radius:8px;font-size:13px"><option value="1">启用</option><option value="0">禁用</option></select></div>
+    <div class="form-row"><label>Name</label><input id="pName" placeholder="e.g. Monthly"></div>
+    <div class="form-row"><label>Days</label><input id="pDays" type="number" placeholder="30" min="1"></div>
+    <div class="form-row"><label>Price</label><input id="pPrice" type="number" placeholder="15" min="0.01" step="0.01"></div>
+    <div class="form-row"><label>Status</label><select id="pEnabled" style="flex:1;background:#fff;border:1px solid #e8e0d4;color:#2d2b27;padding:9px 14px;border-radius:8px;font-size:13px;font-family:inherit"><option value="1">Enabled</option><option value="0">Disabled</option></select></div>
     <div class="modal-footer">
-      <button class="btn" style="background:#2a2a45;color:#94a3b8" onclick="document.getElementById('planModal').classList.remove('show')">取消</button>
-      <button class="btn btn-sm" onclick="doSavePlan()">保存</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('planModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-primary" onclick="doSavePlan()">Save</button>
     </div>
   </div>
 </div>
@@ -1822,7 +1863,7 @@ function doLogin(){
     TOKEN=d.token;
     localStorage.setItem("admin_token",TOKEN);
     showMain()
-  }).catch(function(){errEl.textContent="网络错误";errEl.style.display="block"})
+  }).catch(function(){errEl.textContent="Network error";errEl.style.display="block"})
 }
 
 function doLogout(){
@@ -1835,13 +1876,13 @@ function doLogout(){
 
 function showMain(){
   document.getElementById("loginPage").style.display="none";
-  document.getElementById("mainPage").style.display="block";
+  document.getElementById("mainPage").style.display="flex";
   loadStats();loadDashboard();loadUsers();loadNodes();loadPlans();loadOrders();loadSettings()
 }
 
 function showTab(name,btn){
   document.querySelectorAll(".panel").forEach(function(p){p.classList.remove("active")});
-  document.querySelectorAll(".tab").forEach(function(t){t.classList.remove("active")});
+  document.querySelectorAll(".nav-item").forEach(function(t){t.classList.remove("active")});
   document.getElementById("p-"+name).classList.add("active");
   btn.classList.add("active");
   if(name==="dash")loadDashboard();
@@ -1858,14 +1899,14 @@ function fmtBytes(b){if(!b||b===0)return"0 B";var u=["B","KB","MB","GB","TB"];va
 
 function loadStats(){
   H("stats").then(function(d){
-    var h='<div class="stat"><div class="stat-num">'+d.total_users+'</div><div class="stat-label">总用户</div></div>'+
-      '<div class="stat"><div class="stat-num">'+d.active_users+'</div><div class="stat-label">活跃用户</div></div>'+
-      '<div class="stat"><div class="stat-num">'+d.total_orders+'</div><div class="stat-label">总订单</div></div>'+
-      '<div class="stat"><div class="stat-num">'+d.total_nodes+'</div><div class="stat-label">节点数</div></div>';
+    var h='<div class="stat"><div class="stat-num">'+d.total_users+'</div><div class="stat-label">Total Users</div></div>'+
+      '<div class="stat"><div class="stat-num">'+d.active_users+'</div><div class="stat-label">Active</div></div>'+
+      '<div class="stat"><div class="stat-num">'+d.total_orders+'</div><div class="stat-label">Orders</div></div>'+
+      '<div class="stat"><div class="stat-num">'+d.total_nodes+'</div><div class="stat-label">Nodes</div></div>';
     document.getElementById("stats").innerHTML=h;
     H("dashboard").then(function(dd){
-      h+='<div class="stat"><div class="stat-num">'+dd.online_nodes+'</div><div class="stat-label">在线节点</div></div>';
-      h+='<div class="stat"><div class="stat-num">'+fmtBytes(dd.today_traffic)+'</div><div class="stat-label">今日流量</div></div>';
+      h+='<div class="stat"><div class="stat-num">'+dd.online_nodes+'</div><div class="stat-label">Online</div></div>';
+      h+='<div class="stat"><div class="stat-num">'+fmtBytes(dd.today_traffic)+'</div><div class="stat-label">Today Traffic</div></div>';
       document.getElementById("stats").innerHTML=h
     }).catch(function(){})
   }).catch(function(){})
@@ -1878,26 +1919,26 @@ function loadUsers(){
 function renderUsers(){
   var q=document.getElementById("userSearch").value.toLowerCase();
   var f=users.filter(function(u){return !q||String(u.id).indexOf(q)>=0||(u.email||"").toLowerCase().indexOf(q)>=0||(u.machine_id||"").toLowerCase().indexOf(q)>=0});
-  document.getElementById("userCount").textContent=f.length+"/"+users.length+" 用户";
-  if(f.length===0){document.getElementById("userTable").innerHTML='<div class="empty">暂无用户</div>';return}
+  document.getElementById("userCount").textContent=f.length+"/"+users.length+" users";
+  if(f.length===0){document.getElementById("userTable").innerHTML='<div class="empty">No users</div>';return}
   var now=Math.floor(Date.now()/1000);
-  var h='<table><tr><th>ID</th><th>邮箱/机器</th><th>状态</th><th>到期时间</th><th>注册时间</th><th>操作</th></tr>';
+  var h='<table><tr><th>ID</th><th>Email</th><th>Status</th><th>Expires</th><th>Created</th><th>Actions</th></tr>';
   f.forEach(function(u){
-    var label=u.email||(u.machine_id?"游客:"+u.machine_id.substring(0,8)+"...":"未知");
-    var st=u.disabled?"禁用":(u.expires_at>now?"活跃":"到期");
+    var label=u.email||(u.machine_id?"Guest:"+u.machine_id.substring(0,8)+"...":"Unknown");
+    var st=u.disabled?"Disabled":(u.expires_at>now?"Active":"Expired");
     var cls=u.disabled?"badge-exp":(u.expires_at>now?"badge-ok":"badge-exp");
     h+="<tr><td>"+u.id+"</td><td>"+label+"</td>";
     h+='<td><span class="badge '+cls+'">'+st+"</span></td>";
     h+="<td>"+fmtTime(u.expires_at)+"</td><td>"+fmtTime(u.created_at)+"</td>";
     h+='<td style="white-space:nowrap">';
-    h+='<button class="btn btn-sm" onclick="showExtend('+u.id+",'"+label.replace(/'/g,"")+"')\">充值</button> ";
+    h+='<button class="btn btn-sm" onclick="showExtend('+u.id+",'"+label.replace(/'/g,"")+"')\">+Days</button> ";
     if(u.disabled){
-      h+='<button class="btn btn-sm" style="background:#22c55e" onclick="toggleUser('+u.id+',false)">启用</button> '
+      h+='<button class="btn btn-success" onclick="toggleUser('+u.id+',false)">Enable</button> '
     }else{
-      h+='<button class="btn" style="background:#f59e0b20;color:#f59e0b" onclick="toggleUser('+u.id+',true)">禁用</button> '
+      h+='<button class="btn btn-ghost" onclick="toggleUser('+u.id+',true)">Disable</button> '
     }
-    if(u.email){h+='<button class="btn btn-sm" onclick="showResetPwd('+u.id+",'"+label.replace(/'/g,"")+"')\">重置密码</button> "}
-    h+='<button class="btn btn-danger" onclick="delUser('+u.id+')">删除</button>';
+    if(u.email){h+='<button class="btn btn-ghost" onclick="showResetPwd('+u.id+",'"+label.replace(/'/g,"")+"')\">Reset Pwd</button> "}
+    h+='<button class="btn btn-danger" onclick="delUser('+u.id+')">Delete</button>';
     h+="</td></tr>"
   });
   h+="</table>";
@@ -1915,23 +1956,23 @@ function doExtend(){
   var uid=parseInt(document.getElementById("extendModal").dataset.uid);
   var days=parseInt(document.getElementById("extDays").value);
   H("extend",{method:"POST",body:JSON.stringify({user_id:uid,days:days})}).then(function(d){
-    if(d.error){toast(d.error,"err")}else{toast("充值成功","ok");loadUsers();loadStats()}
+    if(d.error){toast(d.error,"err")}else{toast("Days added","ok");loadUsers();loadStats()}
     document.getElementById("extendModal").classList.remove("show")
   }).catch(function(){})
 }
 
 function toggleUser(uid,disabled){
-  var msg=disabled?"确定禁用该用户？":"确定启用该用户？";
+  var msg=disabled?"Disable this user?":"Enable this user?";
   if(!confirm(msg))return;
   H("toggle-user",{method:"POST",body:JSON.stringify({user_id:uid,disabled:disabled})}).then(function(d){
-    if(d.error){toast(d.error,"err")}else{toast(disabled?"已禁用":"已启用","ok");loadUsers()}
+    if(d.error){toast(d.error,"err")}else{toast(disabled?"Disabled":"Enabled","ok");loadUsers()}
   }).catch(function(){})
 }
 
 function delUser(uid){
-  if(!confirm("确定删除该用户？此操作不可恢复！"))return;
+  if(!confirm("Delete this user? This cannot be undone!"))return;
   H("users?id="+uid,{method:"DELETE"}).then(function(d){
-    if(d.error){toast(d.error,"err")}else{toast("已删除","ok");loadUsers();loadStats()}
+    if(d.error){toast(d.error,"err")}else{toast("Deleted","ok");loadUsers();loadStats()}
   }).catch(function(){})
 }
 
@@ -1945,9 +1986,9 @@ function showResetPwd(uid,label){
 function doResetPwd(){
   var uid=parseInt(document.getElementById("resetPwdModal").dataset.uid);
   var pwd=document.getElementById("rpPwd").value;
-  if(pwd.length<6){toast("密码至少6位","err");return}
+  if(pwd.length<6){toast("Min 6 characters","err");return}
   H("reset-password",{method:"POST",body:JSON.stringify({user_id:uid,password:pwd})}).then(function(d){
-    if(d.error){toast(d.error,"err")}else{toast("密码已重置","ok")}
+    if(d.error){toast(d.error,"err")}else{toast("Password reset","ok")}
     document.getElementById("resetPwdModal").classList.remove("show")
   }).catch(function(){})
 }
@@ -1959,24 +2000,24 @@ function loadNodes(){
 }
 
 function renderNodes(){
-  if(nodes.length===0){document.getElementById("nodeTable").innerHTML='<div class="empty">暂无节点</div>';return}
-  var h='<table><tr><th>ID</th><th>名称</th><th>域名</th><th>在线</th><th>连接数</th><th>地区</th><th>启用</th><th>操作</th></tr>';
+  if(nodes.length===0){document.getElementById("nodeTable").innerHTML='<div class="empty">No nodes</div>';return}
+  var h='<table><tr><th>ID</th><th>Name</th><th>Domain</th><th>Status</th><th>Conns</th><th>Region</th><th>Enabled</th><th>Actions</th></tr>';
   nodes.forEach(function(n){
     var online=n.online;
-    var dot='<span class="online-dot '+(online?"on":"off")+'"></span>'+(online?"在线":"离线");
-    h+="<tr><td>"+n.id+"</td><td>"+n.name+"</td><td>"+n.addr+"</td>";
+    var dot='<span class="online-dot '+(online?"on":"off")+'"></span>'+(online?"Online":"Offline");
+    h+="<tr><td>"+n.id+"</td><td>"+n.name+"</td><td style='color:#8b8077;font-size:12px'>"+n.addr+"</td>";
     h+="<td>"+dot+"</td><td>"+(n.conn_count||0)+"</td><td>"+(n.region||"-")+"</td>";
-    h+='<td><span class="badge '+(n.enabled?"badge-ok":"badge-exp")+'">'+(n.enabled?"启用":"禁用")+"</span></td>";
-    h+='<td><button class="btn btn-sm" onclick="showEditNode('+n.id+')">编辑</button> ';
-    h+='<button class="btn btn-sm" onclick="showDeploy('+n.id+')" style="background:#059669">部署</button> ';
-    h+='<button class="btn btn-danger" onclick="delNode('+n.id+')">删除</button></td></tr>'
+    h+='<td><span class="badge '+(n.enabled?"badge-ok":"badge-exp")+'">'+(n.enabled?"On":"Off")+"</span></td>";
+    h+='<td style="white-space:nowrap"><button class="btn btn-sm" onclick="showEditNode('+n.id+')">Edit</button> ';
+    h+='<button class="btn btn-success" onclick="showDeploy('+n.id+')">Deploy</button> ';
+    h+='<button class="btn btn-danger" onclick="delNode('+n.id+')">Del</button></td></tr>'
   });
   h+="</table>";
   document.getElementById("nodeTable").innerHTML=h
 }
 
 function showAddNode(){
-  document.getElementById("nodeModalTitle").textContent="添加节点";
+  document.getElementById("nodeModalTitle").textContent="Add Node";
   document.getElementById("nodeEditId").value="";
   ["nName","nAddr","nIP","nPSK","nRegion"].forEach(function(id){document.getElementById(id).value=""});
   document.getElementById("nSort").value="0";
@@ -1985,7 +2026,7 @@ function showAddNode(){
 
 function showEditNode(id){
   var n=nodes.find(function(x){return x.id===id});if(!n)return;
-  document.getElementById("nodeModalTitle").textContent="编辑节点";
+  document.getElementById("nodeModalTitle").textContent="Edit Node";
   document.getElementById("nodeEditId").value=id;
   document.getElementById("nName").value=n.name;
   document.getElementById("nAddr").value=n.addr;
@@ -2002,27 +2043,27 @@ function doSaveNode(){
   if(editId){
     data.id=parseInt(editId);
     H("nodes",{method:"PUT",body:JSON.stringify(data)}).then(function(d){
-      if(d.error){toast(d.error,"err")}else{toast("已更新","ok");loadNodes()}
+      if(d.error){toast(d.error,"err")}else{toast("Updated","ok");loadNodes()}
       document.getElementById("nodeModal").classList.remove("show")
     }).catch(function(){})
   }else{
     H("nodes",{method:"POST",body:JSON.stringify(data)}).then(function(d){
-      if(d.error){toast(d.error,"err")}else{toast("已添加","ok");loadNodes();loadStats();if(d.node)showDeploy(d.node.id)}
+      if(d.error){toast(d.error,"err")}else{toast("Added","ok");loadNodes();loadStats();if(d.node)showDeploy(d.node.id)}
       document.getElementById("nodeModal").classList.remove("show")
     }).catch(function(){})
   }
 }
 
 function delNode(id){
-  if(!confirm("确定删除此节点？"))return;
+  if(!confirm("Delete this node?"))return;
   H("nodes?id="+id,{method:"DELETE"}).then(function(d){
-    if(d.error){toast(d.error,"err")}else{toast("已删除","ok");loadNodes();loadStats()}
+    if(d.error){toast(d.error,"err")}else{toast("Deleted","ok");loadNodes();loadStats()}
   }).catch(function(){})
 }
 
 function showDeploy(id){
   var n=nodes.find(function(x){return x.id===id});
-  if(!n){toast("请先刷新节点列表","err");return}
+  if(!n){toast("Refresh nodes first","err");return}
   H("settings").then(function(s){
     var rk=s.node_report_key||"YOUR_REPORT_KEY";
     var origin=location.origin;
@@ -2038,7 +2079,7 @@ function showDeploy(id){
 function copyDeployCmd(){
   var t=document.getElementById("deployCmd");
   t.select();document.execCommand("copy");
-  toast("已复制到剪贴板","ok")
+  toast("Copied","ok")
 }
 
 function loadOrders(){
@@ -2046,8 +2087,8 @@ function loadOrders(){
 }
 
 function renderOrders(){
-  if(orders.length===0){document.getElementById("orderTable").innerHTML='<div class="empty">暂无订单</div>';return}
-  var h='<table><tr><th>ID</th><th>用户</th><th>套餐</th><th>金额</th><th>方式</th><th>状态</th><th>时间</th></tr>';
+  if(orders.length===0){document.getElementById("orderTable").innerHTML='<div class="empty">No orders</div>';return}
+  var h='<table><tr><th>ID</th><th>User</th><th>Plan</th><th>Amount</th><th>Method</th><th>Status</th><th>Time</th></tr>';
   orders.forEach(function(o){
     h+="<tr><td>"+o.id+"</td><td>"+(o.user_email||"ID:"+o.user_id)+"</td><td>"+o.plan+"</td>";
     h+="<td>"+(o.amount>0?"¥"+o.amount:"-")+"</td><td>"+(o.method||"-")+"</td>";
@@ -2063,20 +2104,20 @@ function loadPlans(){
 }
 
 function renderPlans(){
-  if(plans.length===0){document.getElementById("planTable").innerHTML='<div class="empty">暂无套餐</div>';return}
-  var h='<table><tr><th>ID</th><th>名称</th><th>天数</th><th>价格</th><th>状态</th><th>操作</th></tr>';
+  if(plans.length===0){document.getElementById("planTable").innerHTML='<div class="empty">No plans</div>';return}
+  var h='<table><tr><th>ID</th><th>Name</th><th>Days</th><th>Price</th><th>Status</th><th>Actions</th></tr>';
   plans.forEach(function(p){
-    h+="<tr><td>"+p.id+"</td><td>"+p.name+"</td><td>"+p.days+"天</td><td>¥"+p.price+"</td>";
-    h+='<td><span class="badge '+(p.enabled?"badge-ok":"badge-exp")+'">'+(p.enabled?"启用":"禁用")+"</span></td>";
-    h+='<td><button class="btn btn-sm" onclick="showEditPlan('+p.id+')">编辑</button> ';
-    h+='<button class="btn btn-danger" onclick="delPlan('+p.id+')">删除</button></td></tr>'
+    h+="<tr><td>"+p.id+"</td><td>"+p.name+"</td><td>"+p.days+"d</td><td>¥"+p.price+"</td>";
+    h+='<td><span class="badge '+(p.enabled?"badge-ok":"badge-exp")+'">'+(p.enabled?"On":"Off")+"</span></td>";
+    h+='<td><button class="btn btn-sm" onclick="showEditPlan('+p.id+')">Edit</button> ';
+    h+='<button class="btn btn-danger" onclick="delPlan('+p.id+')">Del</button></td></tr>'
   });
   h+="</table>";
   document.getElementById("planTable").innerHTML=h
 }
 
 function showAddPlan(){
-  document.getElementById("planModalTitle").textContent="添加套餐";
+  document.getElementById("planModalTitle").textContent="Add Plan";
   document.getElementById("planEditId").value="";
   document.getElementById("pName").value="";
   document.getElementById("pDays").value="";
@@ -2087,7 +2128,7 @@ function showAddPlan(){
 
 function showEditPlan(id){
   var p=plans.find(function(x){return x.id===id});if(!p)return;
-  document.getElementById("planModalTitle").textContent="编辑套餐";
+  document.getElementById("planModalTitle").textContent="Edit Plan";
   document.getElementById("planEditId").value=id;
   document.getElementById("pName").value=p.name;
   document.getElementById("pDays").value=p.days;
@@ -2099,25 +2140,25 @@ function showEditPlan(id){
 function doSavePlan(){
   var editId=document.getElementById("planEditId").value;
   var data={name:document.getElementById("pName").value.trim(),days:parseInt(document.getElementById("pDays").value)||0,price:parseFloat(document.getElementById("pPrice").value)||0,enabled:document.getElementById("pEnabled").value==="1"};
-  if(!data.name||data.days<=0||data.price<=0){toast("请填写完整信息","err");return}
+  if(!data.name||data.days<=0||data.price<=0){toast("Fill all fields","err");return}
   if(editId){
     data.id=parseInt(editId);
     H("plans",{method:"PUT",body:JSON.stringify(data)}).then(function(d){
-      if(d.error){toast(d.error,"err")}else{toast("已更新","ok");loadPlans()}
+      if(d.error){toast(d.error,"err")}else{toast("Updated","ok");loadPlans()}
       document.getElementById("planModal").classList.remove("show")
     }).catch(function(){})
   }else{
     H("plans",{method:"POST",body:JSON.stringify(data)}).then(function(d){
-      if(d.error){toast(d.error,"err")}else{toast("已添加","ok");loadPlans()}
+      if(d.error){toast(d.error,"err")}else{toast("Added","ok");loadPlans()}
       document.getElementById("planModal").classList.remove("show")
     }).catch(function(){})
   }
 }
 
 function delPlan(id){
-  if(!confirm("确定删除此套餐？"))return;
+  if(!confirm("Delete this plan?"))return;
   H("plans?id="+id,{method:"DELETE"}).then(function(d){
-    if(d.error){toast(d.error,"err")}else{toast("已删除","ok");loadPlans()}
+    if(d.error){toast(d.error,"err")}else{toast("Deleted","ok");loadPlans()}
   }).catch(function(){})
 }
 
@@ -2139,14 +2180,14 @@ function loadSettings(){
 function saveEPay(){
   var data={epay:{url:document.getElementById("epayURL").value.trim(),pid:document.getElementById("epayPID").value.trim(),key:document.getElementById("epayKey").value.trim()}};
   H("settings",{method:"PUT",body:JSON.stringify(data)}).then(function(d){
-    if(d.error){toast(d.error,"err")}else{toast("配置已保存","ok")}
+    if(d.error){toast(d.error,"err")}else{toast("Saved","ok")}
   }).catch(function(){})
 }
 
 function saveVersion(){
   var data={version:{version:document.getElementById("verNum").value.trim(),download_url:document.getElementById("verURL").value.trim(),changelog:document.getElementById("verLog").value.trim()}};
   H("settings",{method:"PUT",body:JSON.stringify(data)}).then(function(d){
-    if(d.error){toast(d.error,"err")}else{toast("版本已保存","ok")}
+    if(d.error){toast(d.error,"err")}else{toast("Saved","ok")}
   }).catch(function(){})
 }
 
@@ -2155,25 +2196,25 @@ function loadDashboard(){
   H("dashboard").then(function(d){
     var days=d.days||[];
     var labels=days.map(function(x){return x.date.substring(5)});
-    var chartOpts={responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#64748b",maxTicksLimit:10},grid:{color:"#1e293b"}},y:{ticks:{color:"#64748b"},grid:{color:"#1e293b"}}}};
+    var chartOpts={responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#8b8077",maxTicksLimit:10},grid:{color:"#e8e0d4"}},y:{ticks:{color:"#8b8077"},grid:{color:"#e8e0d4"}}}};
 
     if(charts.reg)charts.reg.destroy();
-    charts.reg=new Chart(document.getElementById("chartReg"),{type:"line",data:{labels:labels,datasets:[{data:days.map(function(x){return x.reg}),borderColor:"#6366f1",backgroundColor:"#6366f120",fill:true,tension:.3}]},options:chartOpts});
+    charts.reg=new Chart(document.getElementById("chartReg"),{type:"line",data:{labels:labels,datasets:[{data:days.map(function(x){return x.reg}),borderColor:"#da7756",backgroundColor:"#da775615",fill:true,tension:.3}]},options:chartOpts});
 
     if(charts.rev)charts.rev.destroy();
-    charts.rev=new Chart(document.getElementById("chartRev"),{type:"bar",data:{labels:labels,datasets:[{data:days.map(function(x){return x.revenue}),backgroundColor:"#22c55e80",borderColor:"#22c55e",borderWidth:1}]},options:chartOpts});
+    charts.rev=new Chart(document.getElementById("chartRev"),{type:"bar",data:{labels:labels,datasets:[{data:days.map(function(x){return x.revenue}),backgroundColor:"#16a34a40",borderColor:"#16a34a",borderWidth:1}]},options:chartOpts});
 
     if(charts.traffic)charts.traffic.destroy();
-    charts.traffic=new Chart(document.getElementById("chartTraffic"),{type:"line",data:{labels:labels,datasets:[{label:"上传",data:days.map(function(x){return x.upload/1048576}),borderColor:"#f59e0b",tension:.3},{label:"下载",data:days.map(function(x){return x.download/1048576}),borderColor:"#3b82f6",tension:.3}]},options:Object.assign({},chartOpts,{plugins:{legend:{display:true,labels:{color:"#94a3b8"}}}})});
+    charts.traffic=new Chart(document.getElementById("chartTraffic"),{type:"line",data:{labels:labels,datasets:[{label:"Upload",data:days.map(function(x){return x.upload/1048576}),borderColor:"#f59e0b",tension:.3},{label:"Download",data:days.map(function(x){return x.download/1048576}),borderColor:"#3b82f6",tension:.3}]},options:Object.assign({},chartOpts,{plugins:{legend:{display:true,labels:{color:"#8b8077"}}}})});
 
     H("node-status").then(function(nd){
       var ns=nd.nodes||[];
       var onNodes=ns.filter(function(n){return n.online});
       if(charts.nodes)charts.nodes.destroy();
       if(onNodes.length>0){
-        charts.nodes=new Chart(document.getElementById("chartNodes"),{type:"doughnut",data:{labels:onNodes.map(function(n){return n.name}),datasets:[{data:onNodes.map(function(n){return n.conn_count||0}),backgroundColor:["#6366f1","#22c55e","#f59e0b","#ef4444","#8b5cf6","#06b6d4"]}]},options:{responsive:true,plugins:{legend:{position:"bottom",labels:{color:"#94a3b8"}}}}})
+        charts.nodes=new Chart(document.getElementById("chartNodes"),{type:"doughnut",data:{labels:onNodes.map(function(n){return n.name}),datasets:[{data:onNodes.map(function(n){return n.conn_count||0}),backgroundColor:["#da7756","#16a34a","#f59e0b","#dc2626","#8b5cf6","#06b6d4"]}]},options:{responsive:true,plugins:{legend:{position:"bottom",labels:{color:"#8b8077"}}}}})
       }else{
-        document.getElementById("chartNodes").parentElement.innerHTML="<h4>节点连接分布</h4><div class='empty'>暂无在线节点</div>"
+        document.getElementById("chartNodes").parentElement.innerHTML="<h4>Node Connections</h4><div class='empty'>No online nodes</div>"
       }
     }).catch(function(){})
   }).catch(function(){})
@@ -2188,11 +2229,11 @@ function renderTraffic(){
   var f=trafficData.filter(function(t){return !q||String(t.user_id).indexOf(q)>=0||(t.email||"").toLowerCase().indexOf(q)>=0});
   var totalUp=0,totalDown=0;
   f.forEach(function(t){totalUp+=t.upload;totalDown+=t.download});
-  document.getElementById("trafficTotal").textContent="↑ "+fmtBytes(totalUp)+"  ↓ "+fmtBytes(totalDown);
-  if(f.length===0){document.getElementById("trafficTable").innerHTML='<div class="empty">暂无流量数据</div>';return}
-  var h='<table><tr><th>用户ID</th><th>邮箱</th><th>上传</th><th>下载</th><th>总计</th></tr>';
+  document.getElementById("trafficTotal").textContent="Up "+fmtBytes(totalUp)+"  Down "+fmtBytes(totalDown);
+  if(f.length===0){document.getElementById("trafficTable").innerHTML='<div class="empty">No traffic data</div>';return}
+  var h='<table><tr><th>User ID</th><th>Email</th><th>Upload</th><th>Download</th><th>Total</th></tr>';
   f.forEach(function(t){
-    h+="<tr><td>"+t.user_id+"</td><td>"+(t.email||"游客")+"</td>";
+    h+="<tr><td>"+t.user_id+"</td><td>"+(t.email||"Guest")+"</td>";
     h+="<td>"+fmtBytes(t.upload)+"</td><td>"+fmtBytes(t.download)+"</td>";
     h+="<td>"+fmtBytes(t.upload+t.download)+"</td></tr>"
   });
