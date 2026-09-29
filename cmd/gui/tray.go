@@ -1,22 +1,21 @@
 package main
 
 import (
-	"os"
-	"path/filepath"
+	_ "embed"
 
 	"github.com/getlantern/systray"
 	wailsRT "github.com/wailsapp/wails/v2/pkg/runtime"
 )
+
+//go:embed build/windows/tray.ico
+var trayIcon []byte
 
 func (a *App) startTray() {
 	systray.Run(a.onTrayReady, func() {})
 }
 
 func (a *App) onTrayReady() {
-	iconData := loadTrayIcon()
-	if iconData != nil {
-		systray.SetIcon(iconData)
-	}
+	systray.SetIcon(trayIcon)
 	systray.SetTitle("Tunnel Pro")
 	systray.SetTooltip("Tunnel Pro - Disconnected")
 
@@ -59,20 +58,4 @@ func (a *App) updateTrayTooltip(connected bool, nodeName string) {
 			a.trayDisconnect.Disable()
 		}
 	}
-}
-
-func loadTrayIcon() []byte {
-	exe, _ := os.Executable()
-	dir := filepath.Dir(exe)
-	// try tray.ico next to exe first, then in build/windows
-	for _, p := range []string{
-		filepath.Join(dir, "tray.ico"),
-		filepath.Join(dir, "..", "..", "build", "windows", "tray.ico"),
-	} {
-		data, err := os.ReadFile(p)
-		if err == nil && len(data) > 0 {
-			return data
-		}
-	}
-	return nil
 }
