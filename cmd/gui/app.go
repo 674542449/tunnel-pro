@@ -157,7 +157,7 @@ type App struct {
 	authPath       string
 	nodes          []serverConfig
 	mixedAddr      string
-	pacPath        string
+	pacURL         string
 	trayDisconnect interface{ Enable(); Disable() }
 
 	mu          sync.RWMutex
@@ -186,7 +186,7 @@ func NewApp() *App {
 	return &App{
 		authPath:  filepath.Join(dir, "auth.json"),
 		mixedAddr: "127.0.0.1:7890",
-		pacPath:   filepath.Join(dir, "proxy.pac"),
+		pacURL:    "http://127.0.0.1:7890/proxy.pac",
 		activeID:  -1,
 	}
 }
@@ -203,24 +203,24 @@ func (a *App) startup(ctx context.Context) {
 }
 
 func (a *App) cleanStaleProxy() {
-	out, err := exec.Command("reg", "query",
-		`HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings`,
-		"/v", "ProxyEnable").Output()
-	if err != nil {
-		return
+	regPath := `HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings`
+	query := func(val string) string {
+		out, err := exec.Command("reg", "query", regPath, "/v", val).Output()
+		if err != nil {
+			return ""
+		}
+		return string(out)
 	}
-	if !strings.Contains(string(out), "0x1") {
-		return
-	}
-	out, err = exec.Command("reg", "query",
-		`HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings`,
-		"/v", "ProxyServer").Output()
-	if err != nil {
-		return
-	}
-	if strings.Contains(string(out), a.mixedAddr) {
+	proxyEnable := query("ProxyEnable")
+	proxyServer := query("ProxyServer")
+	autoConfig := query("AutoConfigURL")
+	if strings.Contains(proxyEnable, "0x1") && strings.Contains(proxyServer, a.mixedAddr) {
 		clearSystemProxy()
-		log.Println("[startup] cleared stale proxy from previous session")
+		log.Println("[startup] cleared stale system proxy")
+	}
+	if strings.Contains(autoConfig, a.pacURL) {
+		clearSystemProxy()
+		log.Println("[startup] cleared stale PAC proxy")
 	}
 }
 
@@ -703,13 +703,11 @@ func (a *App) SetProxyMode(mode string) {
 func (a *App) applyProxyMode() {
 	a.stopTUN()
 	clearSystemProxy()
-	os.Remove(a.pacPath)
 
 	mode := a.GetProxyMode()
 	switch mode {
 	case "bypass":
-		a.writePAC()
-		setSystemProxyPAC(a.pacPath)
+		setSystemProxyPAC(a.pacURL)
 	case "tun":
 		go a.startTUN()
 	default:
@@ -717,8 +715,8 @@ func (a *App) applyProxyMode() {
 	}
 }
 
-func (a *App) writePAC() {
-	pac := `function FindProxyOrReturn(url, host) {
+func pacContent() string {
+	return `function FindProxyOrReturn(url, host) {
     var PROXY = "PROXY 127.0.0.1:7890; SOCKS5 127.0.0.1:7890; DIRECT";
     var DIRECT_VAL = "DIRECT";
     if (isPlainHostName(host) || host === "127.0.0.1" || host === "localhost") return DIRECT_VAL;
@@ -737,19 +735,19 @@ func (a *App) writePAC() {
         if (dnsDomainIs(host, cnDomains[i]) || host === cnDomains[i].substring(1)) return DIRECT_VAL;
     }
     var cnIpRanges = [
-        [167772160, 184549375],     // 10.0.0.0/8
-        [2886729728, 2887778303],   // 172.16.0.0/12
-        [3232235520, 3232301055],   // 192.168.0.0/16
-        [16777216, 33554431],       // 1.0.0.0 - 1.255.255.255
-        [1946157056, 2013265919],   // 116.0.0.0 - 119.255.255.255
-        [2030043136, 2046820351],   // 121.0.0.0 - 121.255.255.255
-        [2063597568, 2080374783],   // 123.0.0.0 - 123.255.255.255
-        [1811939328, 1879048191],   // 108.0.0.0 - 111.255.255.255
-        [3707764736, 3774873599],   // 221.0.0.0 - 224.255.255.255
-        [3758096384, 3825205247],   // 224.0.0.0 - 227.255.255.255
-        [637534208, 671088639],     // 38.0.0.0 - 39.255.255.255
-        [754974720, 788529151],     // 45.0.0.0 - 46.255.255.255
-        [3087007744, 3087007744+16777215]  // 184.0.0.0/8
+        [167772160, 184549375],
+        [2886729728, 2887778303],
+        [3232235520, 3232301055],
+        [16777216, 33554431],
+        [1946157056, 2013265919],
+        [2030043136, 2046820351],
+        [2063597568, 2080374783],
+        [1811939328, 1879048191],
+        [3707764736, 3774873599],
+        [3758096384, 3825205247],
+        [637534208, 671088639],
+        [754974720, 788529151],
+        [3087007744, 3087007744+16777215]
     ];
     if (/^\d+\.\d+\.\d+\.\d+$/.test(host)) {
         var parts = host.split(".");
@@ -762,16 +760,9 @@ func (a *App) writePAC() {
 }
 function FindProxyForURL(url, host) { return FindProxyOrReturn(url, host); }
 `
-	os.WriteFile(a.pacPath, []byte(pac), 0644)
 }
 
-func setSystemProxyPAC(pacPath string) {
-	abs, err := filepath.Abs(pacPath)
-	if err != nil {
-		abs = pacPath
-	}
-	absSlash := filepath.ToSlash(abs)
-	pacURL := "file:///" + absSlash
+func setSystemProxyPAC(pacURL string) {
 	log.Printf("[proxy] PAC URL: %s", pacURL)
 	regPath := `HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings`
 	run := func(args ...string) { exec.Command("reg", args...).Run() }
@@ -1143,7 +1134,6 @@ func (a *App) Disconnect() {
 		} else {
 			clearSystemProxy()
 		}
-		os.Remove(a.pacPath)
 		a.proxyOn = false
 	}
 
@@ -1276,6 +1266,11 @@ func (a *App) handleHTTP(conn net.Conn) {
 	br := bufio.NewReader(conn)
 	req, err := http.ReadRequest(br)
 	if err != nil {
+		return
+	}
+	if req.Method == "GET" && req.URL.Path == "/proxy.pac" {
+		pac := pacContent()
+		fmt.Fprintf(conn, "HTTP/1.1 200 OK\r\nContent-Type: application/x-ns-proxy-autoconfig\r\nContent-Length: %d\r\nConnection: close\r\n\r\n%s", len(pac), pac)
 		return
 	}
 	if req.Method == http.MethodConnect {

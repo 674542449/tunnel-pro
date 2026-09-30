@@ -87,6 +87,7 @@ export namespace main {
 	    name: string;
 	    days: number;
 	    price: number;
+	    traffic_limit: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new PlanInfo(source);
@@ -98,6 +99,7 @@ export namespace main {
 	        this.name = source["name"];
 	        this.days = source["days"];
 	        this.price = source["price"];
+	        this.traffic_limit = source["traffic_limit"];
 	    }
 	}
 	export class ProfileInfo {
@@ -110,6 +112,8 @@ export namespace main {
 	    trial_used: boolean;
 	    upload: number;
 	    download: number;
+	    traffic_limit: number;
+	    plan_id: number;
 	    plans: PlanInfo[];
 	
 	    static createFrom(source: any = {}) {
@@ -127,6 +131,8 @@ export namespace main {
 	        this.trial_used = source["trial_used"];
 	        this.upload = source["upload"];
 	        this.download = source["download"];
+	        this.traffic_limit = source["traffic_limit"];
+	        this.plan_id = source["plan_id"];
 	        this.plans = this.convertValues(source["plans"], PlanInfo);
 	    }
 	
