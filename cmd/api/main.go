@@ -29,17 +29,19 @@ import (
 // -------- models --------
 
 type User struct {
-	ID         int64  `json:"id"`
-	Email      string `json:"email,omitempty"`
-	PassHash   string `json:"pass_hash,omitempty"`
-	MachineID  string `json:"machine_id,omitempty"`
-	Role       string `json:"role"`
-	TrialUsed  bool   `json:"trial_used"`
-	Disabled   bool   `json:"disabled,omitempty"`
-	ExpiresAt  int64  `json:"expires_at"`
-	CreatedAt  int64  `json:"created_at"`
-	InviteCode string `json:"invite_code,omitempty"`
-	InvitedBy  int64  `json:"invited_by,omitempty"`
+	ID             int64  `json:"id"`
+	Email          string `json:"email,omitempty"`
+	PassHash       string `json:"pass_hash,omitempty"`
+	MachineID      string `json:"machine_id,omitempty"`
+	Role           string `json:"role"`
+	TrialUsed      bool   `json:"trial_used"`
+	Disabled       bool   `json:"disabled,omitempty"`
+	ExpiresAt      int64  `json:"expires_at"`
+	CreatedAt      int64  `json:"created_at"`
+	InviteCode     string `json:"invite_code,omitempty"`
+	InvitedBy      int64  `json:"invited_by,omitempty"`
+	PlanID         int64  `json:"plan_id,omitempty"`
+	TrafficResetAt int64  `json:"traffic_reset_at,omitempty"`
 }
 
 func (u User) IsActive() bool {
@@ -76,6 +78,7 @@ type Order struct {
 	ID        int64   `json:"id"`
 	UserID    int64   `json:"user_id"`
 	UserEmail string  `json:"user_email,omitempty"`
+	PlanID    int64   `json:"plan_id,omitempty"`
 	Plan      string  `json:"plan"`
 	Days      int     `json:"days"`
 	Amount    float64 `json:"amount"`
@@ -511,6 +514,19 @@ func (s *Store) GetUserTraffic() []TrafficLog {
 	out := make([]TrafficLog, len(s.data.TrafficLogs))
 	copy(out, s.data.TrafficLogs)
 	return out
+}
+
+func (s *Store) GetUserTrafficSince(userID int64, since int64) int64 {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	sinceDate := time.Unix(since, 0).Format("2006-01-02")
+	var total int64
+	for _, t := range s.data.TrafficLogs {
+		if t.UserID == userID && t.Date >= sinceDate {
+			total += t.Upload + t.Download
+		}
+	}
+	return total
 }
 
 func (s *Store) PruneTraffic(keepDays int) {
@@ -1047,6 +1063,21 @@ func (a *API) handleNodes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if u.PlanID > 0 {
+		plan := a.store.FindPlan(u.PlanID)
+		if plan != nil && plan.TrafficLimit > 0 {
+			since := u.TrafficResetAt
+			if since == 0 {
+				since = u.CreatedAt
+			}
+			used := a.store.GetUserTrafficSince(u.ID, since)
+			if used >= plan.TrafficLimit {
+				writeE(w, 403, "流量已用完，请升级套餐")
+				return
+			}
+		}
+	}
+
 	nodes := a.store.EnabledNodes()
 	out := make([]ClientNode, len(nodes))
 	for i, n := range nodes {
@@ -1137,6 +1168,7 @@ func (a *API) handleBuy(w http.ResponseWriter, r *http.Request) {
 	order := a.store.AddOrder(Order{
 		UserID:    u.ID,
 		UserEmail: u.Email,
+		PlanID:    plan.ID,
 		Plan:      plan.Name,
 		Days:      plan.Days,
 		Amount:    finalPrice,
@@ -1223,9 +1255,11 @@ func (a *API) handlePayNotify(w http.ResponseWriter, r *http.Request) {
 			base = time.Now().Unix()
 		}
 		u.ExpiresAt = base + int64(order.Days)*86400
+		u.PlanID = order.PlanID
+		u.TrafficResetAt = time.Now().Unix()
 	})
 
-	log.Printf("[pay] Order %d paid, user %d +%d days", orderID, order.UserID, order.Days)
+	log.Printf("[pay] Order %d paid, user %d +%d days, plan %d", orderID, order.UserID, order.Days, order.PlanID)
 	w.Write([]byte("success"))
 }
 
@@ -1316,16 +1350,18 @@ func (a *API) handleChangePassword(w http.ResponseWriter, r *http.Request) {
 
 func safeUser(u *User) map[string]any {
 	return map[string]any{
-		"id":          u.ID,
-		"email":       u.Email,
-		"role":        u.Role,
-		"trial_used":  u.TrialUsed,
-		"disabled":    u.Disabled,
-		"active":      u.IsActive(),
-		"expires_at":  u.ExpiresAt,
-		"created_at":  u.CreatedAt,
-		"invite_code": u.InviteCode,
-		"invited_by":  u.InvitedBy,
+		"id":               u.ID,
+		"email":            u.Email,
+		"role":             u.Role,
+		"trial_used":       u.TrialUsed,
+		"disabled":         u.Disabled,
+		"active":           u.IsActive(),
+		"expires_at":       u.ExpiresAt,
+		"created_at":       u.CreatedAt,
+		"invite_code":      u.InviteCode,
+		"invited_by":       u.InvitedBy,
+		"plan_id":          u.PlanID,
+		"traffic_reset_at": u.TrafficResetAt,
 	}
 }
 

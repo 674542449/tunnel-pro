@@ -261,7 +261,13 @@
                 <span>下载 {{ formatBytes(profile ? profile.download : 0) }}</span>
               </div>
             </div>
-            <div class="traffic-total">总计 {{ formatBytes(profile ? (profile.upload + profile.download) : 0) }}</div>
+            <div class="traffic-total">
+              总计 {{ formatBytes(profile ? (profile.upload + profile.download) : 0) }}
+              <span v-if="profile && profile.traffic_limit > 0"> / {{ formatBytes(profile.traffic_limit) }}</span>
+            </div>
+            <div v-if="profile && profile.traffic_limit > 0" class="traffic-bar-wrap">
+              <div class="traffic-bar" :style="{ width: trafficPercent + '%' }" :class="{ 'bar-warn': trafficPercent > 80 }"></div>
+            </div>
           </div>
 
           <div class="profile-section">
@@ -456,6 +462,12 @@ const avatarLetter = computed(() => {
 const avatarStyle = computed(() => {
   const idx = avatarLetter.value.charCodeAt(0) % avatarColors.length
   return { background: avatarColors[idx] }
+})
+
+const trafficPercent = computed(() => {
+  if (!profile.value || !profile.value.traffic_limit) return 0
+  const used = (profile.value.upload || 0) + (profile.value.download || 0)
+  return Math.min(100, Math.round(used / profile.value.traffic_limit * 100))
 })
 
 const expireDays = computed(() => {
@@ -938,6 +950,9 @@ a { text-decoration: none; }
 .traffic-stats { display: flex; gap: 20px; margin-bottom: 6px; }
 .traffic-item { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; }
 .traffic-total { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+.traffic-bar-wrap { height: 6px; background: var(--border); border-radius: 3px; margin-top: 8px; overflow: hidden; }
+.traffic-bar { height: 100%; background: var(--green); border-radius: 3px; transition: width .3s; }
+.traffic-bar.bar-warn { background: var(--red); }
 
 .empty-hint { font-size: 12px; color: var(--text-secondary); text-align: center; padding: 12px 0; }
 .bind-hint { font-size: 12px; color: var(--text-secondary); margin: -4px 0 8px; }

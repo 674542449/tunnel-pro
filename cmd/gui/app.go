@@ -76,23 +76,25 @@ type StatusInfo struct {
 }
 
 type ProfileInfo struct {
-	ID        int64   `json:"id"`
-	Email     string  `json:"email"`
-	Role      string  `json:"role"`
-	Active    bool    `json:"active"`
-	ExpiresAt int64   `json:"expires_at"`
-	CreatedAt int64   `json:"created_at"`
-	TrialUsed bool    `json:"trial_used"`
-	Upload    int64   `json:"upload"`
-	Download  int64   `json:"download"`
-	Plans     []PlanInfo `json:"plans"`
+	ID           int64      `json:"id"`
+	Email        string     `json:"email"`
+	Role         string     `json:"role"`
+	Active       bool       `json:"active"`
+	ExpiresAt    int64      `json:"expires_at"`
+	CreatedAt    int64      `json:"created_at"`
+	TrialUsed    bool       `json:"trial_used"`
+	Upload       int64      `json:"upload"`
+	Download     int64      `json:"download"`
+	TrafficLimit int64      `json:"traffic_limit"`
+	Plans        []PlanInfo `json:"plans"`
 }
 
 type PlanInfo struct {
-	ID    int64   `json:"id"`
-	Name  string  `json:"name"`
-	Days  int     `json:"days"`
-	Price float64 `json:"price"`
+	ID           int64   `json:"id"`
+	Name         string  `json:"name"`
+	Days         int     `json:"days"`
+	Price        float64 `json:"price"`
+	TrafficLimit int64   `json:"traffic_limit"`
 }
 
 type OrderInfo struct {
@@ -457,6 +459,7 @@ func (a *App) GetProfile() (*ProfileInfo, error) {
 			ExpiresAt int64  `json:"expires_at"`
 			CreatedAt int64  `json:"created_at"`
 			TrialUsed bool   `json:"trial_used"`
+			PlanID    int64  `json:"plan_id"`
 		} `json:"user"`
 		Plans []PlanInfo `json:"plans"`
 		Error string     `json:"error"`
@@ -479,17 +482,26 @@ func (a *App) GetProfile() (*ProfileInfo, error) {
 		download = tr.Download
 	}
 
+	var trafficLimit int64
+	for _, p := range result.Plans {
+		if p.ID == result.User.PlanID {
+			trafficLimit = p.TrafficLimit
+			break
+		}
+	}
+
 	return &ProfileInfo{
-		ID:        result.User.ID,
-		Email:     result.User.Email,
-		Role:      result.User.Role,
-		Active:    result.User.Active,
-		ExpiresAt: result.User.ExpiresAt,
-		CreatedAt: result.User.CreatedAt,
-		TrialUsed: result.User.TrialUsed,
-		Upload:    upload,
-		Download:  download,
-		Plans:     result.Plans,
+		ID:           result.User.ID,
+		Email:        result.User.Email,
+		Role:         result.User.Role,
+		Active:       result.User.Active,
+		ExpiresAt:    result.User.ExpiresAt,
+		CreatedAt:    result.User.CreatedAt,
+		TrialUsed:    result.User.TrialUsed,
+		Upload:       upload,
+		Download:     download,
+		TrafficLimit: trafficLimit,
+		Plans:        result.Plans,
 	}, nil
 }
 
