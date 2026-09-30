@@ -13,9 +13,9 @@ YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
-info()  { echo -e "${GREEN}[INFO]${NC} $1"; }
-warn()  { echo -e "${YELLOW}[WARN]${NC} $1"; }
-error() { echo -e "${RED}[ERROR]${NC} $1"; }
+info()  { echo -e "${GREEN}[OK]${NC} $1"; }
+warn()  { echo -e "${YELLOW}[!]${NC} $1"; }
+error() { echo -e "${RED}[X]${NC} $1"; }
 
 detect_arch() {
     local arch
@@ -23,23 +23,23 @@ detect_arch() {
     case "$arch" in
         x86_64|amd64) echo "amd64" ;;
         aarch64|arm64) echo "arm64" ;;
-        *) error "Unsupported architecture: $arch"; exit 1 ;;
+        *) error "不支持的架构: $arch"; exit 1 ;;
     esac
 }
 
 install_caddy() {
     if command -v caddy &>/dev/null; then
-        info "Caddy already installed, skipping"
+        info "Caddy 已安装，跳过"
         return
     fi
-    info "Installing Caddy..."
+    info "正在安装 Caddy..."
     apt-get update -qq
     apt-get install -y -qq debian-keyring debian-archive-keyring apt-transport-https curl ca-certificates
     curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg 2>/dev/null
     curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list >/dev/null
     apt-get update -qq
     apt-get install -y -qq caddy
-    info "Caddy installed"
+    info "Caddy 安装完成"
 }
 
 write_caddyfile() {
@@ -49,7 +49,7 @@ ${domain} {
     reverse_proxy 127.0.0.1:8080
 }
 CEOF
-    info "Caddyfile written for $domain"
+    info "Caddy 配置已写入 ($domain)"
 }
 
 write_server_config() {
@@ -65,7 +65,7 @@ write_server_config() {
     "report_key": "${report_key}"
 }
 JEOF
-    info "Server config written"
+    info "节点配置已写入"
 }
 
 create_service() {
@@ -85,7 +85,7 @@ WantedBy=multi-user.target
 SEOF
     systemctl daemon-reload
     systemctl enable "$SERVICE_NAME" >/dev/null 2>&1
-    info "Systemd service created"
+    info "系统服务已创建"
 }
 
 create_camouflage_page() {
@@ -102,7 +102,6 @@ HEOF
 do_install() {
     local domain="" psk="" api_url="" node_id="" report_key=""
 
-    # Parse command-line args
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --domain|-d)  domain="$2"; shift 2 ;;
@@ -114,96 +113,111 @@ do_install() {
         esac
     done
 
-    # Interactive fallback
     if [ -z "$domain" ]; then
-        echo -e "${CYAN}=== Tunnel Node Installation ===${NC}"
-        read -rp "Domain (e.g. node1.example.com): " domain
-        read -rp "PSK (pre-shared key): " psk
-        read -rp "API URL (e.g. https://admin.example.com): " api_url
-        read -rp "Node ID: " node_id
-        read -rp "Report Key: " report_key
+        echo -e "${CYAN}=== 节点安装向导 ===${NC}"
+        echo ""
+        read -rp "域名 (如 node1.example.com): " domain
+        read -rp "PSK 密钥: " psk
+        read -rp "API 地址 (如 https://admin.example.com): " api_url
+        read -rp "节点 ID: " node_id
+        read -rp "上报密钥: " report_key
     fi
 
     if [ -z "$domain" ] || [ -z "$psk" ] || [ -z "$node_id" ]; then
-        error "Missing required parameters: domain, psk, node_id"
+        error "缺少必填参数: 域名、PSK、节点ID"
         exit 1
     fi
 
     local arch
     arch=$(detect_arch)
-    info "Architecture: linux/$arch"
+    info "架构: linux/$arch"
 
-    # Stop existing service
     systemctl stop "$SERVICE_NAME" 2>/dev/null || true
     rm -f "$INSTALL_DIR/tunnel-server"
 
-    # Download binary
     local url="https://github.com/${GITHUB_REPO}/releases/latest/download/tunnel-server-linux-${arch}"
-    info "Downloading from $url ..."
+    info "正在下载节点程序..."
     mkdir -p "$INSTALL_DIR"
     if ! curl -fSL -o "$INSTALL_DIR/tunnel-server" "$url"; then
-        error "Download failed! Check network and GitHub repo."
+        error "下载失败，请检查网络"
         exit 1
     fi
     chmod +x "$INSTALL_DIR/tunnel-server"
-    info "Binary downloaded"
+    info "下载完成"
 
-    # Install Caddy
     install_caddy
 
-    # Write configs
     write_caddyfile "$domain"
     write_server_config "$psk" "$api_url" "$node_id" "$report_key"
     create_camouflage_page
 
-    # Create and start services
     create_service
     systemctl restart caddy
     systemctl restart "$SERVICE_NAME"
 
-    # Save this script locally for future management
     local script_url="https://raw.githubusercontent.com/${GITHUB_REPO}/master/scripts/tunnel-node.sh"
     curl -fsSL -o "$INSTALL_DIR/manage.sh" "$script_url" 2>/dev/null && chmod +x "$INSTALL_DIR/manage.sh"
     ln -sf "$INSTALL_DIR/manage.sh" /usr/local/bin/tunnel 2>/dev/null || true
 
     sleep 2
     if systemctl is-active --quiet "$SERVICE_NAME"; then
-        info "Installation complete! Service is running."
         echo ""
-        info "Management: run ${CYAN}tunnel${NC} to open the menu"
+        info "安装完成，节点已运行"
+        echo ""
+        echo -e "  管理命令: ${CYAN}tunnel${NC}"
+        echo ""
     else
-        error "Service failed to start. Check: journalctl -u $SERVICE_NAME -n 20"
+        error "服务启动失败，请查看日志: journalctl -u $SERVICE_NAME -n 20"
     fi
 }
 
 do_start() {
     systemctl start "$SERVICE_NAME"
-    info "Service started"
+    info "服务已启动"
 }
 
 do_stop() {
     systemctl stop "$SERVICE_NAME"
-    info "Service stopped"
+    info "服务已停止"
 }
 
 do_restart() {
     systemctl restart "$SERVICE_NAME"
-    info "Service restarted"
+    info "服务已重启"
 }
 
 do_status() {
-    echo -e "${CYAN}=== Service Status ===${NC}"
-    systemctl status "$SERVICE_NAME" --no-pager -l 2>/dev/null || warn "Service not found"
+    echo -e "${CYAN}── 节点状态 ──${NC}"
+    systemctl status "$SERVICE_NAME" --no-pager -l 2>/dev/null || warn "服务未找到"
     echo ""
-    echo -e "${CYAN}=== Caddy Status ===${NC}"
-    systemctl is-active caddy && echo -e "${GREEN}Caddy: running${NC}" || echo -e "${RED}Caddy: stopped${NC}"
+    echo -e "${CYAN}── Caddy 状态 ──${NC}"
+    systemctl is-active caddy && echo -e "${GREEN}Caddy: 运行中${NC}" || echo -e "${RED}Caddy: 已停止${NC}"
     echo ""
-    echo -e "${CYAN}=== Recent Logs (last 20 lines) ===${NC}"
+    echo -e "${CYAN}── 最近日志 ──${NC}"
     journalctl -u "$SERVICE_NAME" --no-pager -n 20 -o short 2>/dev/null || true
 }
 
+do_update() {
+    local arch
+    arch=$(detect_arch)
+    local url="https://github.com/${GITHUB_REPO}/releases/latest/download/tunnel-server-linux-${arch}"
+    info "正在下载最新版本..."
+    if ! curl -fSL -o "$INSTALL_DIR/tunnel-server.new" "$url"; then
+        error "下载失败"
+        return
+    fi
+    chmod +x "$INSTALL_DIR/tunnel-server.new"
+    systemctl stop "$SERVICE_NAME" 2>/dev/null || true
+    mv "$INSTALL_DIR/tunnel-server.new" "$INSTALL_DIR/tunnel-server"
+    systemctl start "$SERVICE_NAME"
+    info "更新完成，服务已重启"
+
+    local script_url="https://raw.githubusercontent.com/${GITHUB_REPO}/master/scripts/tunnel-node.sh"
+    curl -fsSL -o "$INSTALL_DIR/manage.sh" "$script_url" 2>/dev/null && chmod +x "$INSTALL_DIR/manage.sh"
+}
+
 do_enable_bbr() {
-    info "Enabling BBR congestion control + fq qdisc..."
+    info "正在开启 BBR 拥塞控制..."
     if ! grep -q "net.core.default_qdisc=fq" /etc/sysctl.conf 2>/dev/null; then
         cat >> /etc/sysctl.conf <<'BEOF'
 net.core.default_qdisc=fq
@@ -214,20 +228,20 @@ BEOF
     local cc
     cc=$(sysctl -n net.ipv4.tcp_congestion_control 2>/dev/null)
     if [ "$cc" = "bbr" ]; then
-        info "BBR enabled successfully (congestion control: $cc)"
+        info "BBR 已开启 (当前: $cc)"
     else
-        warn "BBR may require a kernel >= 4.9. Current: $(uname -r)"
+        warn "BBR 需要内核 >= 4.9，当前: $(uname -r)"
     fi
 }
 
 do_open_firewall() {
-    info "Opening firewall ports 80/443 (TCP+UDP)..."
+    info "正在放行 80/443 端口..."
     if command -v ufw &>/dev/null; then
         ufw allow 80/tcp >/dev/null 2>&1
         ufw allow 80/udp >/dev/null 2>&1
         ufw allow 443/tcp >/dev/null 2>&1
         ufw allow 443/udp >/dev/null 2>&1
-        info "UFW rules added"
+        info "UFW 规则已添加"
     else
         iptables -I INPUT -p tcp --dport 80 -j ACCEPT 2>/dev/null
         iptables -I INPUT -p udp --dport 80 -j ACCEPT 2>/dev/null
@@ -237,15 +251,15 @@ do_open_firewall() {
         ip6tables -I INPUT -p udp --dport 80 -j ACCEPT 2>/dev/null
         ip6tables -I INPUT -p tcp --dport 443 -j ACCEPT 2>/dev/null
         ip6tables -I INPUT -p udp --dport 443 -j ACCEPT 2>/dev/null
-        info "iptables/ip6tables rules added"
+        info "防火墙规则已添加"
     fi
 }
 
 do_uninstall() {
-    echo -e "${RED}This will remove the tunnel node completely.${NC}"
-    read -rp "Are you sure? [y/N]: " confirm
+    echo -e "${RED}即将完全卸载节点，此操作不可恢复！${NC}"
+    read -rp "确认卸载？[y/N]: " confirm
     if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
-        info "Cancelled"
+        info "已取消"
         return
     fi
 
@@ -254,59 +268,62 @@ do_uninstall() {
     rm -f "/etc/systemd/system/${SERVICE_NAME}.service"
     systemctl daemon-reload
     rm -rf "$INSTALL_DIR"
-    info "Tunnel node removed"
+    rm -f /usr/local/bin/tunnel
+    info "节点已卸载"
 
-    read -rp "Also remove Caddy? [y/N]: " remove_caddy
+    read -rp "同时卸载 Caddy？[y/N]: " remove_caddy
     if [[ "$remove_caddy" == "y" || "$remove_caddy" == "Y" ]]; then
         systemctl stop caddy 2>/dev/null || true
         apt-get remove -y caddy 2>/dev/null || true
-        info "Caddy removed"
+        info "Caddy 已卸载"
     fi
 }
 
 show_menu() {
     while true; do
         echo ""
-        echo -e "${CYAN}╔══════════════════════════════╗${NC}"
-        echo -e "${CYAN}║    Tunnel Node Management    ║${NC}"
-        echo -e "${CYAN}╚══════════════════════════════╝${NC}"
+        echo -e "${CYAN}╔════════════════════════╗${NC}"
+        echo -e "${CYAN}║     节点管理面板       ║${NC}"
+        echo -e "${CYAN}╚════════════════════════╝${NC}"
         echo ""
-        echo "  1) Install / Reinstall"
-        echo "  2) Start"
-        echo "  3) Stop"
-        echo "  4) Restart"
-        echo "  5) Status & Logs"
-        echo "  6) Enable BBR + FQ"
-        echo "  7) Open Firewall (80/443)"
-        echo "  8) Uninstall"
-        echo "  0) Exit"
+        echo "  1) 安装 / 重装"
+        echo "  2) 启动"
+        echo "  3) 停止"
+        echo "  4) 重启"
+        echo "  5) 状态 & 日志"
+        echo "  6) 更新节点"
+        echo "  7) 开启 BBR"
+        echo "  8) 放行防火墙"
+        echo "  9) 卸载"
+        echo "  0) 退出"
         echo ""
-        read -rp "Choose [0-8]: " choice
+        read -rp "请选择 [0-9]: " choice
         case "$choice" in
             1) do_install ;;
             2) do_start ;;
             3) do_stop ;;
             4) do_restart ;;
             5) do_status ;;
-            6) do_enable_bbr ;;
-            7) do_open_firewall ;;
-            8) do_uninstall ;;
-            0) echo "Bye!"; exit 0 ;;
-            *) warn "Invalid choice" ;;
+            6) do_update ;;
+            7) do_enable_bbr ;;
+            8) do_open_firewall ;;
+            9) do_uninstall ;;
+            0) echo "再见!"; exit 0 ;;
+            *) warn "无效选项" ;;
         esac
     done
 }
 
-# Entry point: CLI arg mode or interactive menu
 case "${1:-}" in
     install) shift; do_install "$@" ;;
     start)   do_start ;;
     stop)    do_stop ;;
     restart) do_restart ;;
     status)  do_status ;;
+    update)  do_update ;;
     bbr)     do_enable_bbr ;;
     firewall) do_open_firewall ;;
     uninstall) do_uninstall ;;
     menu|"")  show_menu ;;
-    *) echo "Usage: $0 {install|start|stop|restart|status|bbr|firewall|uninstall|menu}"; exit 1 ;;
+    *) echo "用法: $0 {install|start|stop|restart|status|update|bbr|firewall|uninstall|menu}"; exit 1 ;;
 esac
