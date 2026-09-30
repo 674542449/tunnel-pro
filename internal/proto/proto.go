@@ -41,6 +41,16 @@ func MakeFrame(streamID uint32, cmd byte, payload []byte) []byte {
 	return buf
 }
 
+func EncodeDataFrame(buf []byte, streamID uint32, payload []byte) []byte {
+	n := HeaderSize + len(payload)
+	buf = buf[:n]
+	binary.BigEndian.PutUint32(buf[0:4], streamID)
+	buf[4] = CmdData
+	binary.BigEndian.PutUint16(buf[5:7], 0)
+	copy(buf[HeaderSize:], payload)
+	return buf
+}
+
 func ParseFrame(data []byte) (streamID uint32, cmd byte, payload []byte, err error) {
 	if len(data) < HeaderSize {
 		return 0, 0, nil, errors.New("frame too short")

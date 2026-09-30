@@ -98,10 +98,11 @@ func (app *App) handleStream(s *mux.Stream, target string) {
 	app.connCount.Add(1)
 	defer app.connCount.Add(-1)
 
+	s.SendAck(proto.StatusOK)
+
 	remote, err := net.DialTimeout("tcp", target, 10*time.Second)
 	if err != nil {
 		log.Printf("dial %s: %v", target, err)
-		s.SendAck(proto.StatusFail)
 		return
 	}
 	defer remote.Close()
@@ -111,7 +112,6 @@ func (app *App) handleStream(s *mux.Stream, target string) {
 		tc.SetWriteBuffer(256 * 1024)
 	}
 
-	s.SendAck(proto.StatusOK)
 	log.Printf("stream: %s (user=%s)", target, s.UserID())
 
 	var up, down atomic.Int64
@@ -169,10 +169,13 @@ func (app *App) startTrafficReport() {
 	}
 }
 
+var wsBufPool sync.Pool
+
 var upgrader = websocket.Upgrader{
 	CheckOrigin:     func(r *http.Request) bool { return true },
 	ReadBufferSize:  mux.WsBufSize(),
 	WriteBufferSize: mux.WsBufSize(),
+	WriteBufferPool: &wsBufPool,
 }
 
 func main() {

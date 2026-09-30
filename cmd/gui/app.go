@@ -130,6 +130,8 @@ type serverConfig struct {
 
 const muxPoolSize = 4
 
+var wsBufPool sync.Pool
+
 type UpdateInfo struct {
 	Available bool   `json:"available"`
 	Version   string `json:"version"`
@@ -1403,6 +1405,7 @@ func dialWS(cfg serverConfig) (*websocket.Conn, error) {
 		HandshakeTimeout: 15 * time.Second,
 		ReadBufferSize:   mux.WsBufSize(),
 		WriteBufferSize:  mux.WsBufSize(),
+		WriteBufferPool:  &wsBufPool,
 		NetDialTLSContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
 			tcpConn, err := net.DialTimeout(network, dialAddr, 15*time.Second)
 			if err != nil {

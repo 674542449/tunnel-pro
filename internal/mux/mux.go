@@ -59,7 +59,11 @@ func (s *Stream) Write(p []byte) (int, error) {
 		if end > len(p) {
 			end = len(p)
 		}
-		if err := s.m.writeFrame(proto.MakeFrame(s.id, proto.CmdData, p[sent:end])); err != nil {
+		buf := framePool.Get().([]byte)
+		frame := proto.EncodeDataFrame(buf, s.id, p[sent:end])
+		err := s.m.writeFrame(frame)
+		framePool.Put(frame[:0:cap(frame)])
+		if err != nil {
 			return sent, err
 		}
 		sent = end
@@ -294,7 +298,6 @@ type MuxPool struct {
 	muxes []*Mux
 	size  int
 	dial  DialFunc
-	idx   atomic.Uint32
 }
 
 func NewMuxPool(size int, dial DialFunc) *MuxPool {
@@ -333,8 +336,15 @@ func (p *MuxPool) Get() (*Mux, error) {
 		return nil, errors.New("no connections")
 	}
 
-	i := p.idx.Add(1) % uint32(len(p.muxes))
-	return p.muxes[i], nil
+	best := p.muxes[0]
+	bestN := best.StreamCount()
+	for _, m := range p.muxes[1:] {
+		if n := m.StreamCount(); n < bestN {
+			best = m
+			bestN = n
+		}
+	}
+	return best, nil
 }
 
 func (p *MuxPool) OpenStream(host string, port uint16) (*Stream, error) {
