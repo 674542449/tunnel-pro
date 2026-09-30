@@ -279,12 +279,23 @@ do_uninstall() {
     fi
 }
 
+get_node_version() {
+    if [ -x "$INSTALL_DIR/tunnel-server" ]; then
+        "$INSTALL_DIR/tunnel-server" -version 2>/dev/null || echo "未知"
+    else
+        echo "未安装"
+    fi
+}
+
 show_menu() {
     while true; do
+        local ver
+        ver=$(get_node_version)
         echo ""
         echo -e "${CYAN}╔════════════════════════╗${NC}"
         echo -e "${CYAN}║     节点管理面板       ║${NC}"
         echo -e "${CYAN}╚════════════════════════╝${NC}"
+        echo -e "  当前版本: ${GREEN}${ver}${NC}"
         echo ""
         echo "  1) 安装 / 重装"
         echo "  2) 启动"

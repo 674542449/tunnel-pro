@@ -183,7 +183,13 @@ var upgrader = websocket.Upgrader{
 
 func main() {
 	cfgPath := flag.String("c", "server.json", "config file path")
+	showVer := flag.Bool("version", false, "print version and exit")
 	flag.Parse()
+
+	if *showVer {
+		fmt.Println(Version)
+		return
+	}
 
 	data, err := os.ReadFile(*cfgPath)
 	if err != nil {

@@ -730,7 +730,14 @@ func pacContent() string {
 "ele.me":1,"cainiao.com":1,"amap.com":1,"autonavi.com":1,"alikunlun.com":1,"tbcdn.cn":1,"mybank.cn":1,
 "163.com":1,"126.com":1,"netease.com":1,"yeah.net":1,"youdao.com":1,"nosdn.127.net":1,"lofter.com":1,
 "bytedance.com":1,"bytedance.net":1,"byteimg.com":1,"bytecdn.cn":1,"bytegoofy.com":1,
-"douyin.com":1,"toutiao.com":1,"snssdk.com":1,"pstatp.com":1,"ixigua.com":1,"feishu.cn":1,"oceanengine.com":1,"zijieapi.com":1,
+"bytetos.com":1,"ibytedtos.com":1,"byted.org":1,"bytedapm.com":1,"bytednsdoc.com":1,"bytedns.net":1,"bytedance.map":1,
+"volcengine.com":1,"volces.com":1,"volccdn.com":1,"volcvideo.com":1,"volcimagex.com":1,"volcfcdnx.com":1,
+"douyin.com":1,"douyinpic.com":1,"douyincdn.com":1,"douyinstatic.com":1,"douyinvod.com":1,"amemv.com":1,
+"toutiao.com":1,"toutiaocdn.com":1,"toutiaoimg.com":1,"toutiaostatic.com":1,"toutiaocloud.com":1,"365yg.com":1,"pstatp.com":1,
+"snssdk.com":1,"sgsnssdk.com":1,"isnssdk.com":1,"ipstatp.com":1,"ibyteimg.com":1,
+"ixigua.com":1,"xiguashipin.com":1,"huoshan.com":1,"huoshanzhibo.com":1,"pipix.com":1,
+"feishu.cn":1,"feishu.net":1,"feishucdn.com":1,"feishupkg.com":1,"larksuite.com":1,"larkusercontent.com":1,
+"oceanengine.com":1,"zijieapi.com":1,"muscdn.com":1,"musical.ly":1,
 "jd.com":1,"jd.hk":1,"360buy.com":1,"jdcloud.com":1,"jdpay.com":1,
 "bilibili.com":1,"bilivideo.com":1,"hdslb.com":1,"biliapi.net":1,"acgvideo.com":1,
 "weibo.com":1,"sina.com.cn":1,"sinaimg.cn":1,"sinajs.cn":1,"sina.com":1,"weibo.cn":1,
@@ -752,7 +759,16 @@ func pacContent() string {
 "wps.com":1,"kingsoft.com":1,"xunlei.com":1,"meizu.com":1,"lenovo.com":1,"zol.com.cn":1,
 "58.com":1,"anjuke.com":1,"lianjia.com":1,"ke.com":1,"ziroom.com":1,
 "trip.com":1,"ctrip.com":1,"qunar.com":1,"fliggy.com":1,"ly.com":1,"tuniu.com":1,
-"58.com":1,"ganji.com":1,"baixing.com":1
+"58.com":1,"ganji.com":1,"baixing.com":1,
+"cnzz.com":1,"umeng.com":1,"growingio.com":1,"sensorsdata.cn":1,
+"chinaz.com":1,"iconfont.cn":1,"bootcss.com":1,"bootcdn.cn":1,
+"coolapk.com":1,"dcloud.net.cn":1,
+"wps.cn":1,"docer.com":1,
+"huya.com":1,"douyu.com":1,"yy.com":1,
+"haosou.com":1,"so.com":1,"soso.com":1,
+"unionpay.com":1,"95516.com":1,
+"mmstat.com":1,"tanx.com":1,"alikunlun.net":1,
+"huxiu.com":1,"geekpark.net":1,"qdaily.com":1
 };
 function FindProxyForURL(url,host){
   if(isPlainHostName(host)||host==="127.0.0.1"||host==="localhost")return "DIRECT";
