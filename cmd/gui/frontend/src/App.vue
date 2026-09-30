@@ -180,7 +180,7 @@ const regionNameMap = {
 
 function flagUrl(region) {
   const code = (region || '').toLowerCase()
-  return code ? `https://flagcdn.com/w40/${code}.svg` : ''
+  return code ? `https://flagcdn.com/w40/${code}.png` : ''
 }
 function regionName(region) {
   return regionNameMap[(region || '').toUpperCase()] || region || ''
