@@ -18,9 +18,15 @@ export function CopyToClipboard(arg1:string):Promise<void>;
 
 export function Disconnect():Promise<void>;
 
+export function GetAnnouncements():Promise<Array<main.AnnouncementInfo>>;
+
+export function GetConnLog():Promise<Array<main.ConnLogEntry>>;
+
 export function GetDarkMode():Promise<any>;
 
 export function GetFavorites():Promise<Array<number>>;
+
+export function GetKillSwitch():Promise<boolean>;
 
 export function GetLastNodeID():Promise<number>;
 
@@ -54,9 +60,11 @@ export function Logout():Promise<void>;
 
 export function OpenURL(arg1:string):Promise<void>;
 
-export function Register(arg1:string,arg2:string):Promise<void>;
+export function Register(arg1:string,arg2:string,arg3:string):Promise<void>;
 
 export function SetDarkMode(arg1:boolean):Promise<void>;
+
+export function SetKillSwitch(arg1:boolean):Promise<void>;
 
 export function SetProxyMode(arg1:string):Promise<void>;
 

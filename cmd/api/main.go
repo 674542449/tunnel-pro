@@ -29,15 +29,17 @@ import (
 // -------- models --------
 
 type User struct {
-	ID        int64  `json:"id"`
-	Email     string `json:"email,omitempty"`
-	PassHash  string `json:"pass_hash,omitempty"`
-	MachineID string `json:"machine_id,omitempty"`
-	Role      string `json:"role"`
-	TrialUsed bool   `json:"trial_used"`
-	Disabled  bool   `json:"disabled,omitempty"`
-	ExpiresAt int64  `json:"expires_at"`
-	CreatedAt int64  `json:"created_at"`
+	ID         int64  `json:"id"`
+	Email      string `json:"email,omitempty"`
+	PassHash   string `json:"pass_hash,omitempty"`
+	MachineID  string `json:"machine_id,omitempty"`
+	Role       string `json:"role"`
+	TrialUsed  bool   `json:"trial_used"`
+	Disabled   bool   `json:"disabled,omitempty"`
+	ExpiresAt  int64  `json:"expires_at"`
+	CreatedAt  int64  `json:"created_at"`
+	InviteCode string `json:"invite_code,omitempty"`
+	InvitedBy  int64  `json:"invited_by,omitempty"`
 }
 
 func (u User) IsActive() bool {
@@ -84,11 +86,14 @@ type Order struct {
 }
 
 type Plan struct {
-	ID      int64   `json:"id"`
-	Name    string  `json:"name"`
-	Days    int     `json:"days"`
-	Price   float64 `json:"price"`
-	Enabled bool    `json:"enabled"`
+	ID           int64   `json:"id"`
+	Name         string  `json:"name"`
+	Days         int     `json:"days"`
+	Price        float64 `json:"price"`
+	TrafficLimit int64   `json:"traffic_limit"` // bytes, 0=unlimited
+	SpeedLimit   int     `json:"speed_limit"`   // Mbps, 0=unlimited
+	DeviceLimit  int     `json:"device_limit"`  // 0=unlimited
+	Enabled      bool    `json:"enabled"`
 }
 
 type TrafficLog struct {
@@ -97,6 +102,28 @@ type TrafficLog struct {
 	Date     string `json:"date"`
 	Upload   int64  `json:"upload"`
 	Download int64  `json:"download"`
+}
+
+type Coupon struct {
+	ID        int64   `json:"id"`
+	Code      string  `json:"code"`
+	Type      string  `json:"type"`       // "percent" or "fixed"
+	Value     float64 `json:"value"`      // percent(10=10%) or fixed amount
+	PlanID    int64   `json:"plan_id"`    // 0=all plans
+	MaxUses   int     `json:"max_uses"`   // 0=unlimited
+	Used      int     `json:"used"`
+	ExpiresAt int64   `json:"expires_at"` // 0=no expiry
+	Enabled   bool    `json:"enabled"`
+	CreatedAt int64   `json:"created_at"`
+}
+
+type Announcement struct {
+	ID        int64  `json:"id"`
+	Title     string `json:"title"`
+	Content   string `json:"content"`
+	Level     string `json:"level"` // "info", "warning", "urgent"
+	Enabled   bool   `json:"enabled"`
+	CreatedAt int64  `json:"created_at"`
 }
 
 // -------- store --------
@@ -108,15 +135,18 @@ type EPay struct {
 }
 
 type StoreData struct {
-	Users   []User      `json:"users"`
-	Nodes   []Node      `json:"nodes"`
-	Orders  []Order     `json:"orders"`
-	Plans   []Plan      `json:"plans"`
-	NextID  int64       `json:"next_id"`
-	Secret  string      `json:"secret"`
-	EPay    EPay        `json:"epay"`
-	Version     VersionInfo  `json:"version"`
-	TrafficLogs []TrafficLog `json:"traffic_logs,omitempty"`
+	Users         []User         `json:"users"`
+	Nodes         []Node         `json:"nodes"`
+	Orders        []Order        `json:"orders"`
+	Plans         []Plan         `json:"plans"`
+	Coupons       []Coupon       `json:"coupons,omitempty"`
+	Announcements []Announcement `json:"announcements,omitempty"`
+	NextID        int64          `json:"next_id"`
+	Secret        string         `json:"secret"`
+	EPay          EPay           `json:"epay"`
+	Version       VersionInfo    `json:"version"`
+	TrafficLogs   []TrafficLog   `json:"traffic_logs,omitempty"`
+	InviteReward  int            `json:"invite_reward"` // days reward for both parties
 }
 
 type Store struct {
@@ -161,6 +191,17 @@ func (s *Store) flush() {
 	os.WriteFile(s.path, data, 0600)
 }
 
+func genInviteCode() string {
+	const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+	buf := make([]byte, 8)
+	rand.Read(buf)
+	code := make([]byte, 8)
+	for i := range code {
+		code[i] = chars[int(buf[i])%len(chars)]
+	}
+	return string(code)
+}
+
 func (s *Store) CreateUser(email, password, machineID, role string) (*User, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -178,16 +219,28 @@ func (s *Store) CreateUser(email, password, machineID, role string) (*User, erro
 		hash = string(h)
 	}
 	u := User{
-		ID:        s.nextID(),
-		Email:     email,
-		PassHash:  hash,
-		MachineID: machineID,
-		Role:      role,
-		CreatedAt: time.Now().Unix(),
+		ID:         s.nextID(),
+		Email:      email,
+		PassHash:   hash,
+		MachineID:  machineID,
+		Role:       role,
+		CreatedAt:  time.Now().Unix(),
+		InviteCode: genInviteCode(),
 	}
 	s.data.Users = append(s.data.Users, u)
 	s.flush()
 	return &u, nil
+}
+
+func (s *Store) FindByInviteCode(code string) *User {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	for i := range s.data.Users {
+		if s.data.Users[i].InviteCode == code {
+			return &s.data.Users[i]
+		}
+	}
+	return nil
 }
 
 func (s *Store) FindByEmail(email string) *User {
@@ -476,6 +529,150 @@ func (s *Store) PruneTraffic(keepDays int) {
 	}
 }
 
+// -------- coupon store --------
+
+func (s *Store) AllCoupons() []Coupon {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	out := make([]Coupon, len(s.data.Coupons))
+	copy(out, s.data.Coupons)
+	return out
+}
+
+func (s *Store) FindCouponByCode(code string) *Coupon {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	for i := range s.data.Coupons {
+		if s.data.Coupons[i].Code == code {
+			c := s.data.Coupons[i]
+			return &c
+		}
+	}
+	return nil
+}
+
+func (s *Store) AddCoupon(c Coupon) Coupon {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	c.ID = s.nextID()
+	c.CreatedAt = time.Now().Unix()
+	s.data.Coupons = append(s.data.Coupons, c)
+	s.flush()
+	return c
+}
+
+func (s *Store) UpdateCoupon(id int64, fn func(*Coupon)) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for i := range s.data.Coupons {
+		if s.data.Coupons[i].ID == id {
+			fn(&s.data.Coupons[i])
+			s.flush()
+			return true
+		}
+	}
+	return false
+}
+
+func (s *Store) DeleteCoupon(id int64) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for i := range s.data.Coupons {
+		if s.data.Coupons[i].ID == id {
+			s.data.Coupons = append(s.data.Coupons[:i], s.data.Coupons[i+1:]...)
+			s.flush()
+			return true
+		}
+	}
+	return false
+}
+
+func (s *Store) UseCoupon(id int64) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for i := range s.data.Coupons {
+		if s.data.Coupons[i].ID == id {
+			s.data.Coupons[i].Used++
+			s.flush()
+			return
+		}
+	}
+}
+
+// -------- announcement store --------
+
+func (s *Store) AllAnnouncements() []Announcement {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	out := make([]Announcement, len(s.data.Announcements))
+	copy(out, s.data.Announcements)
+	return out
+}
+
+func (s *Store) EnabledAnnouncements() []Announcement {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	var out []Announcement
+	for _, a := range s.data.Announcements {
+		if a.Enabled {
+			out = append(out, a)
+		}
+	}
+	return out
+}
+
+func (s *Store) AddAnnouncement(a Announcement) Announcement {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	a.ID = s.nextID()
+	a.CreatedAt = time.Now().Unix()
+	s.data.Announcements = append(s.data.Announcements, a)
+	s.flush()
+	return a
+}
+
+func (s *Store) UpdateAnnouncement(id int64, fn func(*Announcement)) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for i := range s.data.Announcements {
+		if s.data.Announcements[i].ID == id {
+			fn(&s.data.Announcements[i])
+			s.flush()
+			return true
+		}
+	}
+	return false
+}
+
+func (s *Store) DeleteAnnouncement(id int64) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for i := range s.data.Announcements {
+		if s.data.Announcements[i].ID == id {
+			s.data.Announcements = append(s.data.Announcements[:i], s.data.Announcements[i+1:]...)
+			s.flush()
+			return true
+		}
+	}
+	return false
+}
+
+func (s *Store) GetInviteReward() int {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	if s.data.InviteReward <= 0 {
+		return 3
+	}
+	return s.data.InviteReward
+}
+
+func (s *Store) SetInviteReward(days int) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.data.InviteReward = days
+	s.flush()
+}
+
 func (s *Store) GetEPay() EPay {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -636,14 +833,16 @@ func writeE(w http.ResponseWriter, code int, msg string) {
 	json.NewEncoder(w).Encode(map[string]string{"error": msg})
 }
 
-// POST /api/register {email, password}
+// POST /api/register {email, password, invite_code?}
 func (a *API) handleRegister(w http.ResponseWriter, r *http.Request) {
 	var body struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
+		Email      string `json:"email"`
+		Password   string `json:"password"`
+		InviteCode string `json:"invite_code"`
 	}
 	json.NewDecoder(r.Body).Decode(&body)
 	body.Email = strings.TrimSpace(body.Email)
+	body.InviteCode = strings.TrimSpace(strings.ToUpper(body.InviteCode))
 
 	if body.Email == "" || body.Password == "" {
 		writeE(w, 400, "邮箱和密码不能为空")
@@ -652,6 +851,15 @@ func (a *API) handleRegister(w http.ResponseWriter, r *http.Request) {
 	if len(body.Password) < 6 {
 		writeE(w, 400, "密码至少6位")
 		return
+	}
+
+	var inviter *User
+	if body.InviteCode != "" {
+		inviter = a.store.FindByInviteCode(body.InviteCode)
+		if inviter == nil {
+			writeE(w, 400, "邀请码无效")
+			return
+		}
 	}
 
 	u, err := a.store.CreateUser(body.Email, body.Password, "", "user")
@@ -667,9 +875,31 @@ func (a *API) handleRegister(w http.ResponseWriter, r *http.Request) {
 	a.store.UpdateUser(u.ID, func(u *User) {
 		u.TrialUsed = true
 		u.ExpiresAt = time.Now().Add(time.Duration(hours) * time.Hour).Unix()
+		if inviter != nil {
+			u.InvitedBy = inviter.ID
+		}
 	})
-	u = a.store.FindByID(u.ID)
 
+	if inviter != nil {
+		reward := a.store.GetInviteReward()
+		a.store.UpdateUser(u.ID, func(u *User) {
+			base := u.ExpiresAt
+			if base < time.Now().Unix() {
+				base = time.Now().Unix()
+			}
+			u.ExpiresAt = base + int64(reward)*86400
+		})
+		a.store.UpdateUser(inviter.ID, func(u *User) {
+			base := u.ExpiresAt
+			if base < time.Now().Unix() {
+				base = time.Now().Unix()
+			}
+			u.ExpiresAt = base + int64(reward)*86400
+		})
+		log.Printf("[invite] user %d invited by %d, both +%d days", u.ID, inviter.ID, reward)
+	}
+
+	u = a.store.FindByID(u.ID)
 	token := a.makeToken(u, 720)
 	writeJ(w, map[string]any{"token": token, "user": safeUser(u)})
 }
@@ -849,7 +1079,7 @@ func epaySign(params map[string]string, key string) string {
 	return hex.EncodeToString(h[:])
 }
 
-// POST /api/buy {plan_id}
+// POST /api/buy {plan_id, coupon_code?}
 func (a *API) handleBuy(w http.ResponseWriter, r *http.Request) {
 	u, err := a.authUser(r)
 	if err != nil {
@@ -862,7 +1092,8 @@ func (a *API) handleBuy(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var body struct {
-		PlanID int64 `json:"plan_id"`
+		PlanID     int64  `json:"plan_id"`
+		CouponCode string `json:"coupon_code"`
 	}
 	json.NewDecoder(r.Body).Decode(&body)
 
@@ -872,15 +1103,50 @@ func (a *API) handleBuy(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	finalPrice := plan.Price
+	var couponID int64
+	if code := strings.TrimSpace(body.CouponCode); code != "" {
+		c := a.store.FindCouponByCode(code)
+		if c == nil || !c.Enabled {
+			writeE(w, 400, "优惠券无效")
+			return
+		}
+		if c.ExpiresAt > 0 && time.Now().Unix() > c.ExpiresAt {
+			writeE(w, 400, "优惠券已过期")
+			return
+		}
+		if c.MaxUses > 0 && c.Used >= c.MaxUses {
+			writeE(w, 400, "优惠券已用完")
+			return
+		}
+		if c.PlanID > 0 && c.PlanID != plan.ID {
+			writeE(w, 400, "优惠券不适用于此套餐")
+			return
+		}
+		if c.Type == "percent" {
+			finalPrice = plan.Price * (100 - c.Value) / 100
+		} else {
+			finalPrice = plan.Price - c.Value
+		}
+		if finalPrice < 0 {
+			finalPrice = 0
+		}
+		couponID = c.ID
+	}
+
 	order := a.store.AddOrder(Order{
 		UserID:    u.ID,
 		UserEmail: u.Email,
 		Plan:      plan.Name,
 		Days:      plan.Days,
-		Amount:    plan.Price,
+		Amount:    finalPrice,
 		Status:    "pending",
 		Method:    "epay",
 	})
+
+	if couponID > 0 {
+		a.store.UseCoupon(couponID)
+	}
 
 	ep := a.store.GetEPay()
 	if ep.URL == "" {
@@ -1050,14 +1316,16 @@ func (a *API) handleChangePassword(w http.ResponseWriter, r *http.Request) {
 
 func safeUser(u *User) map[string]any {
 	return map[string]any{
-		"id":         u.ID,
-		"email":      u.Email,
-		"role":       u.Role,
-		"trial_used": u.TrialUsed,
-		"disabled":   u.Disabled,
-		"active":     u.IsActive(),
-		"expires_at": u.ExpiresAt,
-		"created_at": u.CreatedAt,
+		"id":          u.ID,
+		"email":       u.Email,
+		"role":        u.Role,
+		"trial_used":  u.TrialUsed,
+		"disabled":    u.Disabled,
+		"active":      u.IsActive(),
+		"expires_at":  u.ExpiresAt,
+		"created_at":  u.CreatedAt,
+		"invite_code": u.InviteCode,
+		"invited_by":  u.InvitedBy,
 	}
 }
 
@@ -1282,11 +1550,14 @@ func (a *API) adminPlans(w http.ResponseWriter, r *http.Request) {
 
 	case "PUT":
 		var body struct {
-			ID      int64   `json:"id"`
-			Name    string  `json:"name"`
-			Days    int     `json:"days"`
-			Price   float64 `json:"price"`
-			Enabled bool    `json:"enabled"`
+			ID           int64   `json:"id"`
+			Name         string  `json:"name"`
+			Days         int     `json:"days"`
+			Price        float64 `json:"price"`
+			TrafficLimit int64   `json:"traffic_limit"`
+			SpeedLimit   int     `json:"speed_limit"`
+			DeviceLimit  int     `json:"device_limit"`
+			Enabled      bool    `json:"enabled"`
 		}
 		json.NewDecoder(r.Body).Decode(&body)
 		ok := a.store.UpdatePlan(body.ID, func(p *Plan) {
@@ -1299,6 +1570,9 @@ func (a *API) adminPlans(w http.ResponseWriter, r *http.Request) {
 			if body.Price > 0 {
 				p.Price = body.Price
 			}
+			p.TrafficLimit = body.TrafficLimit
+			p.SpeedLimit = body.SpeedLimit
+			p.DeviceLimit = body.DeviceLimit
 			p.Enabled = body.Enabled
 		})
 		if !ok {
@@ -1578,6 +1852,258 @@ func (a *API) adminUserTraffic(w http.ResponseWriter, r *http.Request) {
 	writeJ(w, map[string]any{"traffic": out})
 }
 
+// -------- admin coupon handlers --------
+
+func (a *API) adminCoupons(w http.ResponseWriter, r *http.Request) {
+	if !a.adminGuard(w, r) {
+		return
+	}
+	switch r.Method {
+	case "GET":
+		writeJ(w, map[string]any{"coupons": a.store.AllCoupons()})
+	case "POST":
+		var c Coupon
+		json.NewDecoder(r.Body).Decode(&c)
+		if c.Code == "" || c.Value <= 0 {
+			writeE(w, 400, "码和折扣值必填")
+			return
+		}
+		c.Code = strings.ToUpper(strings.TrimSpace(c.Code))
+		if existing := a.store.FindCouponByCode(c.Code); existing != nil {
+			writeE(w, 400, "优惠码已存在")
+			return
+		}
+		c.Enabled = true
+		c = a.store.AddCoupon(c)
+		writeJ(w, map[string]any{"ok": true, "coupon": c})
+	case "PUT":
+		var body struct {
+			ID        int64   `json:"id"`
+			Code      string  `json:"code"`
+			Type      string  `json:"type"`
+			Value     float64 `json:"value"`
+			PlanID    int64   `json:"plan_id"`
+			MaxUses   int     `json:"max_uses"`
+			ExpiresAt int64   `json:"expires_at"`
+			Enabled   bool    `json:"enabled"`
+		}
+		json.NewDecoder(r.Body).Decode(&body)
+		ok := a.store.UpdateCoupon(body.ID, func(c *Coupon) {
+			if body.Code != "" {
+				c.Code = strings.ToUpper(strings.TrimSpace(body.Code))
+			}
+			if body.Type != "" {
+				c.Type = body.Type
+			}
+			if body.Value > 0 {
+				c.Value = body.Value
+			}
+			c.PlanID = body.PlanID
+			c.MaxUses = body.MaxUses
+			c.ExpiresAt = body.ExpiresAt
+			c.Enabled = body.Enabled
+		})
+		if !ok {
+			writeE(w, 404, "优惠券不存在")
+			return
+		}
+		writeJ(w, map[string]bool{"ok": true})
+	case "DELETE":
+		id, _ := strconv.ParseInt(r.URL.Query().Get("id"), 10, 64)
+		if !a.store.DeleteCoupon(id) {
+			writeE(w, 404, "优惠券不存在")
+			return
+		}
+		writeJ(w, map[string]bool{"ok": true})
+	}
+}
+
+// -------- admin announcement handlers --------
+
+func (a *API) adminAnnouncements(w http.ResponseWriter, r *http.Request) {
+	if !a.adminGuard(w, r) {
+		return
+	}
+	switch r.Method {
+	case "GET":
+		writeJ(w, map[string]any{"announcements": a.store.AllAnnouncements()})
+	case "POST":
+		var ann Announcement
+		json.NewDecoder(r.Body).Decode(&ann)
+		if ann.Title == "" || ann.Content == "" {
+			writeE(w, 400, "标题和内容必填")
+			return
+		}
+		if ann.Level == "" {
+			ann.Level = "info"
+		}
+		ann.Enabled = true
+		ann = a.store.AddAnnouncement(ann)
+		writeJ(w, map[string]any{"ok": true, "announcement": ann})
+	case "PUT":
+		var body struct {
+			ID      int64  `json:"id"`
+			Title   string `json:"title"`
+			Content string `json:"content"`
+			Level   string `json:"level"`
+			Enabled bool   `json:"enabled"`
+		}
+		json.NewDecoder(r.Body).Decode(&body)
+		ok := a.store.UpdateAnnouncement(body.ID, func(a *Announcement) {
+			if body.Title != "" {
+				a.Title = body.Title
+			}
+			if body.Content != "" {
+				a.Content = body.Content
+			}
+			if body.Level != "" {
+				a.Level = body.Level
+			}
+			a.Enabled = body.Enabled
+		})
+		if !ok {
+			writeE(w, 404, "公告不存在")
+			return
+		}
+		writeJ(w, map[string]bool{"ok": true})
+	case "DELETE":
+		id, _ := strconv.ParseInt(r.URL.Query().Get("id"), 10, 64)
+		if !a.store.DeleteAnnouncement(id) {
+			writeE(w, 404, "公告不存在")
+			return
+		}
+		writeJ(w, map[string]bool{"ok": true})
+	}
+}
+
+// GET /api/announcements (client-facing)
+func (a *API) handleAnnouncements(w http.ResponseWriter, r *http.Request) {
+	writeJ(w, map[string]any{"announcements": a.store.EnabledAnnouncements()})
+}
+
+// GET /api/admin/export-users
+func (a *API) adminExportUsers(w http.ResponseWriter, r *http.Request) {
+	if !a.adminGuard(w, r) {
+		return
+	}
+	users := a.store.AllUsers()
+	w.Header().Set("Content-Type", "text/csv; charset=utf-8")
+	w.Header().Set("Content-Disposition", "attachment; filename=users.csv")
+	w.Write([]byte("\xEF\xBB\xBF"))
+	w.Write([]byte("ID,邮箱,机器ID,角色,状态,到期时间,注册时间,邀请码,邀请人ID\n"))
+	now := time.Now().Unix()
+	for _, u := range users {
+		status := "已过期"
+		if u.Disabled {
+			status = "已禁用"
+		} else if u.ExpiresAt > now {
+			status = "活跃"
+		}
+		email := u.Email
+		if email == "" {
+			email = "游客"
+		}
+		fmt.Fprintf(w, "%d,%s,%s,%s,%s,%s,%s,%s,%d\n",
+			u.ID, email, u.MachineID, u.Role, status,
+			time.Unix(u.ExpiresAt, 0).Format("2006-01-02 15:04"),
+			time.Unix(u.CreatedAt, 0).Format("2006-01-02 15:04"),
+			u.InviteCode, u.InvitedBy,
+		)
+	}
+}
+
+// GET /api/admin/export-orders
+func (a *API) adminExportOrders(w http.ResponseWriter, r *http.Request) {
+	if !a.adminGuard(w, r) {
+		return
+	}
+	orders := a.store.AllOrders()
+	w.Header().Set("Content-Type", "text/csv; charset=utf-8")
+	w.Header().Set("Content-Disposition", "attachment; filename=orders.csv")
+	w.Write([]byte("\xEF\xBB\xBF"))
+	w.Write([]byte("ID,用户ID,邮箱,套餐,天数,金额,状态,支付方式,创建时间,支付时间\n"))
+	for _, o := range orders {
+		fmt.Fprintf(w, "%d,%d,%s,%s,%d,%.2f,%s,%s,%s,%s\n",
+			o.ID, o.UserID, o.UserEmail, o.Plan, o.Days, o.Amount, o.Status, o.Method,
+			time.Unix(o.CreatedAt, 0).Format("2006-01-02 15:04"),
+			func() string {
+				if o.PaidAt > 0 {
+					return time.Unix(o.PaidAt, 0).Format("2006-01-02 15:04")
+				}
+				return "-"
+			}(),
+		)
+	}
+}
+
+// admin settings for invite reward
+func (a *API) adminInviteSettings(w http.ResponseWriter, r *http.Request) {
+	if !a.adminGuard(w, r) {
+		return
+	}
+	switch r.Method {
+	case "GET":
+		writeJ(w, map[string]any{"invite_reward": a.store.GetInviteReward()})
+	case "PUT":
+		var body struct {
+			Days int `json:"days"`
+		}
+		json.NewDecoder(r.Body).Decode(&body)
+		if body.Days <= 0 {
+			writeE(w, 400, "天数无效")
+			return
+		}
+		a.store.SetInviteReward(body.Days)
+		writeJ(w, map[string]bool{"ok": true})
+	}
+}
+
+// POST /api/check-coupon {code, plan_id}
+func (a *API) handleCheckCoupon(w http.ResponseWriter, r *http.Request) {
+	var body struct {
+		Code   string `json:"code"`
+		PlanID int64  `json:"plan_id"`
+	}
+	json.NewDecoder(r.Body).Decode(&body)
+	code := strings.TrimSpace(strings.ToUpper(body.Code))
+	if code == "" {
+		writeE(w, 400, "请输入优惠码")
+		return
+	}
+	c := a.store.FindCouponByCode(code)
+	if c == nil || !c.Enabled {
+		writeE(w, 400, "优惠码无效")
+		return
+	}
+	if c.ExpiresAt > 0 && time.Now().Unix() > c.ExpiresAt {
+		writeE(w, 400, "优惠码已过期")
+		return
+	}
+	if c.MaxUses > 0 && c.Used >= c.MaxUses {
+		writeE(w, 400, "优惠码已用完")
+		return
+	}
+	if c.PlanID > 0 && c.PlanID != body.PlanID {
+		writeE(w, 400, "优惠码不适用于此套餐")
+		return
+	}
+	plan := a.store.FindPlan(body.PlanID)
+	if plan == nil {
+		writeE(w, 400, "套餐不存在")
+		return
+	}
+	var discount float64
+	if c.Type == "percent" {
+		discount = plan.Price * c.Value / 100
+	} else {
+		discount = c.Value
+	}
+	if discount > plan.Price {
+		discount = plan.Price
+	}
+	writeJ(w, map[string]any{"valid": true, "discount": discount, "final_price": plan.Price - discount, "type": c.Type, "value": c.Value})
+}
+
 // -------- admin panel --------
 
 func (a *API) serveAdmin(w http.ResponseWriter, r *http.Request) {
@@ -1661,6 +2187,14 @@ func main() {
 	mux.HandleFunc("GET /api/admin/orders", api.adminOrders)
 	mux.HandleFunc("/api/admin/plans", api.adminPlans)
 	mux.HandleFunc("/api/admin/settings", api.adminSettings)
+	mux.HandleFunc("/api/admin/coupons", api.adminCoupons)
+	mux.HandleFunc("/api/admin/announcements", api.adminAnnouncements)
+	mux.HandleFunc("/api/admin/invite-settings", api.adminInviteSettings)
+	mux.HandleFunc("GET /api/admin/export-users", api.adminExportUsers)
+	mux.HandleFunc("GET /api/admin/export-orders", api.adminExportOrders)
+
+	mux.HandleFunc("GET /api/announcements", api.handleAnnouncements)
+	mux.HandleFunc("POST /api/check-coupon", api.handleCheckCoupon)
 
 	mux.HandleFunc("GET /admin", api.serveAdmin)
 	mux.HandleFunc("GET /admin/", api.serveAdmin)
@@ -1814,6 +2348,14 @@ tr:hover td{background:#fdf9f3}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         <span>流量</span>
       </button>
+      <button class="nav-item" onclick="showTab('coupons',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6"/><polyline points="12 3 12 15"/><polyline points="8 7 12 3 16 7"/></svg>
+        <span>优惠券</span>
+      </button>
+      <button class="nav-item" onclick="showTab('announce',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 17H2a3 3 0 006 0h8a3 3 0 006 0zM6 8l1.8-5.4A2 2 0 019.7 1h4.6a2 2 0 011.9 1.4L18 8"/><line x1="2" y1="8" x2="22" y2="8"/></svg>
+        <span>公告</span>
+      </button>
       <button class="nav-item" onclick="showTab('settings',this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
         <span>设置</span>
@@ -1841,6 +2383,7 @@ tr:hover td{background:#fdf9f3}
         <input id="userSearch" placeholder="搜索邮箱 / ID..." oninput="renderUsers()">
         <span style="flex:1"></span>
         <span id="userCount" style="font-size:13px;color:#8b8077"></span>
+        <button class="btn btn-ghost" onclick="exportCSV('users')">导出CSV</button>
       </div>
       <div class="card" id="userTable"></div>
     </div>
@@ -1860,6 +2403,10 @@ tr:hover td{background:#fdf9f3}
     </div>
 
     <div class="panel" id="p-orders">
+      <div class="toolbar">
+        <span style="flex:1"></span>
+        <button class="btn btn-ghost" onclick="exportCSV('orders')">导出CSV</button>
+      </div>
       <div class="card" id="orderTable"></div>
     </div>
 
@@ -1872,7 +2419,28 @@ tr:hover td{background:#fdf9f3}
       <div class="card" id="trafficTable"></div>
     </div>
 
+    <div class="panel" id="p-coupons">
+      <div class="toolbar">
+        <button class="btn btn-primary" onclick="showAddCoupon()">+ 添加优惠券</button>
+      </div>
+      <div class="card" id="couponTable"></div>
+    </div>
+
+    <div class="panel" id="p-announce">
+      <div class="toolbar">
+        <button class="btn btn-primary" onclick="showAddAnnounce()">+ 发布公告</button>
+      </div>
+      <div class="card" id="announceTable"></div>
+    </div>
+
     <div class="panel" id="p-settings">
+      <div class="settings-card">
+        <h3>邀请奖励</h3>
+        <div class="form-row"><label>双方奖励</label><input id="inviteReward" type="number" value="3" min="1" placeholder="天数"> <span style="font-size:13px;color:#8b8077;margin-left:4px">天</span></div>
+        <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">
+          <button class="btn btn-primary" onclick="saveInviteReward()">保存</button>
+        </div>
+      </div>
       <div class="settings-card">
         <h3>支付配置 (EPay)</h3>
         <div class="form-row"><label>接口地址</label><input id="epayURL" placeholder="https://pay.example.com"></div>
@@ -1958,10 +2526,44 @@ tr:hover td{background:#fdf9f3}
     <div class="form-row"><label>名称</label><input id="pName" placeholder="如 月付套餐"></div>
     <div class="form-row"><label>天数</label><input id="pDays" type="number" placeholder="30" min="1"></div>
     <div class="form-row"><label>价格</label><input id="pPrice" type="number" placeholder="15" min="0.01" step="0.01"></div>
+    <div class="form-row"><label>流量</label><input id="pTraffic" type="number" placeholder="0=不限 (GB)" min="0"> <span style="font-size:12px;color:#8b8077;margin-left:4px">GB</span></div>
+    <div class="form-row"><label>限速</label><input id="pSpeed" type="number" placeholder="0=不限 (Mbps)" min="0"> <span style="font-size:12px;color:#8b8077;margin-left:4px">Mbps</span></div>
+    <div class="form-row"><label>设备数</label><input id="pDevice" type="number" placeholder="0=不限" min="0"></div>
     <div class="form-row"><label>状态</label><select id="pEnabled" style="flex:1;background:#fff;border:1px solid #e8e0d4;color:#2d2b27;padding:9px 14px;border-radius:8px;font-size:13px;font-family:inherit"><option value="1">启用</option><option value="0">停用</option></select></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="document.getElementById('planModal').classList.remove('show')">取消</button>
       <button class="btn btn-primary" onclick="doSavePlan()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="couponModal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal-box">
+    <h3 id="couponModalTitle">添加优惠券</h3>
+    <input type="hidden" id="couponEditId">
+    <div class="form-row"><label>优惠码</label><input id="cCode" placeholder="如 NEWYEAR2024" style="text-transform:uppercase"></div>
+    <div class="form-row"><label>类型</label><select id="cType" style="flex:1;background:#fff;border:1px solid #e8e0d4;color:#2d2b27;padding:9px 14px;border-radius:8px;font-size:13px;font-family:inherit"><option value="percent">百分比折扣</option><option value="fixed">固定金额</option></select></div>
+    <div class="form-row"><label>值</label><input id="cValue" type="number" placeholder="10=10%折扣 或 5=减5元" min="0.01" step="0.01"></div>
+    <div class="form-row"><label>限定套餐</label><select id="cPlan" style="flex:1;background:#fff;border:1px solid #e8e0d4;color:#2d2b27;padding:9px 14px;border-radius:8px;font-size:13px;font-family:inherit"><option value="0">全部套餐</option></select></div>
+    <div class="form-row"><label>最大使用</label><input id="cMaxUses" type="number" placeholder="0=不限" min="0"></div>
+    <div class="form-row"><label>到期时间</label><input id="cExpires" type="date"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="document.getElementById('couponModal').classList.remove('show')">取消</button>
+      <button class="btn btn-primary" onclick="doSaveCoupon()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="announceModal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal-box">
+    <h3 id="announceModalTitle">发布公告</h3>
+    <input type="hidden" id="announceEditId">
+    <div class="form-row"><label>标题</label><input id="aTitle" placeholder="公告标题"></div>
+    <div class="form-row"><label>内容</label><textarea id="aContent" placeholder="公告内容" rows="4" style="flex:1;width:100%;background:#fff;border:1px solid #e8e0d4;color:#2d2b27;padding:9px 14px;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical"></textarea></div>
+    <div class="form-row"><label>级别</label><select id="aLevel" style="flex:1;background:#fff;border:1px solid #e8e0d4;color:#2d2b27;padding:9px 14px;border-radius:8px;font-size:13px;font-family:inherit"><option value="info">通知</option><option value="warning">警告</option><option value="urgent">紧急</option></select></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="document.getElementById('announceModal').classList.remove('show')">取消</button>
+      <button class="btn btn-primary" onclick="doSaveAnnounce()">保存</button>
     </div>
   </div>
 </div>
@@ -2001,13 +2603,14 @@ function doLogout(){
   localStorage.removeItem("admin_token");
   document.getElementById("mainPage").style.display="none";
   document.getElementById("loginPage").style.display="flex";
-  document.getElementById("loginKey").value="";
+  document.getElementById("loginUser").value="";
+  document.getElementById("loginPass").value="";
 }
 
 function showMain(){
   document.getElementById("loginPage").style.display="none";
   document.getElementById("mainPage").style.display="flex";
-  loadStats();loadDashboard();loadUsers();loadNodes();loadPlans();loadOrders();loadSettings()
+  loadStats();loadDashboard();loadUsers();loadNodes();loadPlans();loadOrders();loadSettings();loadCoupons();loadAnnouncements()
 }
 
 function showTab(name,btn){
@@ -2021,6 +2624,8 @@ function showTab(name,btn){
   if(name==="traffic")loadTraffic();
   if(name==="settings")loadSettings();
   if(name==="nodes")loadNodes();
+  if(name==="coupons")loadCoupons();
+  if(name==="announce")loadAnnouncements();
 }
 
 function fmtTime(ts){if(!ts)return"-";var d=new Date(ts*1000);return d.getFullYear()+"-"+(d.getMonth()+1).toString().padStart(2,"0")+"-"+d.getDate().toString().padStart(2,"0")+" "+d.getHours().toString().padStart(2,"0")+":"+d.getMinutes().toString().padStart(2,"0")}
@@ -2235,9 +2840,13 @@ function loadPlans(){
 
 function renderPlans(){
   if(plans.length===0){document.getElementById("planTable").innerHTML='<div class="empty">暂无套餐</div>';return}
-  var h='<table><tr><th>ID</th><th>名称</th><th>天数</th><th>价格</th><th>状态</th><th>操作</th></tr>';
+  var h='<table><tr><th>ID</th><th>名称</th><th>天数</th><th>价格</th><th>流量</th><th>限速</th><th>设备</th><th>状态</th><th>操作</th></tr>';
   plans.forEach(function(p){
+    var tl=p.traffic_limit?fmtBytes(p.traffic_limit):"不限";
+    var sl=p.speed_limit?p.speed_limit+"Mbps":"不限";
+    var dl=p.device_limit?p.device_limit+"台":"不限";
     h+="<tr><td>"+p.id+"</td><td>"+p.name+"</td><td>"+p.days+"d</td><td>¥"+p.price+"</td>";
+    h+="<td>"+tl+"</td><td>"+sl+"</td><td>"+dl+"</td>";
     h+='<td><span class="badge '+(p.enabled?"badge-ok":"badge-exp")+'">'+(p.enabled?"On":"Off")+"</span></td>";
     h+='<td><button class="btn btn-sm" onclick="showEditPlan('+p.id+')">编辑</button> ';
     h+='<button class="btn btn-danger" onclick="delPlan('+p.id+')">删除</button></td></tr>'
@@ -2252,6 +2861,9 @@ function showAddPlan(){
   document.getElementById("pName").value="";
   document.getElementById("pDays").value="";
   document.getElementById("pPrice").value="";
+  document.getElementById("pTraffic").value="0";
+  document.getElementById("pSpeed").value="0";
+  document.getElementById("pDevice").value="0";
   document.getElementById("pEnabled").value="1";
   document.getElementById("planModal").classList.add("show")
 }
@@ -2263,13 +2875,17 @@ function showEditPlan(id){
   document.getElementById("pName").value=p.name;
   document.getElementById("pDays").value=p.days;
   document.getElementById("pPrice").value=p.price;
+  document.getElementById("pTraffic").value=p.traffic_limit?Math.round(p.traffic_limit/1073741824):0;
+  document.getElementById("pSpeed").value=p.speed_limit||0;
+  document.getElementById("pDevice").value=p.device_limit||0;
   document.getElementById("pEnabled").value=p.enabled?"1":"0";
   document.getElementById("planModal").classList.add("show")
 }
 
 function doSavePlan(){
   var editId=document.getElementById("planEditId").value;
-  var data={name:document.getElementById("pName").value.trim(),days:parseInt(document.getElementById("pDays").value)||0,price:parseFloat(document.getElementById("pPrice").value)||0,enabled:document.getElementById("pEnabled").value==="1"};
+  var trafficGB=parseInt(document.getElementById("pTraffic").value)||0;
+  var data={name:document.getElementById("pName").value.trim(),days:parseInt(document.getElementById("pDays").value)||0,price:parseFloat(document.getElementById("pPrice").value)||0,traffic_limit:trafficGB*1073741824,speed_limit:parseInt(document.getElementById("pSpeed").value)||0,device_limit:parseInt(document.getElementById("pDevice").value)||0,enabled:document.getElementById("pEnabled").value==="1"};
   if(!data.name||data.days<=0||data.price<=0){toast("请填写所有字段","err");return}
   if(editId){
     data.id=parseInt(editId);
@@ -2304,6 +2920,17 @@ function loadSettings(){
       document.getElementById("verURL").value=d.version.download_url||"";
       document.getElementById("verLog").value=d.version.changelog||""
     }
+  }).catch(function(){});
+  H("invite-settings").then(function(d){
+    document.getElementById("inviteReward").value=d.invite_reward||3
+  }).catch(function(){})
+}
+
+function saveInviteReward(){
+  var days=parseInt(document.getElementById("inviteReward").value)||0;
+  if(days<=0){toast("天数无效","err");return}
+  H("invite-settings",{method:"PUT",body:JSON.stringify({days:days})}).then(function(d){
+    if(d.error){toast(d.error,"err")}else{toast("已保存","ok")}
   }).catch(function(){})
 }
 
@@ -2318,6 +2945,153 @@ function saveVersion(){
   var data={version:{version:document.getElementById("verNum").value.trim(),download_url:document.getElementById("verURL").value.trim(),changelog:document.getElementById("verLog").value.trim()}};
   H("settings",{method:"PUT",body:JSON.stringify(data)}).then(function(d){
     if(d.error){toast(d.error,"err")}else{toast("已保存","ok")}
+  }).catch(function(){})
+}
+
+function exportCSV(type){
+  var url="/api/admin/export-"+type+"?t="+Date.now();
+  var a=document.createElement("a");
+  a.href=url;
+  a.download=type+".csv";
+  fetch(url,{headers:{"Authorization":"Bearer "+TOKEN}}).then(function(r){return r.blob()}).then(function(b){
+    var u=URL.createObjectURL(b);a.href=u;a.click();URL.revokeObjectURL(u)
+  }).catch(function(){toast("导出失败","err")})
+}
+
+var coupons=[];
+function loadCoupons(){
+  H("coupons").then(function(d){coupons=d.coupons||[];renderCoupons()}).catch(function(){})
+}
+function renderCoupons(){
+  if(coupons.length===0){document.getElementById("couponTable").innerHTML='<div class="empty">暂无优惠券</div>';return}
+  var h='<table><tr><th>ID</th><th>优惠码</th><th>类型</th><th>值</th><th>限定套餐</th><th>已用/上限</th><th>到期</th><th>状态</th><th>操作</th></tr>';
+  coupons.forEach(function(c){
+    var typeText=c.type==="percent"?c.value+"%":"¥"+c.value;
+    var planText=c.plan_id?"ID:"+c.plan_id:"全部";
+    var usesText=c.used+"/"+(c.max_uses||"∞");
+    var expText=c.expires_at?fmtTime(c.expires_at):"永不";
+    h+="<tr><td>"+c.id+"</td><td><strong>"+c.code+"</strong></td><td>"+(c.type==="percent"?"百分比":"固定额")+"</td><td>"+typeText+"</td>";
+    h+="<td>"+planText+"</td><td>"+usesText+"</td><td>"+expText+"</td>";
+    h+='<td><span class="badge '+(c.enabled?"badge-ok":"badge-exp")+'">'+(c.enabled?"On":"Off")+"</span></td>";
+    h+='<td><button class="btn btn-sm" onclick="showEditCoupon('+c.id+')">编辑</button> ';
+    h+='<button class="btn btn-danger" onclick="delCoupon('+c.id+')">删除</button></td></tr>'
+  });
+  h+="</table>";
+  document.getElementById("couponTable").innerHTML=h
+}
+function showAddCoupon(){
+  document.getElementById("couponModalTitle").textContent="添加优惠券";
+  document.getElementById("couponEditId").value="";
+  document.getElementById("cCode").value="";
+  document.getElementById("cType").value="percent";
+  document.getElementById("cValue").value="";
+  document.getElementById("cPlan").value="0";
+  document.getElementById("cMaxUses").value="0";
+  document.getElementById("cExpires").value="";
+  var sel=document.getElementById("cPlan");
+  sel.innerHTML='<option value="0">全部套餐</option>';
+  plans.forEach(function(p){sel.innerHTML+='<option value="'+p.id+'">'+p.name+'</option>'});
+  document.getElementById("couponModal").classList.add("show")
+}
+function showEditCoupon(id){
+  var c=coupons.find(function(x){return x.id===id});if(!c)return;
+  document.getElementById("couponModalTitle").textContent="编辑优惠券";
+  document.getElementById("couponEditId").value=id;
+  document.getElementById("cCode").value=c.code;
+  document.getElementById("cType").value=c.type;
+  document.getElementById("cValue").value=c.value;
+  var sel=document.getElementById("cPlan");
+  sel.innerHTML='<option value="0">全部套餐</option>';
+  plans.forEach(function(p){sel.innerHTML+='<option value="'+p.id+'">'+p.name+'</option>'});
+  sel.value=c.plan_id||"0";
+  document.getElementById("cMaxUses").value=c.max_uses||0;
+  document.getElementById("cExpires").value=c.expires_at?new Date(c.expires_at*1000).toISOString().split("T")[0]:"";
+  document.getElementById("couponModal").classList.add("show")
+}
+function doSaveCoupon(){
+  var editId=document.getElementById("couponEditId").value;
+  var expDate=document.getElementById("cExpires").value;
+  var expTs=expDate?Math.floor(new Date(expDate+"T23:59:59").getTime()/1000):0;
+  var data={code:document.getElementById("cCode").value.trim().toUpperCase(),type:document.getElementById("cType").value,value:parseFloat(document.getElementById("cValue").value)||0,plan_id:parseInt(document.getElementById("cPlan").value)||0,max_uses:parseInt(document.getElementById("cMaxUses").value)||0,expires_at:expTs,enabled:true};
+  if(!data.code||data.value<=0){toast("请填写优惠码和值","err");return}
+  if(editId){
+    data.id=parseInt(editId);
+    H("coupons",{method:"PUT",body:JSON.stringify(data)}).then(function(d){
+      if(d.error){toast(d.error,"err")}else{toast("已更新","ok");loadCoupons()}
+      document.getElementById("couponModal").classList.remove("show")
+    }).catch(function(){})
+  }else{
+    H("coupons",{method:"POST",body:JSON.stringify(data)}).then(function(d){
+      if(d.error){toast(d.error,"err")}else{toast("已添加","ok");loadCoupons()}
+      document.getElementById("couponModal").classList.remove("show")
+    }).catch(function(){})
+  }
+}
+function delCoupon(id){
+  if(!confirm("确定删除此优惠券？"))return;
+  H("coupons?id="+id,{method:"DELETE"}).then(function(d){
+    if(d.error){toast(d.error,"err")}else{toast("已删除","ok");loadCoupons()}
+  }).catch(function(){})
+}
+
+var announcements=[];
+function loadAnnouncements(){
+  H("announcements").then(function(d){announcements=d.announcements||[];renderAnnouncements()}).catch(function(){})
+}
+function renderAnnouncements(){
+  if(announcements.length===0){document.getElementById("announceTable").innerHTML='<div class="empty">暂无公告</div>';return}
+  var levelMap={info:"通知",warning:"警告",urgent:"紧急"};
+  var levelCls={info:"badge-ok",warning:"badge-exp",urgent:"badge-exp"};
+  var h='<table><tr><th>ID</th><th>标题</th><th>级别</th><th>状态</th><th>时间</th><th>操作</th></tr>';
+  announcements.forEach(function(a){
+    h+="<tr><td>"+a.id+"</td><td>"+a.title+"</td>";
+    h+='<td><span class="badge '+(levelCls[a.level]||"badge-ok")+'">'+(levelMap[a.level]||a.level)+"</span></td>";
+    h+='<td><span class="badge '+(a.enabled?"badge-ok":"badge-exp")+'">'+(a.enabled?"On":"Off")+"</span></td>";
+    h+="<td>"+fmtTime(a.created_at)+"</td>";
+    h+='<td><button class="btn btn-sm" onclick="showEditAnnounce('+a.id+')">编辑</button> ';
+    h+='<button class="btn btn-danger" onclick="delAnnounce('+a.id+')">删除</button></td></tr>'
+  });
+  h+="</table>";
+  document.getElementById("announceTable").innerHTML=h
+}
+function showAddAnnounce(){
+  document.getElementById("announceModalTitle").textContent="发布公告";
+  document.getElementById("announceEditId").value="";
+  document.getElementById("aTitle").value="";
+  document.getElementById("aContent").value="";
+  document.getElementById("aLevel").value="info";
+  document.getElementById("announceModal").classList.add("show")
+}
+function showEditAnnounce(id){
+  var a=announcements.find(function(x){return x.id===id});if(!a)return;
+  document.getElementById("announceModalTitle").textContent="编辑公告";
+  document.getElementById("announceEditId").value=id;
+  document.getElementById("aTitle").value=a.title;
+  document.getElementById("aContent").value=a.content;
+  document.getElementById("aLevel").value=a.level;
+  document.getElementById("announceModal").classList.add("show")
+}
+function doSaveAnnounce(){
+  var editId=document.getElementById("announceEditId").value;
+  var data={title:document.getElementById("aTitle").value.trim(),content:document.getElementById("aContent").value.trim(),level:document.getElementById("aLevel").value,enabled:true};
+  if(!data.title||!data.content){toast("请填写标题和内容","err");return}
+  if(editId){
+    data.id=parseInt(editId);
+    H("announcements",{method:"PUT",body:JSON.stringify(data)}).then(function(d){
+      if(d.error){toast(d.error,"err")}else{toast("已更新","ok");loadAnnouncements()}
+      document.getElementById("announceModal").classList.remove("show")
+    }).catch(function(){})
+  }else{
+    H("announcements",{method:"POST",body:JSON.stringify(data)}).then(function(d){
+      if(d.error){toast(d.error,"err")}else{toast("已发布","ok");loadAnnouncements()}
+      document.getElementById("announceModal").classList.remove("show")
+    }).catch(function(){})
+  }
+}
+function delAnnounce(id){
+  if(!confirm("确定删除此公告？"))return;
+  H("announcements?id="+id,{method:"DELETE"}).then(function(d){
+    if(d.error){toast(d.error,"err")}else{toast("已删除","ok");loadAnnouncements()}
   }).catch(function(){})
 }
 

@@ -43,6 +43,9 @@
           <div v-if="loginMode === 'register'" class="input-wrap">
             <input ref="pass2Input" v-model="pass2" :type="showPass ? 'text' : 'password'" placeholder="确认密码" @keyup.enter="doAuth"/>
           </div>
+          <div v-if="loginMode === 'register'" class="input-wrap">
+            <input v-model="inviteCode" type="text" placeholder="邀请码（选填）" @keyup.enter="doAuth"/>
+          </div>
           <div v-if="emailChecking" class="email-hint">检查中...</div>
           <button class="btn-primary" @click="doAuth" :disabled="loading">
             {{ loading ? '...' : (loginMode === 'login' ? '登录' : '注册') }}
@@ -104,6 +107,35 @@
         发现新版本 {{ updateInfo.version }} — 点击下载
       </div>
 
+      <!-- Announcements banner -->
+      <div v-if="announcements.length > 0 && !reconnecting && !updateInfo.available" class="announce-banner" @click="showAnnouncementModal = true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span>{{ announcements[0].title }}</span>
+        <span v-if="announcements.length > 1" class="announce-more">+{{ announcements.length - 1 }}</span>
+      </div>
+
+      <!-- Announcement modal -->
+      <div v-if="showAnnouncementModal" class="announce-overlay" @click.self="showAnnouncementModal = false">
+        <div class="announce-modal">
+          <div class="announce-modal-header">
+            <span>公告</span>
+            <button class="profile-close" @click="showAnnouncementModal = false">&#x2715;</button>
+          </div>
+          <div class="announce-list">
+            <div v-for="a in announcements" :key="a.id" :class="['announce-item', 'al-' + a.level]">
+              <div class="announce-title">
+                <svg v-if="a.level === 'urgent'" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <svg v-else-if="a.level === 'warning'" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <svg v-else width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                {{ a.title }}
+              </div>
+              <div class="announce-content">{{ a.content }}</div>
+              <div class="announce-time">{{ formatDateTime(a.created_at) }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Settings dropdown -->
       <div v-if="showSettings" class="settings-panel">
         <div class="settings-item">
@@ -138,9 +170,46 @@
           <span v-else-if="proxyMode === 'bypass'">中国大陆网站直连，其余走代理</span>
           <span v-else>虚拟网卡全局接管（首次需下载组件）</span>
         </div>
+        <div class="settings-item">
+          <span>Kill Switch</span>
+          <label class="switch">
+            <input type="checkbox" :checked="killSwitch" @change="toggleKillSwitch"/>
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="mode-hint" v-if="killSwitch">代理断开时自动切断网络，防止 IP 泄露</div>
+        <div class="settings-item">
+          <span>连接日志</span>
+          <button class="btn-text" @click="openConnLog">查看</button>
+        </div>
         <div class="settings-item" style="border-bottom:none">
           <span>版本</span>
           <span class="settings-val">v{{ appVersion }}</span>
+        </div>
+      </div>
+
+      <!-- Connection log modal -->
+      <div v-if="showConnLog" class="announce-overlay" @click.self="showConnLog = false">
+        <div class="announce-modal">
+          <div class="announce-modal-header">
+            <span>连接日志</span>
+            <button class="profile-close" @click="showConnLog = false">&#x2715;</button>
+          </div>
+          <div class="connlog-list">
+            <div v-if="connLog.length === 0" class="empty-hint">暂无日志</div>
+            <div v-for="(log, i) in connLog" :key="i" class="connlog-item">
+              <div class="connlog-left">
+                <span :class="['connlog-action', log.action === 'connect' ? 'cla-on' : (log.action === 'disconnect' ? 'cla-off' : 'cla-warn')]">
+                  {{ logActionText(log.action) }}
+                </span>
+                <span class="connlog-node">{{ log.node }}</span>
+              </div>
+              <div class="connlog-right">
+                <span v-if="log.detail" class="connlog-detail">{{ log.detail }}</span>
+                <span class="connlog-time">{{ formatDateTime(log.time) }}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -320,7 +389,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { Login, Register, GuestLogin, IsLoggedIn, Logout, GetNodes, Connect, Disconnect, GetStatus, GetSpeed, TestLatency, HideWindow, OpenURL, GetLastNodeID, GetProfile, GetOrders, ChangePassword, CheckEmail, BindEmail, GetSavedEmail, ToggleFavorite, GetFavorites, SetDarkMode, GetDarkMode, CopyToClipboard, GetProxyMode, SetProxyMode, GetVersion } from '../wailsjs/go/main/App'
+import { Login, Register, GuestLogin, IsLoggedIn, Logout, GetNodes, Connect, Disconnect, GetStatus, GetSpeed, TestLatency, HideWindow, OpenURL, GetLastNodeID, GetProfile, GetOrders, ChangePassword, CheckEmail, BindEmail, GetSavedEmail, ToggleFavorite, GetFavorites, SetDarkMode, GetDarkMode, CopyToClipboard, GetProxyMode, SetProxyMode, GetVersion, GetAnnouncements, GetConnLog, SetKillSwitch, GetKillSwitch } from '../wailsjs/go/main/App'
 import { WindowMinimise, EventsOn } from '../wailsjs/runtime/runtime'
 
 const loggedIn = ref(false)
@@ -365,6 +434,13 @@ const showBindPass = ref(false)
 const bindLoading = ref(false)
 const bindMsg = ref('')
 const bindOk = ref(false)
+
+const announcements = ref([])
+const showAnnouncementModal = ref(false)
+const killSwitch = ref(false)
+const showConnLog = ref(false)
+const connLog = ref([])
+const inviteCode = ref('')
 
 const toast = ref({ show: false, msg: '', type: 'info' })
 let toastTimer = null
@@ -447,6 +523,37 @@ function orderStatusText(s) {
   return { pending: '待支付', paid: '已支付', expired: '已过期', cancelled: '已取消' }[s] || s
 }
 
+function formatDateTime(ts) {
+  if (!ts) return '-'
+  const d = new Date(ts * 1000)
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0')
+}
+
+function logActionText(action) {
+  return { connect: '连接', disconnect: '断开', lost: '断线', reconnect: '重连', 'reconnect-fail': '重连失败' }[action] || action
+}
+
+async function toggleKillSwitch() {
+  killSwitch.value = !killSwitch.value
+  await SetKillSwitch(killSwitch.value)
+  showToast(killSwitch.value ? 'Kill Switch 已开启' : 'Kill Switch 已关闭', 'success')
+}
+
+async function openConnLog() {
+  try {
+    const logs = await GetConnLog()
+    connLog.value = logs || []
+  } catch {}
+  showConnLog.value = true
+}
+
+async function loadAnnouncements() {
+  try {
+    const list = await GetAnnouncements()
+    announcements.value = list || []
+  } catch {}
+}
+
 function updateConnDuration() {
   const at = status.value.connectedAt
   if (!at || !connected.value) { connDuration.value = ''; return }
@@ -483,11 +590,12 @@ async function doAuth() {
     if (loginMode.value === 'login') {
       await Login(email.value, pass.value)
     } else {
-      await Register(email.value, pass.value)
+      await Register(email.value, pass.value, inviteCode.value.trim())
     }
     loggedIn.value = true
     showToast(loginMode.value === 'login' ? '登录成功' : '注册成功', 'success')
     await refreshNodes()
+    loadAnnouncements()
     try { const p = await GetProfile(); if (p) profile.value = p } catch {}
   } catch (e) {
     error.value = e
@@ -503,6 +611,7 @@ async function doGuest() {
     loggedIn.value = true
     showToast('游客登录成功', 'success')
     await refreshNodes()
+    loadAnnouncements()
     try { const p = await GetProfile(); if (p) profile.value = p } catch {}
   } catch (e) {
     error.value = e
@@ -673,10 +782,13 @@ onMounted(async () => {
   try { const pm = await GetProxyMode(); if (pm) proxyMode.value = pm } catch {}
   try { appVersion.value = await GetVersion() } catch {}
 
+  try { killSwitch.value = await GetKillSwitch() } catch {}
+
   const isLogged = await IsLoggedIn()
   if (isLogged) {
     loggedIn.value = true
     await refreshNodes()
+    loadAnnouncements()
     try {
       const p = await GetProfile()
       if (p) {
@@ -901,4 +1013,48 @@ a { text-decoration: none; }
 .expire-warn { color: var(--red); font-weight: 600; }
 .speed-group { display: flex; gap: 20px; }
 .speed-item { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+
+/* Announcement banner */
+.announce-banner { margin: 0 18px 8px; padding: 10px 14px; background: #dbeafe; color: #1d4ed8; font-size: 12px; font-weight: 600; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+.announce-banner:hover { background: #bfdbfe; }
+.announce-more { font-size: 11px; opacity: .7; }
+.app.dark .announce-banner { background: #1e2a4a; color: #60a5fa; }
+.app.dark .announce-banner:hover { background: #263564; }
+
+/* Announcement modal */
+.announce-overlay { position: fixed; top: 36px; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.4); z-index: 100; display: flex; align-items: flex-start; justify-content: center; padding: 30px 16px; }
+.announce-modal { width: 100%; max-width: 380px; max-height: 80vh; background: var(--card); border-radius: 14px; box-shadow: 0 8px 32px rgba(0,0,0,.2); display: flex; flex-direction: column; overflow: hidden; }
+.announce-modal-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; font-size: 15px; font-weight: 600; border-bottom: 1px solid var(--border); }
+.announce-list, .connlog-list { overflow-y: auto; padding: 10px 14px; flex: 1; }
+.announce-item { padding: 12px; background: var(--bg); border-radius: 10px; margin-bottom: 8px; }
+.announce-item:last-child { margin-bottom: 0; }
+.al-urgent { border-left: 3px solid #ef4444; }
+.al-warning { border-left: 3px solid #f59e0b; }
+.al-info { border-left: 3px solid #3b82f6; }
+.announce-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.announce-content { font-size: 12px; color: var(--text-secondary); line-height: 1.5; white-space: pre-wrap; }
+.announce-time { font-size: 11px; color: var(--text-secondary); margin-top: 6px; opacity: .7; }
+
+/* Connection log */
+.connlog-item { display: flex; justify-content: space-between; align-items: flex-start; padding: 10px 12px; background: var(--bg); border-radius: 8px; margin-bottom: 6px; font-size: 12px; }
+.connlog-left { display: flex; align-items: center; gap: 8px; }
+.connlog-action { padding: 2px 8px; border-radius: 6px; font-weight: 600; font-size: 11px; }
+.cla-on { background: #dcfce7; color: #16a34a; }
+.cla-off { background: #f3f4f6; color: #6b7280; }
+.cla-warn { background: #fee2e2; color: #dc2626; }
+.app.dark .cla-on { background: #1a3a1a; color: #4ade80; }
+.app.dark .cla-off { background: #2d2d4a; color: #8b92a8; }
+.app.dark .cla-warn { background: #3b1c1c; color: #f87171; }
+.connlog-node { font-weight: 500; }
+.connlog-right { text-align: right; }
+.connlog-detail { display: block; color: var(--text-secondary); font-size: 11px; }
+.connlog-time { font-size: 11px; color: var(--text-secondary); opacity: .7; }
+
+/* Kill Switch toggle */
+.switch { position: relative; display: inline-block; width: 38px; height: 20px; flex-shrink: 0; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: var(--border); border-radius: 20px; transition: .3s; }
+.slider:before { content: ""; position: absolute; height: 16px; width: 16px; left: 2px; bottom: 2px; background: #fff; border-radius: 50%; transition: .3s; }
+.switch input:checked + .slider { background: var(--accent); }
+.switch input:checked + .slider:before { transform: translateX(18px); }
 </style>

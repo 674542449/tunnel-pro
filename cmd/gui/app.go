@@ -113,6 +113,7 @@ type AuthState struct {
 	Favorites  []int64         `json:"favorites,omitempty"`
 	DarkMode   *bool           `json:"dark_mode,omitempty"`
 	ProxyMode  string          `json:"proxy_mode,omitempty"`
+	KillSwitch bool            `json:"kill_switch,omitempty"`
 }
 
 type serverConfig struct {
@@ -150,6 +151,21 @@ type UpdateInfo struct {
 	URL       string `json:"url"`
 }
 
+type AnnouncementInfo struct {
+	ID        int64  `json:"id"`
+	Title     string `json:"title"`
+	Content   string `json:"content"`
+	Level     string `json:"level"`
+	CreatedAt int64  `json:"created_at"`
+}
+
+type ConnLogEntry struct {
+	Time   int64  `json:"time"`
+	Action string `json:"action"`
+	Node   string `json:"node"`
+	Detail string `json:"detail,omitempty"`
+}
+
 type App struct {
 	ctx            context.Context
 	auth           AuthState
@@ -170,6 +186,10 @@ type App struct {
 	tunCmd      *exec.Cmd
 	tunRunning  bool
 	origGateway string
+
+	connLog     []ConnLogEntry
+	connLogMu   sync.Mutex
+	killSwitch  bool
 }
 
 func NewApp() *App {
@@ -186,6 +206,7 @@ func NewApp() *App {
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 	a.loadAuth()
+	a.killSwitch = a.auth.KillSwitch
 	a.cleanStaleProxy()
 	go a.startMixed()
 	go a.healthCheck()
@@ -290,8 +311,8 @@ func (a *App) Login(email, pass string) error {
 	return nil
 }
 
-func (a *App) Register(email, pass string) error {
-	body, _ := json.Marshal(map[string]string{"email": email, "password": pass})
+func (a *App) Register(email, pass, inviteCode string) error {
+	body, _ := json.Marshal(map[string]string{"email": email, "password": pass, "invite_code": inviteCode})
 	resp, err := http.Post(apiBase+"/api/register", "application/json", bytes.NewReader(body))
 	if err != nil {
 		return fmt.Errorf("network error")
@@ -575,6 +596,71 @@ func (a *App) GetDarkMode() *bool {
 }
 
 func (a *App) GetVersion() string { return clientVersion }
+
+func (a *App) GetAnnouncements() []AnnouncementInfo {
+	resp, err := http.Get(apiBase + "/api/announcements")
+	if err != nil {
+		return nil
+	}
+	defer resp.Body.Close()
+	var result struct {
+		Announcements []AnnouncementInfo `json:"announcements"`
+	}
+	json.NewDecoder(resp.Body).Decode(&result)
+	return result.Announcements
+}
+
+func (a *App) addConnLog(action, node, detail string) {
+	a.connLogMu.Lock()
+	defer a.connLogMu.Unlock()
+	entry := ConnLogEntry{Time: time.Now().Unix(), Action: action, Node: node, Detail: detail}
+	a.connLog = append(a.connLog, entry)
+	if len(a.connLog) > 200 {
+		a.connLog = a.connLog[len(a.connLog)-200:]
+	}
+}
+
+func (a *App) GetConnLog() []ConnLogEntry {
+	a.connLogMu.Lock()
+	defer a.connLogMu.Unlock()
+	out := make([]ConnLogEntry, len(a.connLog))
+	copy(out, a.connLog)
+	for i, j := 0, len(out)-1; i < j; i, j = i+1, j-1 {
+		out[i], out[j] = out[j], out[i]
+	}
+	return out
+}
+
+func (a *App) SetKillSwitch(on bool) {
+	a.killSwitch = on
+	a.auth.KillSwitch = on
+	a.saveAuth()
+	if on && !a.proxyOn {
+		a.enableKillSwitch()
+	}
+	if !on {
+		a.disableKillSwitch()
+	}
+}
+
+func (a *App) GetKillSwitch() bool {
+	return a.killSwitch
+}
+
+func (a *App) enableKillSwitch() {
+	regPath := `HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings`
+	run := func(args ...string) { exec.Command("reg", args...).Run() }
+	run("add", regPath, "/v", "ProxyEnable", "/t", "REG_DWORD", "/d", "1", "/f")
+	run("add", regPath, "/v", "ProxyServer", "/t", "REG_SZ", "/d", "http=0.0.0.0:1;https=0.0.0.0:1", "/f")
+	run("add", regPath, "/v", "AutoConfigURL", "/t", "REG_SZ", "/d", "", "/f")
+	refreshProxy()
+	log.Println("[killswitch] network blocked")
+}
+
+func (a *App) disableKillSwitch() {
+	clearSystemProxy()
+	log.Println("[killswitch] network restored")
+}
 
 func (a *App) CopyToClipboard(text string) {
 	exec.Command("cmd", "/c", "echo|set /p="+text+"|clip").Run()
@@ -956,6 +1042,7 @@ func (a *App) Connect(nodeID int64) error {
 	a.auth.LastNodeID = nodeID
 	a.saveAuth()
 
+	a.addConnLog("connect", cfg.Name, "connected to "+cfg.Addr)
 	a.updateTrayTooltip(true, cfg.Name)
 	wailsRT.EventsEmit(a.ctx, "connection-changed", StatusInfo{Connected: true, NodeName: cfg.Name, NodeID: nodeID, ConnectedAt: a.connectedAt})
 	return nil
@@ -975,11 +1062,16 @@ func (a *App) Disconnect() {
 
 	a.stopTUN()
 	if a.proxyOn {
-		clearSystemProxy()
+		if a.killSwitch {
+			a.enableKillSwitch()
+		} else {
+			clearSystemProxy()
+		}
 		os.Remove(a.pacPath)
 		a.proxyOn = false
 	}
 
+	a.addConnLog("disconnect", "", "disconnected")
 	a.updateTrayTooltip(false, "")
 	if a.ctx != nil {
 		wailsRT.EventsEmit(a.ctx, "connection-changed", StatusInfo{Connected: false})
@@ -1177,6 +1269,7 @@ func (a *App) healthCheck() {
 		if conn == nil || !conn.IsClosed() {
 			continue
 		}
+		a.addConnLog("lost", "", "connection lost, attempting reconnect")
 		log.Println("[health] connection lost, reconnecting...")
 		if a.ctx != nil {
 			wailsRT.EventsEmit(a.ctx, "reconnecting", true)
@@ -1204,7 +1297,10 @@ func (a *App) healthCheck() {
 		if a.ctx != nil {
 			wailsRT.EventsEmit(a.ctx, "reconnecting", false)
 		}
-		if !ok {
+		if ok {
+			a.addConnLog("reconnect", "", "reconnected successfully")
+		} else {
+			a.addConnLog("failed", "", "reconnect failed after 5 attempts")
 			a.Disconnect()
 		}
 	}

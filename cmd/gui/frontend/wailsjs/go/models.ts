@@ -1,5 +1,43 @@
 export namespace main {
 	
+	export class AnnouncementInfo {
+	    id: number;
+	    title: string;
+	    content: string;
+	    level: string;
+	    created_at: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new AnnouncementInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.title = source["title"];
+	        this.content = source["content"];
+	        this.level = source["level"];
+	        this.created_at = source["created_at"];
+	    }
+	}
+	export class ConnLogEntry {
+	    time: number;
+	    action: string;
+	    node: string;
+	    detail?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ConnLogEntry(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.time = source["time"];
+	        this.action = source["action"];
+	        this.node = source["node"];
+	        this.detail = source["detail"];
+	    }
+	}
 	export class NodeInfo {
 	    id: number;
 	    name: string;

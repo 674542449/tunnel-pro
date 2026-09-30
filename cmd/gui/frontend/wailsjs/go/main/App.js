@@ -34,12 +34,24 @@ export function Disconnect() {
   return window['go']['main']['App']['Disconnect']();
 }
 
+export function GetAnnouncements() {
+  return window['go']['main']['App']['GetAnnouncements']();
+}
+
+export function GetConnLog() {
+  return window['go']['main']['App']['GetConnLog']();
+}
+
 export function GetDarkMode() {
   return window['go']['main']['App']['GetDarkMode']();
 }
 
 export function GetFavorites() {
   return window['go']['main']['App']['GetFavorites']();
+}
+
+export function GetKillSwitch() {
+  return window['go']['main']['App']['GetKillSwitch']();
 }
 
 export function GetLastNodeID() {
@@ -106,12 +118,16 @@ export function OpenURL(arg1) {
   return window['go']['main']['App']['OpenURL'](arg1);
 }
 
-export function Register(arg1, arg2) {
-  return window['go']['main']['App']['Register'](arg1, arg2);
+export function Register(arg1, arg2, arg3) {
+  return window['go']['main']['App']['Register'](arg1, arg2, arg3);
 }
 
 export function SetDarkMode(arg1) {
   return window['go']['main']['App']['SetDarkMode'](arg1);
+}
+
+export function SetKillSwitch(arg1) {
+  return window['go']['main']['App']['SetKillSwitch'](arg1);
 }
 
 export function SetProxyMode(arg1) {
