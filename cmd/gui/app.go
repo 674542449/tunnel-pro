@@ -408,7 +408,7 @@ func (a *App) CheckUpdate() UpdateInfo {
 	json.NewDecoder(resp.Body).Decode(&release)
 	ver := strings.TrimPrefix(release.TagName, "v")
 	cur := strings.TrimPrefix(Version, "v")
-	if ver != "" && ver != cur {
+	if ver != "" && compareVersions(ver, cur) > 0 {
 		dlURL := ""
 		for _, asset := range release.Assets {
 			if strings.HasSuffix(asset.Name, ".exe") {
@@ -716,8 +716,6 @@ func (a *App) applyProxyMode() {
 	switch mode {
 	case "direct":
 		clearSystemProxy()
-	case "bypass":
-		setSystemProxyPAC(a.pacURL)
 	case "tun":
 		clearSystemProxy()
 		go a.startTUN()
@@ -728,60 +726,138 @@ func (a *App) applyProxyMode() {
 
 const chinaDomainsURL = "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf"
 
+var builtinChinaTLDs = []string{
+	"cn", "com.cn", "net.cn", "org.cn", "gov.cn", "edu.cn", "mil.cn", "ac.cn",
+}
+
+var builtinChinaDomains = []string{
+	"baidu.com", "bdstatic.com", "bdimg.com", "baiducontent.com", "bcebos.com", "baidupcs.com",
+	"qq.com", "gtimg.com", "qpic.cn", "qcloud.com", "myqcloud.com", "tencent.com", "weixin.qq.com", "wechat.com", "weixin.com", "tenpay.com", "wxpay.com",
+	"alibaba.com", "alicdn.com", "aliyun.com", "aliyuncs.com", "alibabacloud.com", "alipay.com",
+	"taobao.com", "tmall.com", "1688.com", "aliexpress.com", "dingtalk.com",
+	"ele.me", "cainiao.com", "amap.com", "autonavi.com", "alikunlun.com", "tbcdn.cn", "mybank.cn",
+	"163.com", "126.com", "netease.com", "yeah.net", "youdao.com", "lofter.com",
+	"bytedance.com", "bytedance.net", "byteimg.com", "bytecdn.cn", "bytegoofy.com",
+	"bytetos.com", "ibytedtos.com", "byted.org", "bytedapm.com", "bytednsdoc.com", "bytedns.net",
+	"volcengine.com", "volces.com", "volccdn.com", "volcvideo.com",
+	"douyin.com", "douyinpic.com", "douyincdn.com", "douyinstatic.com", "douyinvod.com", "amemv.com",
+	"toutiao.com", "toutiaocdn.com", "toutiaoimg.com", "pstatp.com", "snssdk.com", "ibyteimg.com",
+	"ixigua.com", "feishu.cn", "feishu.net", "feishucdn.com", "larksuite.com", "oceanengine.com",
+	"jd.com", "jd.hk", "360buy.com", "jdcloud.com",
+	"bilibili.com", "bilivideo.com", "hdslb.com", "biliapi.net", "acgvideo.com",
+	"weibo.com", "sina.com.cn", "sinaimg.cn", "sina.com", "weibo.cn",
+	"zhihu.com", "zhimg.com", "douban.com", "doubanio.com",
+	"sohu.com", "sogou.com", "ifeng.com",
+	"meituan.com", "dianping.com", "pinduoduo.com", "yangkeduo.com",
+	"xiaomi.com", "mi.com", "miui.com", "huawei.com", "honor.com", "vmall.com",
+	"oppo.com", "vivo.com", "realme.com", "oneplus.com",
+	"youku.com", "iqiyi.com", "iqiyipic.com", "mgtv.com", "cctv.com",
+	"kuaishou.com", "kwai.com", "gifshow.com", "xiaohongshu.com", "xhscdn.com",
+	"csdn.net", "jianshu.com", "gitee.com", "oschina.net", "cnblogs.com",
+	"360.cn", "360safe.com", "qihoo.com", "2345.com",
+	"zhipin.com", "lagou.com", "liepin.com", "51job.com",
+	"kugou.com", "kuwo.com", "12306.cn", "cnki.net", "smzdm.com",
+	"wps.com", "wps.cn", "kingsoft.com", "xunlei.com", "lenovo.com",
+	"58.com", "anjuke.com", "lianjia.com", "ke.com",
+	"trip.com", "ctrip.com", "qunar.com", "fliggy.com", "ly.com",
+	"huya.com", "douyu.com", "yy.com",
+	"unionpay.com", "95516.com",
+	"qiniu.com", "qiniucdn.com", "upyun.com",
+	"eastmoney.com", "36kr.com", "thepaper.cn",
+	"coolapk.com", "meizu.com", "zol.com.cn",
+	"suning.com", "vip.com", "kaola.com",
+}
+
 func (a *App) loadChinaDomains() {
 	exe, _ := os.Executable()
 	cacheFile := filepath.Join(filepath.Dir(exe), "china_domains.cache")
 
 	domains := make(map[string]bool)
+	for _, d := range builtinChinaTLDs {
+		domains[d] = true
+	}
+	for _, d := range builtinChinaDomains {
+		domains[d] = true
+	}
+	log.Printf("[bypass] loaded %d builtin China domains", len(domains))
 
-	client := &http.Client{Timeout: 30 * time.Second}
-	resp, err := client.Get(chinaDomainsURL)
-	if err == nil && resp.StatusCode == 200 {
-		scanner := bufio.NewScanner(resp.Body)
-		for scanner.Scan() {
-			line := scanner.Text()
-			if !strings.HasPrefix(line, "server=/") {
-				continue
-			}
-			parts := strings.SplitN(line, "/", 3)
-			if len(parts) < 3 {
-				continue
-			}
-			d := strings.TrimSpace(strings.ToLower(parts[1]))
-			if d != "" {
-				domains[d] = true
+	// try load from cache first (immediate availability)
+	if data, err := os.ReadFile(cacheFile); err == nil {
+		count := 0
+		for _, line := range strings.Split(string(data), "\n") {
+			line = strings.TrimSpace(line)
+			if line != "" {
+				domains[line] = true
+				count++
 			}
 		}
-		resp.Body.Close()
-		if len(domains) > 1000 {
-			var buf strings.Builder
-			for d := range domains {
-				buf.WriteString(d)
-				buf.WriteByte('\n')
-			}
-			os.WriteFile(cacheFile, []byte(buf.String()), 0644)
-			log.Printf("[PAC] downloaded %d China domains", len(domains))
-		}
-	} else {
-		if resp != nil {
-			resp.Body.Close()
-		}
-		if data, err2 := os.ReadFile(cacheFile); err2 == nil {
-			for _, line := range strings.Split(string(data), "\n") {
-				line = strings.TrimSpace(line)
-				if line != "" {
-					domains[line] = true
-				}
-			}
-			log.Printf("[PAC] loaded %d China domains from cache", len(domains))
-		} else {
-			log.Printf("[PAC] failed to download (%v) and no cache available", err)
+		if count > 1000 {
+			log.Printf("[bypass] loaded %d domains from cache", count)
 		}
 	}
 
 	a.chinaDomainsMu.Lock()
 	a.chinaDomains = domains
 	a.chinaDomainsMu.Unlock()
+
+	// background: try download fresh list (via local proxy if available)
+	go a.downloadChinaDomains(cacheFile)
+}
+
+func (a *App) downloadChinaDomains(cacheFile string) {
+	time.Sleep(10 * time.Second)
+
+	proxyURL, _ := url.Parse("http://127.0.0.1:7890")
+	client := &http.Client{
+		Timeout:   30 * time.Second,
+		Transport: &http.Transport{Proxy: http.ProxyURL(proxyURL)},
+	}
+	resp, err := client.Get(chinaDomainsURL)
+	if err != nil {
+		client2 := &http.Client{Timeout: 15 * time.Second}
+		resp, err = client2.Get(chinaDomainsURL)
+		if err != nil {
+			log.Printf("[bypass] download failed (direct & proxy): %v", err)
+			return
+		}
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return
+	}
+
+	domains := make(map[string]bool)
+	for _, d := range builtinChinaTLDs {
+		domains[d] = true
+	}
+	scanner := bufio.NewScanner(resp.Body)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if !strings.HasPrefix(line, "server=/") {
+			continue
+		}
+		parts := strings.SplitN(line, "/", 3)
+		if len(parts) < 3 {
+			continue
+		}
+		d := strings.TrimSpace(strings.ToLower(parts[1]))
+		if d != "" {
+			domains[d] = true
+		}
+	}
+
+	if len(domains) > 1000 {
+		var buf strings.Builder
+		for d := range domains {
+			buf.WriteString(d)
+			buf.WriteByte('\n')
+		}
+		os.WriteFile(cacheFile, []byte(buf.String()), 0644)
+		a.chinaDomainsMu.Lock()
+		a.chinaDomains = domains
+		a.chinaDomainsMu.Unlock()
+		log.Printf("[bypass] updated to %d China domains", len(domains))
+	}
 }
 
 func (a *App) pacContent() string {
@@ -1329,6 +1405,34 @@ func (a *App) TestLatency(nodeID int64) int {
 
 // ---------- proxy ----------
 
+func (a *App) shouldBypass(host string) bool {
+	if a.GetProxyMode() != "bypass" {
+		return false
+	}
+	a.chinaDomainsMu.RLock()
+	domains := a.chinaDomains
+	a.chinaDomainsMu.RUnlock()
+	if len(domains) == 0 {
+		return false
+	}
+	h := strings.ToLower(host)
+	if domains[h] {
+		return true
+	}
+	parts := strings.Split(h, ".")
+	for i := 1; i < len(parts); i++ {
+		if domains[strings.Join(parts[i:], ".")] {
+			return true
+		}
+	}
+	return false
+}
+
+func directDial(host string, port uint16) (net.Conn, error) {
+	addr := net.JoinHostPort(host, strconv.Itoa(int(port)))
+	return net.DialTimeout("tcp", addr, 10*time.Second)
+}
+
 func (a *App) openStream(host string, port uint16) (*mux.Stream, error) {
 	a.mu.RLock()
 	p := a.pool
@@ -1383,6 +1487,17 @@ func (a *App) handleMixed(conn net.Conn) {
 	if first[0] == 0x05 {
 		socks5.HandleConn(wrapped, func(c net.Conn, host string, port uint16) {
 			defer c.Close()
+			if a.shouldBypass(host) {
+				remote, err := directDial(host, port)
+				if err != nil {
+					socks5.ReplyFailure(c)
+					return
+				}
+				defer remote.Close()
+				socks5.ReplySuccess(c)
+				relay.CountingRelay(remote, c, &a.downBytes, &a.upBytes)
+				return
+			}
 			stream, err := a.openStream(host, port)
 			if err != nil {
 				socks5.ReplyFailure(c)
@@ -1416,6 +1531,17 @@ func (a *App) handleHTTP(conn net.Conn) {
 			return
 		}
 		port, _ := strconv.Atoi(portStr)
+		if a.shouldBypass(host) {
+			remote, err := directDial(host, uint16(port))
+			if err != nil {
+				conn.Write([]byte("HTTP/1.1 502 Bad Gateway\r\n\r\n"))
+				return
+			}
+			defer remote.Close()
+			conn.Write([]byte("HTTP/1.1 200 Connection Established\r\n\r\n"))
+			relay.CountingRelay(remote, conn, &a.downBytes, &a.upBytes)
+			return
+		}
 		stream, err := a.openStream(host, uint16(port))
 		if err != nil {
 			conn.Write([]byte("HTTP/1.1 502 Bad Gateway\r\n\r\n"))
@@ -1431,6 +1557,21 @@ func (a *App) handleHTTP(conn net.Conn) {
 	if req.URL.Port() != "" {
 		p, _ := strconv.Atoi(req.URL.Port())
 		port = uint16(p)
+	}
+	if a.shouldBypass(host) {
+		remote, err := directDial(host, port)
+		if err != nil {
+			conn.Write([]byte("HTTP/1.1 502 Bad Gateway\r\n\r\n"))
+			return
+		}
+		defer remote.Close()
+		req.RequestURI = req.URL.RequestURI()
+		req.Header.Del("Proxy-Connection")
+		var buf bytes.Buffer
+		req.Write(&buf)
+		remote.Write(buf.Bytes())
+		relay.CountingRelay(remote, conn, &a.downBytes, &a.upBytes)
+		return
 	}
 	stream, err := a.openStream(host, port)
 	if err != nil {
@@ -1531,6 +1672,27 @@ func refreshProxy() {
 	set := wininet.NewProc("InternetSetOptionW")
 	set.Call(0, 39, 0, 0)
 	set.Call(0, 37, 0, 0)
+}
+
+func compareVersions(a, b string) int {
+	pa := strings.Split(a, ".")
+	pb := strings.Split(b, ".")
+	for i := 0; i < 3; i++ {
+		var va, vb int
+		if i < len(pa) {
+			va, _ = strconv.Atoi(pa[i])
+		}
+		if i < len(pb) {
+			vb, _ = strconv.Atoi(pb[i])
+		}
+		if va > vb {
+			return 1
+		}
+		if va < vb {
+			return -1
+		}
+	}
+	return 0
 }
 
 // ---------- websocket dial ----------
