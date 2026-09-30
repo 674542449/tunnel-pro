@@ -6,6 +6,10 @@ export function ActivateTrial() {
   return window['go']['main']['App']['ActivateTrial']();
 }
 
+export function ChangePassword(arg1, arg2) {
+  return window['go']['main']['App']['ChangePassword'](arg1, arg2);
+}
+
 export function CheckUpdate() {
   return window['go']['main']['App']['CheckUpdate']();
 }
@@ -24,6 +28,14 @@ export function GetLastNodeID() {
 
 export function GetNodes() {
   return window['go']['main']['App']['GetNodes']();
+}
+
+export function GetOrders() {
+  return window['go']['main']['App']['GetOrders']();
+}
+
+export function GetProfile() {
+  return window['go']['main']['App']['GetProfile']();
 }
 
 export function GetSpeed() {

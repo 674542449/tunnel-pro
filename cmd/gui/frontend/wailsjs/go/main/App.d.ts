@@ -4,6 +4,8 @@ import {main} from '../models';
 
 export function ActivateTrial():Promise<void>;
 
+export function ChangePassword(arg1:string,arg2:string):Promise<void>;
+
 export function CheckUpdate():Promise<main.UpdateInfo>;
 
 export function Connect(arg1:number):Promise<void>;
@@ -13,6 +15,10 @@ export function Disconnect():Promise<void>;
 export function GetLastNodeID():Promise<number>;
 
 export function GetNodes():Promise<Array<main.NodeInfo>>;
+
+export function GetOrders():Promise<Array<main.OrderInfo>>;
+
+export function GetProfile():Promise<main.ProfileInfo>;
 
 export function GetSpeed():Promise<main.SpeedInfo>;
 

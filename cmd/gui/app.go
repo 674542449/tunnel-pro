@@ -71,6 +71,36 @@ type StatusInfo struct {
 	NodeID    int64  `json:"nodeId"`
 }
 
+type ProfileInfo struct {
+	ID        int64   `json:"id"`
+	Email     string  `json:"email"`
+	Role      string  `json:"role"`
+	Active    bool    `json:"active"`
+	ExpiresAt int64   `json:"expires_at"`
+	CreatedAt int64   `json:"created_at"`
+	TrialUsed bool    `json:"trial_used"`
+	Upload    int64   `json:"upload"`
+	Download  int64   `json:"download"`
+	Plans     []PlanInfo `json:"plans"`
+}
+
+type PlanInfo struct {
+	ID    int64   `json:"id"`
+	Name  string  `json:"name"`
+	Days  int     `json:"days"`
+	Price float64 `json:"price"`
+}
+
+type OrderInfo struct {
+	ID        int64   `json:"id"`
+	Plan      string  `json:"plan"`
+	Days      int     `json:"days"`
+	Amount    float64 `json:"amount"`
+	Status    string  `json:"status"`
+	CreatedAt int64   `json:"created_at"`
+	PaidAt    int64   `json:"paid_at"`
+}
+
 type AuthState struct {
 	Token      string          `json:"token,omitempty"`
 	User       json.RawMessage `json:"user,omitempty"`
@@ -364,6 +394,96 @@ func (a *App) checkUpdateOnStart() {
 	if info.Available {
 		wailsRT.EventsEmit(a.ctx, "update-available", info)
 	}
+}
+
+func (a *App) apiGet(path string) (*http.Response, error) {
+	req, _ := http.NewRequest("GET", apiBase+path, nil)
+	req.Header.Set("Authorization", "Bearer "+a.auth.Token)
+	return http.DefaultClient.Do(req)
+}
+
+func (a *App) GetProfile() (*ProfileInfo, error) {
+	resp, err := a.apiGet("/api/me")
+	if err != nil {
+		return nil, fmt.Errorf("网络错误")
+	}
+	defer resp.Body.Close()
+	var result struct {
+		User struct {
+			ID        int64  `json:"id"`
+			Email     string `json:"email"`
+			Role      string `json:"role"`
+			Active    bool   `json:"active"`
+			ExpiresAt int64  `json:"expires_at"`
+			CreatedAt int64  `json:"created_at"`
+			TrialUsed bool   `json:"trial_used"`
+		} `json:"user"`
+		Plans []PlanInfo `json:"plans"`
+		Error string     `json:"error"`
+	}
+	json.NewDecoder(resp.Body).Decode(&result)
+	if result.Error != "" {
+		return nil, errors.New(result.Error)
+	}
+
+	tResp, err := a.apiGet("/api/my-traffic")
+	var upload, download int64
+	if err == nil {
+		defer tResp.Body.Close()
+		var tr struct {
+			Upload   int64 `json:"upload"`
+			Download int64 `json:"download"`
+		}
+		json.NewDecoder(tResp.Body).Decode(&tr)
+		upload = tr.Upload
+		download = tr.Download
+	}
+
+	return &ProfileInfo{
+		ID:        result.User.ID,
+		Email:     result.User.Email,
+		Role:      result.User.Role,
+		Active:    result.User.Active,
+		ExpiresAt: result.User.ExpiresAt,
+		CreatedAt: result.User.CreatedAt,
+		TrialUsed: result.User.TrialUsed,
+		Upload:    upload,
+		Download:  download,
+		Plans:     result.Plans,
+	}, nil
+}
+
+func (a *App) GetOrders() []OrderInfo {
+	resp, err := a.apiGet("/api/orders")
+	if err != nil {
+		return nil
+	}
+	defer resp.Body.Close()
+	var result struct {
+		Orders []OrderInfo `json:"orders"`
+	}
+	json.NewDecoder(resp.Body).Decode(&result)
+	return result.Orders
+}
+
+func (a *App) ChangePassword(oldPass, newPass string) error {
+	body, _ := json.Marshal(map[string]string{"old_password": oldPass, "new_password": newPass})
+	req, _ := http.NewRequest("POST", apiBase+"/api/change-password", bytes.NewReader(body))
+	req.Header.Set("Authorization", "Bearer "+a.auth.Token)
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("网络错误")
+	}
+	defer resp.Body.Close()
+	var result struct {
+		Error string `json:"error"`
+	}
+	json.NewDecoder(resp.Body).Decode(&result)
+	if result.Error != "" {
+		return errors.New(result.Error)
+	}
+	return nil
 }
 
 func (a *App) GetNodes() []NodeInfo {

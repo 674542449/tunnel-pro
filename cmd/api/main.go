@@ -928,6 +928,69 @@ func (a *API) handleOrderStatus(w http.ResponseWriter, r *http.Request) {
 	writeJ(w, map[string]any{"order": order})
 }
 
+func (a *API) handleMyOrders(w http.ResponseWriter, r *http.Request) {
+	u, err := a.authUser(r)
+	if err != nil {
+		writeE(w, 401, "请先登录")
+		return
+	}
+	all := a.store.AllOrders()
+	var out []Order
+	for _, o := range all {
+		if o.UserID == u.ID {
+			out = append(out, o)
+		}
+	}
+	writeJ(w, map[string]any{"orders": out})
+}
+
+func (a *API) handleMyTraffic(w http.ResponseWriter, r *http.Request) {
+	u, err := a.authUser(r)
+	if err != nil {
+		writeE(w, 401, "请先登录")
+		return
+	}
+	logs := a.store.GetUserTraffic()
+	var totalUp, totalDown int64
+	for _, t := range logs {
+		if t.UserID == u.ID {
+			totalUp += t.Upload
+			totalDown += t.Download
+		}
+	}
+	writeJ(w, map[string]any{"upload": totalUp, "download": totalDown, "total": totalUp + totalDown})
+}
+
+func (a *API) handleChangePassword(w http.ResponseWriter, r *http.Request) {
+	u, err := a.authUser(r)
+	if err != nil {
+		writeE(w, 401, "请先登录")
+		return
+	}
+	if u.Email == "" {
+		writeE(w, 400, "游客账号无法修改密码")
+		return
+	}
+	var body struct {
+		OldPass string `json:"old_password"`
+		NewPass string `json:"new_password"`
+	}
+	json.NewDecoder(r.Body).Decode(&body)
+	if len(body.NewPass) < 6 {
+		writeE(w, 400, "新密码至少6位")
+		return
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(u.PassHash), []byte(body.OldPass)); err != nil {
+		writeE(w, 400, "旧密码错误")
+		return
+	}
+	h, _ := bcrypt.GenerateFromPassword([]byte(body.NewPass), 12)
+	a.store.UpdateUser(u.ID, func(u *User) {
+		u.PassHash = string(h)
+	})
+	writeJ(w, map[string]any{"ok": true})
+}
+
 func safeUser(u *User) map[string]any {
 	return map[string]any{
 		"id":         u.ID,
@@ -1511,6 +1574,9 @@ func main() {
 
 	mux.HandleFunc("POST /api/buy", api.handleBuy)
 	mux.HandleFunc("GET /api/order", api.handleOrderStatus)
+	mux.HandleFunc("GET /api/orders", api.handleMyOrders)
+	mux.HandleFunc("GET /api/my-traffic", api.handleMyTraffic)
+	mux.HandleFunc("POST /api/change-password", api.handleChangePassword)
 	mux.HandleFunc("GET /api/version", api.handleVersion)
 	mux.HandleFunc("/api/pay/notify", api.handlePayNotify)
 	mux.HandleFunc("GET /api/pay/return", api.handlePayReturn)
