@@ -4,13 +4,23 @@ import {main} from '../models';
 
 export function ActivateTrial():Promise<void>;
 
+export function BindEmail(arg1:string,arg2:string):Promise<void>;
+
 export function ChangePassword(arg1:string,arg2:string):Promise<void>;
+
+export function CheckEmail(arg1:string):Promise<boolean>;
 
 export function CheckUpdate():Promise<main.UpdateInfo>;
 
 export function Connect(arg1:number):Promise<void>;
 
+export function CopyToClipboard(arg1:string):Promise<void>;
+
 export function Disconnect():Promise<void>;
+
+export function GetDarkMode():Promise<any>;
+
+export function GetFavorites():Promise<Array<number>>;
 
 export function GetLastNodeID():Promise<number>;
 
@@ -20,11 +30,17 @@ export function GetOrders():Promise<Array<main.OrderInfo>>;
 
 export function GetProfile():Promise<main.ProfileInfo>;
 
+export function GetProxyMode():Promise<string>;
+
+export function GetSavedEmail():Promise<string>;
+
 export function GetSpeed():Promise<main.SpeedInfo>;
 
 export function GetStatus():Promise<main.StatusInfo>;
 
 export function GetUser():Promise<string>;
+
+export function GetVersion():Promise<string>;
 
 export function GuestLogin():Promise<void>;
 
@@ -40,6 +56,12 @@ export function OpenURL(arg1:string):Promise<void>;
 
 export function Register(arg1:string,arg2:string):Promise<void>;
 
+export function SetDarkMode(arg1:boolean):Promise<void>;
+
+export function SetProxyMode(arg1:string):Promise<void>;
+
 export function ShowWindow():Promise<void>;
 
 export function TestLatency(arg1:number):Promise<number>;
+
+export function ToggleFavorite(arg1:number):Promise<Array<number>>;

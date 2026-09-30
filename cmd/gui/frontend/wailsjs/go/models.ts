@@ -128,6 +128,7 @@ export namespace main {
 	    connected: boolean;
 	    nodeName: string;
 	    nodeId: number;
+	    connectedAt: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new StatusInfo(source);
@@ -138,6 +139,7 @@ export namespace main {
 	        this.connected = source["connected"];
 	        this.nodeName = source["nodeName"];
 	        this.nodeId = source["nodeId"];
+	        this.connectedAt = source["connectedAt"];
 	    }
 	}
 	export class UpdateInfo {

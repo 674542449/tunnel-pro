@@ -551,7 +551,8 @@ func verifyJWT(token, secret string) (*Claims, error) {
 
 type Config struct {
 	Listen        string `json:"listen"`
-	AdminKey      string `json:"admin_key"`
+	AdminUser     string `json:"admin_user"`
+	AdminPass     string `json:"admin_pass"`
 	TrialHours    int    `json:"trial_hours"`
 	SiteURL       string `json:"site_url"`
 	NodeReportKey string `json:"node_report_key"`
@@ -610,14 +611,14 @@ func (a *API) requireAdmin(r *http.Request) bool {
 	return c.Role == "admin"
 }
 
-// POST /api/admin/login {key}
 func (a *API) handleAdminLogin(w http.ResponseWriter, r *http.Request) {
 	var body struct {
-		Key string `json:"key"`
+		Username string `json:"username"`
+		Password string `json:"password"`
 	}
 	json.NewDecoder(r.Body).Decode(&body)
-	if body.Key != a.config.AdminKey {
-		writeE(w, 401, "密钥错误")
+	if body.Username != a.config.AdminUser || body.Password != a.config.AdminPass {
+		writeE(w, 401, "账号或密码错误")
 		return
 	}
 	token := signJWT(Claims{UID: 0, Role: "admin", Exp: time.Now().Add(24 * time.Hour).Unix()}, a.store.data.Secret)
@@ -658,6 +659,16 @@ func (a *API) handleRegister(w http.ResponseWriter, r *http.Request) {
 		writeE(w, 400, err.Error())
 		return
 	}
+
+	hours := a.config.TrialHours
+	if hours <= 0 {
+		hours = 1
+	}
+	a.store.UpdateUser(u.ID, func(u *User) {
+		u.TrialUsed = true
+		u.ExpiresAt = time.Now().Add(time.Duration(hours) * time.Hour).Unix()
+	})
+	u = a.store.FindByID(u.ID)
 
 	token := a.makeToken(u, 720)
 	writeJ(w, map[string]any{"token": token, "user": safeUser(u)})
@@ -734,6 +745,52 @@ func (a *API) handleTrial(w http.ResponseWriter, r *http.Request) {
 		u.ExpiresAt = expires
 	})
 
+	u = a.store.FindByID(u.ID)
+	writeJ(w, map[string]any{"ok": true, "user": safeUser(u)})
+}
+
+func (a *API) handleCheckEmail(w http.ResponseWriter, r *http.Request) {
+	var body struct {
+		Email string `json:"email"`
+	}
+	json.NewDecoder(r.Body).Decode(&body)
+	u := a.store.FindByEmail(strings.TrimSpace(body.Email))
+	writeJ(w, map[string]any{"exists": u != nil})
+}
+
+func (a *API) handleBindEmail(w http.ResponseWriter, r *http.Request) {
+	u, err := a.authUser(r)
+	if err != nil {
+		writeE(w, 401, "请先登录")
+		return
+	}
+	if u.Email != "" {
+		writeE(w, 400, "已绑定邮箱")
+		return
+	}
+	var body struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+	json.NewDecoder(r.Body).Decode(&body)
+	body.Email = strings.TrimSpace(body.Email)
+	if body.Email == "" || body.Password == "" {
+		writeE(w, 400, "邮箱和密码不能为空")
+		return
+	}
+	if len(body.Password) < 6 {
+		writeE(w, 400, "密码至少6位")
+		return
+	}
+	if existing := a.store.FindByEmail(body.Email); existing != nil {
+		writeE(w, 400, "该邮箱已被注册")
+		return
+	}
+	h, _ := bcrypt.GenerateFromPassword([]byte(body.Password), 12)
+	a.store.UpdateUser(u.ID, func(u *User) {
+		u.Email = body.Email
+		u.PassHash = string(h)
+	})
 	u = a.store.FindByID(u.ID)
 	writeJ(w, map[string]any{"ok": true, "user": safeUser(u)})
 }
@@ -1546,11 +1603,14 @@ func main() {
 	if cfg.TrialHours == 0 {
 		cfg.TrialHours = 1
 	}
-	if cfg.AdminKey == "" {
-		buf := make([]byte, 16)
+	if cfg.AdminUser == "" {
+		cfg.AdminUser = "admin"
+	}
+	if cfg.AdminPass == "" {
+		buf := make([]byte, 8)
 		rand.Read(buf)
-		cfg.AdminKey = hex.EncodeToString(buf)
-		log.Printf("Generated admin key: %s", cfg.AdminKey)
+		cfg.AdminPass = hex.EncodeToString(buf)
+		log.Printf("Generated admin password: %s", cfg.AdminPass)
 	}
 
 	dir := "."
@@ -1569,6 +1629,8 @@ func main() {
 	mux.HandleFunc("POST /api/login", api.handleLogin)
 	mux.HandleFunc("POST /api/guest", api.handleGuest)
 	mux.HandleFunc("POST /api/trial", api.handleTrial)
+	mux.HandleFunc("POST /api/check-email", api.handleCheckEmail)
+	mux.HandleFunc("POST /api/bind-email", api.handleBindEmail)
 	mux.HandleFunc("GET /api/me", api.handleMe)
 	mux.HandleFunc("GET /api/nodes", api.handleNodes)
 
@@ -1608,7 +1670,7 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Printf("API server: http://%s", cfg.Listen)
-	log.Printf("Admin key:  %s", cfg.AdminKey)
+	log.Printf("Admin login: %s / %s", cfg.AdminUser, cfg.AdminPass)
 	log.Fatal(http.Serve(ln, mux))
 }
 
@@ -1713,9 +1775,10 @@ tr:hover td{background:#fdf9f3}
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12h10M14 6l6 6-6 6"/></svg>
     </div>
     <h2>Tunnel 管理后台</h2>
-    <p>输入管理员密钥继续</p>
+    <p>管理员登录</p>
     <div class="login-err" id="loginErr"></div>
-    <input type="password" id="loginKey" placeholder="管理员密钥" onkeydown="if(event.key==='Enter')doLogin()">
+    <input type="text" id="loginUser" placeholder="账号" onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()" style="margin-bottom:10px">
+    <input type="password" id="loginPass" placeholder="密码" onkeydown="if(event.key==='Enter')doLogin()">
     <button class="btn btn-primary" onclick="doLogin()">登录</button>
   </div>
 </div>
@@ -1920,11 +1983,12 @@ function H(t,d){
 function toast(m,t){var e=document.getElementById("toast");e.textContent=m;e.className="toast show "+(t||"");clearTimeout(toast.t);toast.t=setTimeout(function(){e.className="toast"},2500)}
 
 function doLogin(){
-  var key=document.getElementById("loginKey").value.trim();
-  if(!key)return;
+  var user=document.getElementById("loginUser").value.trim();
+  var pass=document.getElementById("loginPass").value.trim();
+  if(!user||!pass)return;
   var errEl=document.getElementById("loginErr");
   errEl.style.display="none";
-  fetch("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({key:key})}).then(function(r){return r.json()}).then(function(d){
+  fetch("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:user,password:pass})}).then(function(r){return r.json()}).then(function(d){
     if(d.error){errEl.textContent=d.error;errEl.style.display="block";return}
     TOKEN=d.token;
     localStorage.setItem("admin_token",TOKEN);

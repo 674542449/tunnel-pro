@@ -6,8 +6,16 @@ export function ActivateTrial() {
   return window['go']['main']['App']['ActivateTrial']();
 }
 
+export function BindEmail(arg1, arg2) {
+  return window['go']['main']['App']['BindEmail'](arg1, arg2);
+}
+
 export function ChangePassword(arg1, arg2) {
   return window['go']['main']['App']['ChangePassword'](arg1, arg2);
+}
+
+export function CheckEmail(arg1) {
+  return window['go']['main']['App']['CheckEmail'](arg1);
 }
 
 export function CheckUpdate() {
@@ -18,8 +26,20 @@ export function Connect(arg1) {
   return window['go']['main']['App']['Connect'](arg1);
 }
 
+export function CopyToClipboard(arg1) {
+  return window['go']['main']['App']['CopyToClipboard'](arg1);
+}
+
 export function Disconnect() {
   return window['go']['main']['App']['Disconnect']();
+}
+
+export function GetDarkMode() {
+  return window['go']['main']['App']['GetDarkMode']();
+}
+
+export function GetFavorites() {
+  return window['go']['main']['App']['GetFavorites']();
 }
 
 export function GetLastNodeID() {
@@ -38,6 +58,14 @@ export function GetProfile() {
   return window['go']['main']['App']['GetProfile']();
 }
 
+export function GetProxyMode() {
+  return window['go']['main']['App']['GetProxyMode']();
+}
+
+export function GetSavedEmail() {
+  return window['go']['main']['App']['GetSavedEmail']();
+}
+
 export function GetSpeed() {
   return window['go']['main']['App']['GetSpeed']();
 }
@@ -48,6 +76,10 @@ export function GetStatus() {
 
 export function GetUser() {
   return window['go']['main']['App']['GetUser']();
+}
+
+export function GetVersion() {
+  return window['go']['main']['App']['GetVersion']();
 }
 
 export function GuestLogin() {
@@ -78,10 +110,22 @@ export function Register(arg1, arg2) {
   return window['go']['main']['App']['Register'](arg1, arg2);
 }
 
+export function SetDarkMode(arg1) {
+  return window['go']['main']['App']['SetDarkMode'](arg1);
+}
+
+export function SetProxyMode(arg1) {
+  return window['go']['main']['App']['SetProxyMode'](arg1);
+}
+
 export function ShowWindow() {
   return window['go']['main']['App']['ShowWindow']();
 }
 
 export function TestLatency(arg1) {
   return window['go']['main']['App']['TestLatency'](arg1);
+}
+
+export function ToggleFavorite(arg1) {
+  return window['go']['main']['App']['ToggleFavorite'](arg1);
 }

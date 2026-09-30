@@ -1,6 +1,7 @@
 package main
 
 import (
+	"archive/zip"
 	"bufio"
 	"bytes"
 	"context"
@@ -8,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"math/rand"
 	"net"
@@ -16,6 +18,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -66,9 +69,10 @@ type SpeedInfo struct {
 }
 
 type StatusInfo struct {
-	Connected bool   `json:"connected"`
-	NodeName  string `json:"nodeName"`
-	NodeID    int64  `json:"nodeId"`
+	Connected   bool   `json:"connected"`
+	NodeName    string `json:"nodeName"`
+	NodeID      int64  `json:"nodeId"`
+	ConnectedAt int64  `json:"connectedAt"`
 }
 
 type ProfileInfo struct {
@@ -105,6 +109,10 @@ type AuthState struct {
 	Token      string          `json:"token,omitempty"`
 	User       json.RawMessage `json:"user,omitempty"`
 	LastNodeID int64           `json:"last_node_id,omitempty"`
+	SavedEmail string          `json:"saved_email,omitempty"`
+	Favorites  []int64         `json:"favorites,omitempty"`
+	DarkMode   *bool           `json:"dark_mode,omitempty"`
+	ProxyMode  string          `json:"proxy_mode,omitempty"`
 }
 
 type serverConfig struct {
@@ -148,14 +156,20 @@ type App struct {
 	authPath       string
 	nodes          []serverConfig
 	mixedAddr      string
+	pacPath        string
 	trayDisconnect interface{ Enable(); Disable() }
 
-	mu        sync.RWMutex
-	pool      *connPool
-	activeID  int64
-	proxyOn   bool
-	upBytes   atomic.Int64
-	downBytes atomic.Int64
+	mu          sync.RWMutex
+	pool        *connPool
+	activeID    int64
+	proxyOn     bool
+	upBytes     atomic.Int64
+	downBytes   atomic.Int64
+	connectedAt int64
+
+	tunCmd      *exec.Cmd
+	tunRunning  bool
+	origGateway string
 }
 
 func NewApp() *App {
@@ -164,6 +178,7 @@ func NewApp() *App {
 	return &App{
 		authPath:  filepath.Join(dir, "auth.json"),
 		mixedAddr: "127.0.0.1:7890",
+		pacPath:   filepath.Join(dir, "proxy.pac"),
 		activeID:  -1,
 	}
 }
@@ -268,7 +283,9 @@ func (a *App) Login(email, pass string) error {
 	if result.Error != "" {
 		return errors.New(result.Error)
 	}
-	a.auth = AuthState{Token: result.Token, User: result.User}
+	a.auth.Token = result.Token
+	a.auth.User = result.User
+	a.auth.SavedEmail = email
 	a.saveAuth()
 	return nil
 }
@@ -289,7 +306,9 @@ func (a *App) Register(email, pass string) error {
 	if result.Error != "" {
 		return errors.New(result.Error)
 	}
-	a.auth = AuthState{Token: result.Token, User: result.User}
+	a.auth.Token = result.Token
+	a.auth.User = result.User
+	a.auth.SavedEmail = email
 	a.saveAuth()
 	return nil
 }
@@ -486,6 +505,358 @@ func (a *App) ChangePassword(oldPass, newPass string) error {
 	return nil
 }
 
+func (a *App) CheckEmail(email string) (bool, error) {
+	body, _ := json.Marshal(map[string]string{"email": email})
+	resp, err := http.Post(apiBase+"/api/check-email", "application/json", bytes.NewReader(body))
+	if err != nil {
+		return false, fmt.Errorf("网络错误")
+	}
+	defer resp.Body.Close()
+	var result struct {
+		Exists bool `json:"exists"`
+	}
+	json.NewDecoder(resp.Body).Decode(&result)
+	return result.Exists, nil
+}
+
+func (a *App) BindEmail(email, pass string) error {
+	body, _ := json.Marshal(map[string]string{"email": email, "password": pass})
+	req, _ := http.NewRequest("POST", apiBase+"/api/bind-email", bytes.NewReader(body))
+	req.Header.Set("Authorization", "Bearer "+a.auth.Token)
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("网络错误")
+	}
+	defer resp.Body.Close()
+	var result struct {
+		Error string `json:"error"`
+	}
+	json.NewDecoder(resp.Body).Decode(&result)
+	if result.Error != "" {
+		return errors.New(result.Error)
+	}
+	return nil
+}
+
+func (a *App) GetSavedEmail() string {
+	return a.auth.SavedEmail
+}
+
+func (a *App) ToggleFavorite(nodeID int64) []int64 {
+	found := false
+	var newFavs []int64
+	for _, id := range a.auth.Favorites {
+		if id == nodeID {
+			found = true
+		} else {
+			newFavs = append(newFavs, id)
+		}
+	}
+	if !found {
+		newFavs = append(newFavs, nodeID)
+	}
+	a.auth.Favorites = newFavs
+	a.saveAuth()
+	return newFavs
+}
+
+func (a *App) GetFavorites() []int64 {
+	return a.auth.Favorites
+}
+
+func (a *App) SetDarkMode(dark bool) {
+	a.auth.DarkMode = &dark
+	a.saveAuth()
+}
+
+func (a *App) GetDarkMode() *bool {
+	return a.auth.DarkMode
+}
+
+func (a *App) GetVersion() string { return clientVersion }
+
+func (a *App) CopyToClipboard(text string) {
+	exec.Command("cmd", "/c", "echo|set /p="+text+"|clip").Run()
+}
+
+func (a *App) GetProxyMode() string {
+	if a.auth.ProxyMode == "" {
+		return "bypass"
+	}
+	return a.auth.ProxyMode
+}
+
+func (a *App) SetProxyMode(mode string) {
+	a.auth.ProxyMode = mode
+	a.saveAuth()
+	if a.proxyOn {
+		a.applyProxyMode()
+	}
+}
+
+func (a *App) applyProxyMode() {
+	a.stopTUN()
+	clearSystemProxy()
+	os.Remove(a.pacPath)
+
+	mode := a.GetProxyMode()
+	switch mode {
+	case "bypass":
+		a.writePAC()
+		setSystemProxyPAC(a.pacPath)
+	case "tun":
+		go a.startTUN()
+	default:
+		setSystemProxy(a.mixedAddr)
+	}
+}
+
+func (a *App) writePAC() {
+	pac := `function FindProxyOrReturn(url, host) {
+    var PROXY = "PROXY 127.0.0.1:7890; SOCKS5 127.0.0.1:7890; DIRECT";
+    var DIRECT_VAL = "DIRECT";
+    if (isPlainHostName(host) || host === "127.0.0.1" || host === "localhost") return DIRECT_VAL;
+    var cnDomains = [
+        ".cn", ".com.cn", ".net.cn", ".org.cn",
+        ".baidu.com", ".qq.com", ".taobao.com", ".tmall.com", ".jd.com",
+        ".alipay.com", ".aliyun.com", ".163.com", ".126.com", ".sina.com.cn",
+        ".weibo.com", ".sohu.com", ".youku.com", ".bilibili.com", ".zhihu.com",
+        ".douyin.com", ".toutiao.com", ".bytedance.com", ".csdn.net",
+        ".douban.com", ".meituan.com", ".pinduoduo.com", ".xiaomi.com",
+        ".huawei.com", ".tencent.com", ".wechat.com", ".weixin.qq.com",
+        ".sogou.com", ".360.cn", ".iqiyi.com", ".cctv.com",
+        ".gov.cn", ".edu.cn", ".mil.cn"
+    ];
+    for (var i = 0; i < cnDomains.length; i++) {
+        if (dnsDomainIs(host, cnDomains[i]) || host === cnDomains[i].substring(1)) return DIRECT_VAL;
+    }
+    var cnIpRanges = [
+        [167772160, 184549375],     // 10.0.0.0/8
+        [2886729728, 2887778303],   // 172.16.0.0/12
+        [3232235520, 3232301055],   // 192.168.0.0/16
+        [16777216, 33554431],       // 1.0.0.0 - 1.255.255.255
+        [1946157056, 2013265919],   // 116.0.0.0 - 119.255.255.255
+        [2030043136, 2046820351],   // 121.0.0.0 - 121.255.255.255
+        [2063597568, 2080374783],   // 123.0.0.0 - 123.255.255.255
+        [1811939328, 1879048191],   // 108.0.0.0 - 111.255.255.255
+        [3707764736, 3774873599],   // 221.0.0.0 - 224.255.255.255
+        [3758096384, 3825205247],   // 224.0.0.0 - 227.255.255.255
+        [637534208, 671088639],     // 38.0.0.0 - 39.255.255.255
+        [754974720, 788529151],     // 45.0.0.0 - 46.255.255.255
+        [3087007744, 3087007744+16777215]  // 184.0.0.0/8
+    ];
+    if (/^\d+\.\d+\.\d+\.\d+$/.test(host)) {
+        var parts = host.split(".");
+        var ip = (+parts[0])*16777216 + (+parts[1])*65536 + (+parts[2])*256 + (+parts[3]);
+        for (var j = 0; j < cnIpRanges.length; j++) {
+            if (ip >= cnIpRanges[j][0] && ip <= cnIpRanges[j][1]) return DIRECT_VAL;
+        }
+    }
+    return PROXY;
+}
+function FindProxyForURL(url, host) { return FindProxyOrReturn(url, host); }
+`
+	os.WriteFile(a.pacPath, []byte(pac), 0644)
+}
+
+func setSystemProxyPAC(pacPath string) {
+	abs, err := filepath.Abs(pacPath)
+	if err != nil {
+		abs = pacPath
+	}
+	absSlash := filepath.ToSlash(abs)
+	pacURL := "file:///" + absSlash
+	log.Printf("[proxy] PAC URL: %s", pacURL)
+	regPath := `HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings`
+	run := func(args ...string) { exec.Command("reg", args...).Run() }
+	run("add", regPath, "/v", "ProxyEnable", "/t", "REG_DWORD", "/d", "0", "/f")
+	run("add", regPath, "/v", "ProxyServer", "/t", "REG_SZ", "/d", "", "/f")
+	run("add", regPath, "/v", "AutoConfigURL", "/t", "REG_SZ", "/d", pacURL, "/f")
+	refreshProxy()
+}
+
+func (a *App) startTUN() {
+	exe, _ := os.Executable()
+	dir := filepath.Dir(exe)
+	t2sPath := filepath.Join(dir, "tun2socks.exe")
+	wintunPath := filepath.Join(dir, "wintun.dll")
+
+	if !fileExists(t2sPath) || !fileExists(wintunPath) {
+		log.Println("[TUN] downloading components...")
+		if err := downloadTUNComponents(dir); err != nil {
+			log.Printf("[TUN] download failed: %v, falling back to global", err)
+			setSystemProxy(a.mixedAddr)
+			return
+		}
+	}
+
+	gw, err := getDefaultGateway()
+	if err != nil {
+		log.Printf("[TUN] cannot detect gateway: %v, falling back to global", err)
+		setSystemProxy(a.mixedAddr)
+		return
+	}
+	a.origGateway = gw
+	log.Printf("[TUN] original gateway: %s", gw)
+
+	a.tunCmd = exec.Command(t2sPath,
+		"-device", "wintun://TunnelPro",
+		"-proxy", "socks5://127.0.0.1:7890",
+		"-loglevel", "warn",
+	)
+	a.tunCmd.Dir = dir
+	a.tunCmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	if err := a.tunCmd.Start(); err != nil {
+		log.Printf("[TUN] start failed: %v, falling back to global", err)
+		setSystemProxy(a.mixedAddr)
+		return
+	}
+
+	time.Sleep(3 * time.Second)
+
+	exec.Command("netsh", "interface", "ip", "set", "address", "TunnelPro", "static", "10.0.85.2", "255.255.255.0", "10.0.85.1").Run()
+	exec.Command("netsh", "interface", "ip", "set", "dns", "TunnelPro", "static", "8.8.8.8").Run()
+	exec.Command("netsh", "interface", "ip", "add", "dns", "TunnelPro", "1.1.1.1", "index=2").Run()
+
+	var serverIP string
+	a.mu.RLock()
+	for _, n := range a.nodes {
+		if n.ID == a.activeID {
+			serverIP = n.Addr
+			if h, _, err := net.SplitHostPort(serverIP); err == nil {
+				serverIP = h
+			}
+			if ips, err := net.LookupHost(serverIP); err == nil && len(ips) > 0 {
+				serverIP = ips[0]
+			}
+			break
+		}
+	}
+	a.mu.RUnlock()
+
+	if serverIP != "" {
+		exec.Command("route", "add", serverIP, "mask", "255.255.255.255", gw, "metric", "5").Run()
+		log.Printf("[TUN] route: %s via %s", serverIP, gw)
+	}
+	exec.Command("route", "add", "0.0.0.0", "mask", "128.0.0.0", "10.0.85.1", "metric", "6").Run()
+	exec.Command("route", "add", "128.0.0.0", "mask", "128.0.0.0", "10.0.85.1", "metric", "6").Run()
+
+	a.tunRunning = true
+	log.Println("[TUN] started successfully")
+}
+
+func (a *App) stopTUN() {
+	if !a.tunRunning {
+		return
+	}
+	exec.Command("route", "delete", "0.0.0.0", "mask", "128.0.0.0", "10.0.85.1").Run()
+	exec.Command("route", "delete", "128.0.0.0", "mask", "128.0.0.0", "10.0.85.1").Run()
+
+	if a.tunCmd != nil && a.tunCmd.Process != nil {
+		a.tunCmd.Process.Kill()
+		a.tunCmd.Wait()
+		a.tunCmd = nil
+	}
+	a.tunRunning = false
+	log.Println("[TUN] stopped")
+}
+
+func fileExists(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
+}
+
+func getDefaultGateway() (string, error) {
+	out, err := exec.Command("powershell", "-NoProfile", "-Command",
+		"(Get-NetRoute -DestinationPrefix '0.0.0.0/0' | Sort-Object RouteMetric | Select-Object -First 1).NextHop").Output()
+	if err != nil {
+		return "", err
+	}
+	gw := strings.TrimSpace(string(out))
+	if gw == "" || !strings.Contains(gw, ".") {
+		return "", errors.New("no gateway found")
+	}
+	return gw, nil
+}
+
+func downloadTUNComponents(dir string) error {
+	arch := runtime.GOARCH
+	if arch == "" {
+		arch = "amd64"
+	}
+
+	t2sURL := "https://github.com/xjasonlyu/tun2socks/releases/download/v2.5.2/tun2socks-windows-" + arch + ".zip"
+	log.Printf("[TUN] downloading tun2socks from %s", t2sURL)
+	if err := downloadAndExtractZip(t2sURL, dir, func(name string) string {
+		if strings.HasSuffix(strings.ToLower(name), ".exe") {
+			return "tun2socks.exe"
+		}
+		return ""
+	}); err != nil {
+		return fmt.Errorf("tun2socks download: %w", err)
+	}
+
+	wintunURL := "https://www.wintun.net/builds/wintun-0.14.1.zip"
+	wantDLL := "wintun/bin/" + arch + "/wintun.dll"
+	log.Printf("[TUN] downloading wintun from %s", wintunURL)
+	if err := downloadAndExtractZip(wintunURL, dir, func(name string) string {
+		if strings.ToLower(filepath.ToSlash(name)) == wantDLL {
+			return "wintun.dll"
+		}
+		return ""
+	}); err != nil {
+		return fmt.Errorf("wintun download: %w", err)
+	}
+
+	return nil
+}
+
+func downloadAndExtractZip(zipURL, destDir string, nameMapper func(string) string) error {
+	resp, err := http.Get(zipURL)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("HTTP %d", resp.StatusCode)
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	zr, err := zip.NewReader(bytes.NewReader(body), int64(len(body)))
+	if err != nil {
+		return err
+	}
+	extracted := 0
+	for _, f := range zr.File {
+		outName := nameMapper(f.Name)
+		if outName == "" {
+			continue
+		}
+		rc, err := f.Open()
+		if err != nil {
+			return err
+		}
+		outPath := filepath.Join(destDir, outName)
+		out, err := os.Create(outPath)
+		if err != nil {
+			rc.Close()
+			return err
+		}
+		io.Copy(out, rc)
+		out.Close()
+		rc.Close()
+		extracted++
+		log.Printf("[TUN] extracted %s", outName)
+	}
+	if extracted == 0 {
+		return errors.New("no matching files in zip")
+	}
+	return nil
+}
+
 func (a *App) GetNodes() []NodeInfo {
 	req, _ := http.NewRequest("GET", apiBase+"/api/nodes", nil)
 	req.Header.Set("Authorization", "Bearer "+a.auth.Token)
@@ -578,14 +949,15 @@ func (a *App) Connect(nodeID int64) error {
 	a.activeID = nodeID
 	a.mu.Unlock()
 
-	setSystemProxy(a.mixedAddr)
+	a.applyProxyMode()
 	a.proxyOn = true
+	a.connectedAt = time.Now().Unix()
 
 	a.auth.LastNodeID = nodeID
 	a.saveAuth()
 
 	a.updateTrayTooltip(true, cfg.Name)
-	wailsRT.EventsEmit(a.ctx, "connection-changed", StatusInfo{Connected: true, NodeName: cfg.Name, NodeID: nodeID})
+	wailsRT.EventsEmit(a.ctx, "connection-changed", StatusInfo{Connected: true, NodeName: cfg.Name, NodeID: nodeID, ConnectedAt: a.connectedAt})
 	return nil
 }
 
@@ -598,10 +970,13 @@ func (a *App) Disconnect() {
 		a.pool = nil
 	}
 	a.activeID = -1
+	a.connectedAt = 0
 	a.mu.Unlock()
 
+	a.stopTUN()
 	if a.proxyOn {
 		clearSystemProxy()
+		os.Remove(a.pacPath)
 		a.proxyOn = false
 	}
 
@@ -624,7 +999,7 @@ func (a *App) GetStatus() StatusInfo {
 			break
 		}
 	}
-	return StatusInfo{Connected: true, NodeName: name, NodeID: a.activeID}
+	return StatusInfo{Connected: true, NodeName: name, NodeID: a.activeID, ConnectedAt: a.connectedAt}
 }
 
 func (a *App) GetSpeed() SpeedInfo {
@@ -842,15 +1217,19 @@ func setSystemProxy(addr string) {
 	run := func(args ...string) { exec.Command("reg", args...).Run() }
 	run("add", regPath, "/v", "AutoConfigURL", "/t", "REG_SZ", "/d", "", "/f")
 	run("add", regPath, "/v", "ProxyEnable", "/t", "REG_DWORD", "/d", "1", "/f")
-	run("add", regPath, "/v", "ProxyServer", "/t", "REG_SZ", "/d", addr, "/f")
+	run("add", regPath, "/v", "ProxyServer", "/t", "REG_SZ", "/d",
+		"http="+addr+";https="+addr+";socks="+addr, "/f")
 	run("add", regPath, "/v", "ProxyOverride", "/t", "REG_SZ", "/d",
 		"localhost;127.*;10.*;192.168.*;<local>", "/f")
+	log.Printf("[proxy] system proxy set to %s", addr)
 	refreshProxy()
 }
 
 func clearSystemProxy() {
 	regPath := `HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings`
-	exec.Command("reg", "add", regPath, "/v", "ProxyEnable", "/t", "REG_DWORD", "/d", "0", "/f").Run()
+	run := func(args ...string) { exec.Command("reg", args...).Run() }
+	run("add", regPath, "/v", "ProxyEnable", "/t", "REG_DWORD", "/d", "0", "/f")
+	run("add", regPath, "/v", "AutoConfigURL", "/t", "REG_SZ", "/d", "", "/f")
 	refreshProxy()
 }
 
