@@ -784,6 +784,8 @@ type API struct {
 	cfgMu      sync.RWMutex
 	cfgPath    string
 	nodeStatus sync.Map // map[int64]*NodeStatus
+	sessions   sync.Map // map[string]int64 (sessionKey -> userID)
+	sessionMu  sync.Mutex
 }
 
 func (a *API) makeToken(u *User, hours int) string {
@@ -1099,12 +1101,64 @@ func (a *API) handleNodes(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	var speedLimit, deviceLimit int
+	if u.PlanID > 0 {
+		if plan := a.store.FindPlan(u.PlanID); plan != nil {
+			speedLimit = plan.SpeedLimit
+			deviceLimit = plan.DeviceLimit
+		}
+	}
+
 	nodes := a.store.EnabledNodes()
 	out := make([]ClientNode, len(nodes))
 	for i, n := range nodes {
 		out[i] = ClientNode{ID: n.ID, Name: n.Name, Addr: n.Addr, IP: n.IP, PSK: n.PSK, Region: n.Region}
 	}
-	writeJ(w, map[string]any{"nodes": out})
+	writeJ(w, map[string]any{"nodes": out, "speed_limit": speedLimit, "device_limit": deviceLimit})
+}
+
+func (a *API) countUserSessions(userID int64) int {
+	count := 0
+	a.sessions.Range(func(k, v any) bool {
+		if v.(int64) == userID {
+			count++
+		}
+		return true
+	})
+	return count
+}
+
+// POST /api/session {action: "connect"|"disconnect", session_id: "xxx"}
+func (a *API) handleSession(w http.ResponseWriter, r *http.Request) {
+	u, err := a.authUser(r)
+	if err != nil {
+		writeE(w, 401, "请先登录")
+		return
+	}
+	var body struct {
+		Action    string `json:"action"`
+		SessionID string `json:"session_id"`
+	}
+	json.NewDecoder(r.Body).Decode(&body)
+
+	if body.Action == "connect" {
+		if u.PlanID > 0 {
+			if plan := a.store.FindPlan(u.PlanID); plan != nil && plan.DeviceLimit > 0 {
+				current := a.countUserSessions(u.ID)
+				if current >= plan.DeviceLimit {
+					writeE(w, 403, fmt.Sprintf("设备数已达上限(%d台)，请先断开其他设备", plan.DeviceLimit))
+					return
+				}
+			}
+		}
+		a.sessions.Store(body.SessionID, u.ID)
+		writeJ(w, map[string]any{"ok": true})
+	} else if body.Action == "disconnect" {
+		a.sessions.Delete(body.SessionID)
+		writeJ(w, map[string]any{"ok": true})
+	} else {
+		writeE(w, 400, "invalid action")
+	}
 }
 
 // -------- EPay helpers --------
@@ -2247,6 +2301,7 @@ func main() {
 	mux.HandleFunc("POST /api/bind-email", api.handleBindEmail)
 	mux.HandleFunc("GET /api/me", api.handleMe)
 	mux.HandleFunc("GET /api/nodes", api.handleNodes)
+	mux.HandleFunc("POST /api/session", api.handleSession)
 
 	mux.HandleFunc("POST /api/buy", api.handleBuy)
 	mux.HandleFunc("GET /api/order", api.handleOrderStatus)

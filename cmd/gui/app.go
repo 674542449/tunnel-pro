@@ -190,9 +190,12 @@ type App struct {
 	tunRunning  bool
 	origGateway string
 
-	connLog     []ConnLogEntry
-	connLogMu   sync.Mutex
-	killSwitch  bool
+	connLog        []ConnLogEntry
+	connLogMu      sync.Mutex
+	killSwitch     bool
+	speedLimitMbps int
+	deviceLimit    int
+	sessionID      string
 }
 
 func NewApp() *App {
@@ -994,8 +997,12 @@ func (a *App) GetNodes() []NodeInfo {
 			PSK    string `json:"psk"`
 			Region string `json:"region"`
 		} `json:"nodes"`
+		SpeedLimit  int `json:"speed_limit"`
+		DeviceLimit int `json:"device_limit"`
 	}
 	json.NewDecoder(resp.Body).Decode(&result)
+	a.speedLimitMbps = result.SpeedLimit
+	a.deviceLimit = result.DeviceLimit
 
 	a.nodes = nil
 	var out []NodeInfo
@@ -1029,6 +1036,35 @@ func (a *App) GetNodes() []NodeInfo {
 	return out
 }
 
+func genSessionID() string {
+	const chars = "abcdefghijklmnopqrstuvwxyz0123456789"
+	b := make([]byte, 16)
+	for i := range b {
+		b[i] = chars[rand.Intn(len(chars))]
+	}
+	return string(b)
+}
+
+func (a *App) apiSession(action, sid string) error {
+	body, _ := json.Marshal(map[string]string{"action": action, "session_id": sid})
+	req, _ := http.NewRequest("POST", apiBase+"/api/session", bytes.NewReader(body))
+	req.Header.Set("Authorization", "Bearer "+a.auth.Token)
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil
+	}
+	defer resp.Body.Close()
+	var result struct {
+		Error string `json:"error"`
+	}
+	json.NewDecoder(resp.Body).Decode(&result)
+	if result.Error != "" {
+		return errors.New(result.Error)
+	}
+	return nil
+}
+
 func (a *App) Connect(nodeID int64) error {
 	var cfg *serverConfig
 	for i := range a.nodes {
@@ -1042,6 +1078,14 @@ func (a *App) Connect(nodeID int64) error {
 	}
 
 	a.Disconnect()
+
+	if a.deviceLimit > 0 {
+		sid := genSessionID()
+		if err := a.apiSession("connect", sid); err != nil {
+			return err
+		}
+		a.sessionID = sid
+	}
 
 	dialFn := func() (*mux.Mux, error) {
 		ws, err := dialWS(*cfg)
@@ -1082,7 +1126,20 @@ func (a *App) Connect(nodeID int64) error {
 	return nil
 }
 
+func (a *App) doRelay(stream, conn io.ReadWriteCloser) {
+	if a.speedLimitMbps > 0 {
+		bytesPerSec := int64(a.speedLimitMbps) * 1024 * 1024 / 8
+		relay.RateLimitedRelay(stream, conn, &a.downBytes, &a.upBytes, bytesPerSec)
+	} else {
+		relay.CountingRelay(stream, conn, &a.downBytes, &a.upBytes)
+	}
+}
+
 func (a *App) Disconnect() {
+	if a.sessionID != "" {
+		a.apiSession("disconnect", a.sessionID)
+		a.sessionID = ""
+	}
 	a.mu.Lock()
 	if a.pool != nil {
 		if a.pool.conn != nil {
@@ -1236,7 +1293,7 @@ func (a *App) handleMixed(conn net.Conn) {
 			}
 			defer stream.Close()
 			socks5.ReplySuccess(c)
-			relay.CountingRelay(stream, c, &a.downBytes, &a.upBytes)
+			a.doRelay(stream, c)
 		})
 	} else {
 		a.handleHTTP(wrapped)
@@ -1264,7 +1321,7 @@ func (a *App) handleHTTP(conn net.Conn) {
 		}
 		defer stream.Close()
 		conn.Write([]byte("HTTP/1.1 200 Connection Established\r\n\r\n"))
-		relay.CountingRelay(stream, conn, &a.downBytes, &a.upBytes)
+		a.doRelay(stream, conn)
 		return
 	}
 	host := req.URL.Hostname()
@@ -1284,7 +1341,7 @@ func (a *App) handleHTTP(conn net.Conn) {
 	var buf bytes.Buffer
 	req.Write(&buf)
 	stream.Write(buf.Bytes())
-	relay.CountingRelay(stream, conn, &a.downBytes, &a.upBytes)
+	a.doRelay(stream, conn)
 }
 
 func (a *App) healthCheck() {
