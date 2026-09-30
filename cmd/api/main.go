@@ -1843,7 +1843,7 @@ func (a *API) handleDeployScript(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cmd := fmt.Sprintf(
-		`curl -fsSL https://raw.githubusercontent.com/674542449/tunnel-pro/master/scripts/tunnel-node.sh | bash -s install --domain %s --psk %s --api-url %s --node-id %d --report-key %s`,
+		`curl -fsSL https://raw.githubusercontent.com/674542449/tunnel-pro/master/scripts/tunnel-node.sh | bash -s install -d '%s' -p '%s' -a '%s' -n %d -k '%s'`,
 		node.Addr, node.PSK, a.config.SiteURL, node.ID, a.config.NodeReportKey,
 	)
 

@@ -105,11 +105,11 @@ do_install() {
     # Parse command-line args
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            --domain)    domain="$2"; shift 2 ;;
-            --psk)       psk="$2"; shift 2 ;;
-            --api-url)   api_url="$2"; shift 2 ;;
-            --node-id)   node_id="$2"; shift 2 ;;
-            --report-key) report_key="$2"; shift 2 ;;
+            --domain|-d)  domain="$2"; shift 2 ;;
+            --psk|-p)     psk="$2"; shift 2 ;;
+            --api-url|--api|-a) api_url="$2"; shift 2 ;;
+            --node-id|--id|-n)  node_id="$2"; shift 2 ;;
+            --report-key|--key|-k) report_key="$2"; shift 2 ;;
             *) shift ;;
         esac
     done
