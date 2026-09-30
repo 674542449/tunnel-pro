@@ -86,6 +86,7 @@ type ProfileInfo struct {
 	Upload       int64      `json:"upload"`
 	Download     int64      `json:"download"`
 	TrafficLimit int64      `json:"traffic_limit"`
+	PlanID       int64      `json:"plan_id"`
 	Plans        []PlanInfo `json:"plans"`
 }
 
@@ -430,6 +431,32 @@ func (a *App) OpenURL(url string) {
 	exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
 }
 
+func (a *App) BuyPlan(planID int64, couponCode string) (string, error) {
+	body, _ := json.Marshal(map[string]any{"plan_id": planID, "coupon_code": couponCode})
+	req, _ := http.NewRequest("POST", apiBase+"/api/buy", bytes.NewReader(body))
+	req.Header.Set("Authorization", "Bearer "+a.auth.Token)
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("网络错误")
+	}
+	defer resp.Body.Close()
+	var result struct {
+		PayURL  string `json:"pay_url"`
+		Error   string `json:"error"`
+		Message string `json:"message"`
+	}
+	json.NewDecoder(resp.Body).Decode(&result)
+	if result.Error != "" {
+		return "", errors.New(result.Error)
+	}
+	if result.PayURL != "" {
+		exec.Command("rundll32", "url.dll,FileProtocolHandler", result.PayURL).Start()
+		return result.PayURL, nil
+	}
+	return "", fmt.Errorf(result.Message)
+}
+
 func (a *App) checkUpdateOnStart() {
 	time.Sleep(2 * time.Second)
 	info := a.CheckUpdate()
@@ -470,24 +497,18 @@ func (a *App) GetProfile() (*ProfileInfo, error) {
 	}
 
 	tResp, err := a.apiGet("/api/my-traffic")
-	var upload, download int64
+	var upload, download, trafficLimit int64
 	if err == nil {
 		defer tResp.Body.Close()
 		var tr struct {
-			Upload   int64 `json:"upload"`
-			Download int64 `json:"download"`
+			Upload       int64 `json:"upload"`
+			Download     int64 `json:"download"`
+			TrafficLimit int64 `json:"traffic_limit"`
 		}
 		json.NewDecoder(tResp.Body).Decode(&tr)
 		upload = tr.Upload
 		download = tr.Download
-	}
-
-	var trafficLimit int64
-	for _, p := range result.Plans {
-		if p.ID == result.User.PlanID {
-			trafficLimit = p.TrafficLimit
-			break
-		}
+		trafficLimit = tr.TrafficLimit
 	}
 
 	return &ProfileInfo{
@@ -501,6 +522,7 @@ func (a *App) GetProfile() (*ProfileInfo, error) {
 		Upload:       upload,
 		Download:     download,
 		TrafficLimit: trafficLimit,
+		PlanID:       result.User.PlanID,
 		Plans:        result.Plans,
 	}, nil
 }

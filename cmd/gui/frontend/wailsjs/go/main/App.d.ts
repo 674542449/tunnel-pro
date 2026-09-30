@@ -6,6 +6,8 @@ export function ActivateTrial():Promise<void>;
 
 export function BindEmail(arg1:string,arg2:string):Promise<void>;
 
+export function BuyPlan(arg1:number,arg2:string):Promise<string>;
+
 export function ChangePassword(arg1:string,arg2:string):Promise<void>;
 
 export function CheckEmail(arg1:string):Promise<boolean>;

@@ -10,6 +10,10 @@ export function BindEmail(arg1, arg2) {
   return window['go']['main']['App']['BindEmail'](arg1, arg2);
 }
 
+export function BuyPlan(arg1, arg2) {
+  return window['go']['main']['App']['BuyPlan'](arg1, arg2);
+}
+
 export function ChangePassword(arg1, arg2) {
   return window['go']['main']['App']['ChangePassword'](arg1, arg2);
 }

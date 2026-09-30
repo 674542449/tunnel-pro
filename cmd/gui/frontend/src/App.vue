@@ -326,6 +326,25 @@
             </div>
           </div>
 
+          <div v-if="profile && profile.plans && profile.plans.length > 0" class="profile-section">
+            <div class="section-title">续费 / 更换套餐</div>
+            <div v-for="p in profile.plans" :key="p.id" class="plan-card">
+              <div class="plan-info">
+                <div class="plan-name">{{ p.name }}</div>
+                <div class="plan-desc">{{ p.days }}天 <span v-if="p.traffic_limit">· {{ formatBytes(p.traffic_limit) }}/月</span></div>
+              </div>
+              <div class="plan-right">
+                <div class="plan-price">¥{{ p.price }}</div>
+                <button class="btn-sm" @click="buyPlan(p)">
+                  {{ profile.plan_id === p.id ? '续费' : '购买' }}
+                </button>
+              </div>
+            </div>
+            <div v-if="profile.active && profile.plan_id" class="plan-hint">
+              更换套餐时，剩余时间将按残值折算到新套餐
+            </div>
+          </div>
+
           <div class="profile-section">
             <button class="btn-logout" @click="logout">退出登录</button>
           </div>
@@ -395,7 +414,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { Login, Register, GuestLogin, IsLoggedIn, Logout, GetNodes, Connect, Disconnect, GetStatus, GetSpeed, TestLatency, HideWindow, OpenURL, GetLastNodeID, GetProfile, GetOrders, ChangePassword, CheckEmail, BindEmail, GetSavedEmail, ToggleFavorite, GetFavorites, SetDarkMode, GetDarkMode, CopyToClipboard, GetProxyMode, SetProxyMode, GetVersion, GetAnnouncements, GetConnLog, SetKillSwitch, GetKillSwitch } from '../wailsjs/go/main/App'
+import { Login, Register, GuestLogin, IsLoggedIn, Logout, GetNodes, Connect, Disconnect, GetStatus, GetSpeed, TestLatency, HideWindow, OpenURL, GetLastNodeID, GetProfile, GetOrders, ChangePassword, CheckEmail, BindEmail, GetSavedEmail, ToggleFavorite, GetFavorites, SetDarkMode, GetDarkMode, CopyToClipboard, GetProxyMode, SetProxyMode, GetVersion, GetAnnouncements, GetConnLog, SetKillSwitch, GetKillSwitch, BuyPlan } from '../wailsjs/go/main/App'
 import { WindowMinimise, EventsOn } from '../wailsjs/runtime/runtime'
 
 const loggedIn = ref(false)
@@ -557,6 +576,15 @@ async function openConnLog() {
     connLog.value = logs || []
   } catch {}
   showConnLog.value = true
+}
+
+async function buyPlan(plan) {
+  try {
+    await BuyPlan(plan.id, '')
+    showToast('正在跳转支付页面...', 'info')
+  } catch (e) {
+    showToast(String(e), 'error')
+  }
 }
 
 async function loadAnnouncements() {
@@ -1072,4 +1100,13 @@ a { text-decoration: none; }
 .slider:before { content: ""; position: absolute; height: 16px; width: 16px; left: 2px; bottom: 2px; background: #fff; border-radius: 50%; transition: .3s; }
 .switch input:checked + .slider { background: var(--accent); }
 .switch input:checked + .slider:before { transform: translateX(18px); }
+
+/* Plan cards */
+.plan-card { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg); border-radius: 10px; margin-bottom: 6px; }
+.plan-info { flex: 1; }
+.plan-name { font-size: 13px; font-weight: 600; }
+.plan-desc { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.plan-right { display: flex; align-items: center; gap: 10px; }
+.plan-price { font-size: 15px; font-weight: 700; color: var(--accent); }
+.plan-hint { font-size: 11px; color: var(--text-secondary); margin-top: 6px; text-align: center; }
 </style>

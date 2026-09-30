@@ -81,6 +81,7 @@ type Order struct {
 	PlanID    int64   `json:"plan_id,omitempty"`
 	Plan      string  `json:"plan"`
 	Days      int     `json:"days"`
+	BonusDays int     `json:"bonus_days,omitempty"`
 	Amount    float64 `json:"amount"`
 	Status    string  `json:"status"`
 	Method    string  `json:"method,omitempty"`
@@ -1051,6 +1052,29 @@ func (a *API) handleMe(w http.ResponseWriter, r *http.Request) {
 	writeJ(w, map[string]any{"user": safeUser(u), "plans": a.store.EnabledPlans()})
 }
 
+func monthlyResetTime(purchaseAt int64) int64 {
+	if purchaseAt == 0 {
+		return time.Date(time.Now().Year(), time.Now().Month(), 1, 0, 0, 0, 0, time.Local).Unix()
+	}
+	pt := time.Unix(purchaseAt, 0)
+	now := time.Now()
+	day := pt.Day()
+	reset := time.Date(now.Year(), now.Month(), day, 0, 0, 0, 0, time.Local)
+	if day > 28 {
+		lastDay := time.Date(now.Year(), now.Month()+1, 0, 0, 0, 0, 0, time.Local).Day()
+		if day > lastDay {
+			reset = time.Date(now.Year(), now.Month(), lastDay, 0, 0, 0, 0, time.Local)
+		}
+	}
+	if reset.After(now) {
+		reset = reset.AddDate(0, -1, 0)
+	}
+	if reset.Before(pt) {
+		return purchaseAt
+	}
+	return reset.Unix()
+}
+
 // GET /api/nodes
 func (a *API) handleNodes(w http.ResponseWriter, r *http.Request) {
 	u, err := a.authUser(r)
@@ -1066,13 +1090,10 @@ func (a *API) handleNodes(w http.ResponseWriter, r *http.Request) {
 	if u.PlanID > 0 {
 		plan := a.store.FindPlan(u.PlanID)
 		if plan != nil && plan.TrafficLimit > 0 {
-			since := u.TrafficResetAt
-			if since == 0 {
-				since = u.CreatedAt
-			}
+			since := monthlyResetTime(u.TrafficResetAt)
 			used := a.store.GetUserTrafficSince(u.ID, since)
 			if used >= plan.TrafficLimit {
-				writeE(w, 403, "流量已用完，请升级套餐")
+				writeE(w, 403, "本月流量已用完，下月自动重置")
 				return
 			}
 		}
@@ -1165,12 +1186,30 @@ func (a *API) handleBuy(w http.ResponseWriter, r *http.Request) {
 		couponID = c.ID
 	}
 
+	var bonusDays int
+	if u.IsActive() && u.PlanID > 0 && u.PlanID != plan.ID {
+		oldPlan := a.store.FindPlan(u.PlanID)
+		if oldPlan != nil && oldPlan.Price > 0 && oldPlan.Days > 0 {
+			remainSec := u.ExpiresAt - time.Now().Unix()
+			if remainSec > 0 {
+				remainDays := float64(remainSec) / 86400.0
+				pricePerDay := oldPlan.Price / float64(oldPlan.Days)
+				residual := remainDays * pricePerDay
+				newPricePerDay := plan.Price / float64(plan.Days)
+				if newPricePerDay > 0 {
+					bonusDays = int(residual / newPricePerDay)
+				}
+			}
+		}
+	}
+
 	order := a.store.AddOrder(Order{
 		UserID:    u.ID,
 		UserEmail: u.Email,
 		PlanID:    plan.ID,
 		Plan:      plan.Name,
 		Days:      plan.Days,
+		BonusDays: bonusDays,
 		Amount:    finalPrice,
 		Status:    "pending",
 		Method:    "epay",
@@ -1250,16 +1289,21 @@ func (a *API) handlePayNotify(w http.ResponseWriter, r *http.Request) {
 	})
 
 	a.store.UpdateUser(order.UserID, func(u *User) {
-		base := u.ExpiresAt
-		if base < time.Now().Unix() {
-			base = time.Now().Unix()
+		now := time.Now().Unix()
+		if order.BonusDays > 0 || u.PlanID != order.PlanID {
+			u.ExpiresAt = now + int64(order.Days+order.BonusDays)*86400
+		} else {
+			base := u.ExpiresAt
+			if base < now {
+				base = now
+			}
+			u.ExpiresAt = base + int64(order.Days)*86400
 		}
-		u.ExpiresAt = base + int64(order.Days)*86400
 		u.PlanID = order.PlanID
-		u.TrafficResetAt = time.Now().Unix()
+		u.TrafficResetAt = now
 	})
 
-	log.Printf("[pay] Order %d paid, user %d +%d days, plan %d", orderID, order.UserID, order.Days, order.PlanID)
+	log.Printf("[pay] Order %d paid, user %d +%d days +%d bonus, plan %d", orderID, order.UserID, order.Days, order.BonusDays, order.PlanID)
 	w.Write([]byte("success"))
 }
 
@@ -1307,15 +1351,23 @@ func (a *API) handleMyTraffic(w http.ResponseWriter, r *http.Request) {
 		writeE(w, 401, "请先登录")
 		return
 	}
+	since := monthlyResetTime(u.TrafficResetAt)
+	sinceDate := time.Unix(since, 0).Format("2006-01-02")
 	logs := a.store.GetUserTraffic()
 	var totalUp, totalDown int64
 	for _, t := range logs {
-		if t.UserID == u.ID {
+		if t.UserID == u.ID && t.Date >= sinceDate {
 			totalUp += t.Upload
 			totalDown += t.Download
 		}
 	}
-	writeJ(w, map[string]any{"upload": totalUp, "download": totalDown, "total": totalUp + totalDown})
+	var trafficLimit int64
+	if u.PlanID > 0 {
+		if plan := a.store.FindPlan(u.PlanID); plan != nil {
+			trafficLimit = plan.TrafficLimit
+		}
+	}
+	writeJ(w, map[string]any{"upload": totalUp, "download": totalDown, "total": totalUp + totalDown, "traffic_limit": trafficLimit})
 }
 
 func (a *API) handleChangePassword(w http.ResponseWriter, r *http.Request) {
@@ -2790,7 +2842,10 @@ function renderNodes(){
 function showAddNode(){
   document.getElementById("nodeModalTitle").textContent="添加节点";
   document.getElementById("nodeEditId").value="";
-  ["nName","nAddr","nIP","nPSK","nRegion"].forEach(function(id){document.getElementById(id).value=""});
+  ["nName","nAddr","nIP","nRegion"].forEach(function(id){document.getElementById(id).value=""});
+  var chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  var psk="";for(var i=0;i<32;i++)psk+=chars.charAt(Math.floor(Math.random()*chars.length));
+  document.getElementById("nPSK").value=psk;
   document.getElementById("nSort").value="0";
   document.getElementById("nodeModal").classList.add("show")
 }
