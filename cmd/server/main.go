@@ -105,6 +105,11 @@ func (app *App) handleStream(s *mux.Stream, target string) {
 		return
 	}
 	defer remote.Close()
+	if tc, ok := remote.(*net.TCPConn); ok {
+		tc.SetNoDelay(true)
+		tc.SetReadBuffer(256 * 1024)
+		tc.SetWriteBuffer(256 * 1024)
+	}
 
 	s.SendAck(proto.StatusOK)
 	log.Printf("stream: %s (user=%s)", target, s.UserID())
@@ -165,7 +170,9 @@ func (app *App) startTrafficReport() {
 }
 
 var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool { return true },
+	CheckOrigin:     func(r *http.Request) bool { return true },
+	ReadBufferSize:  mux.WsBufSize(),
+	WriteBufferSize: mux.WsBufSize(),
 }
 
 func main() {

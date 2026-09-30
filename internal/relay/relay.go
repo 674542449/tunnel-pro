@@ -7,19 +7,32 @@ import (
 	"time"
 )
 
+const copyBufSize = 64 * 1024
+
+var bufPool = sync.Pool{
+	New: func() any {
+		b := make([]byte, copyBufSize)
+		return &b
+	},
+}
+
 func Relay(a, b io.ReadWriteCloser) {
 	var wg sync.WaitGroup
 	wg.Add(2)
 
 	go func() {
 		defer wg.Done()
-		io.Copy(a, b)
+		bp := bufPool.Get().(*[]byte)
+		io.CopyBuffer(a, b, *bp)
+		bufPool.Put(bp)
 		a.Close()
 	}()
 
 	go func() {
 		defer wg.Done()
-		io.Copy(b, a)
+		bp := bufPool.Get().(*[]byte)
+		io.CopyBuffer(b, a, *bp)
+		bufPool.Put(bp)
 		b.Close()
 	}()
 
@@ -45,13 +58,17 @@ func CountingRelay(a, b io.ReadWriteCloser, aToB, bToA *atomic.Int64) {
 
 	go func() {
 		defer wg.Done()
-		io.Copy(a, &countingReader{r: b, n: bToA})
+		bp := bufPool.Get().(*[]byte)
+		io.CopyBuffer(a, &countingReader{r: b, n: bToA}, *bp)
+		bufPool.Put(bp)
 		a.Close()
 	}()
 
 	go func() {
 		defer wg.Done()
-		io.Copy(b, &countingReader{r: a, n: aToB})
+		bp := bufPool.Get().(*[]byte)
+		io.CopyBuffer(b, &countingReader{r: a, n: aToB}, *bp)
+		bufPool.Put(bp)
 		b.Close()
 	}()
 
@@ -59,11 +76,11 @@ func CountingRelay(a, b io.ReadWriteCloser, aToB, bToA *atomic.Int64) {
 }
 
 type rateLimitedReader struct {
-	r         io.Reader
-	n         *atomic.Int64
-	bucket    int64
-	limit     int64 // bytes per second
-	lastFill  time.Time
+	r        io.Reader
+	n        *atomic.Int64
+	bucket   int64
+	limit    int64 // bytes per second
+	lastFill time.Time
 }
 
 func (r *rateLimitedReader) Read(p []byte) (int, error) {
@@ -71,13 +88,13 @@ func (r *rateLimitedReader) Read(p []byte) (int, error) {
 		now := time.Now()
 		elapsed := now.Sub(r.lastFill).Seconds()
 		r.bucket += int64(elapsed * float64(r.limit))
-		if r.bucket > r.limit {
-			r.bucket = r.limit
+		if r.bucket > r.limit*2 {
+			r.bucket = r.limit * 2
 		}
 		r.lastFill = now
 		if r.bucket <= 0 {
-			time.Sleep(time.Millisecond * 10)
-			r.bucket += int64(0.01 * float64(r.limit))
+			time.Sleep(time.Millisecond * 5)
+			r.bucket += int64(0.005 * float64(r.limit))
 		}
 		if int64(len(p)) > r.bucket {
 			p = p[:r.bucket]
@@ -102,13 +119,17 @@ func RateLimitedRelay(a, b io.ReadWriteCloser, aToB, bToA *atomic.Int64, bytesPe
 	now := time.Now()
 	go func() {
 		defer wg.Done()
-		io.Copy(a, &rateLimitedReader{r: b, n: bToA, limit: bytesPerSec, bucket: bytesPerSec, lastFill: now})
+		bp := bufPool.Get().(*[]byte)
+		io.CopyBuffer(a, &rateLimitedReader{r: b, n: bToA, limit: bytesPerSec, bucket: bytesPerSec * 2, lastFill: now}, *bp)
+		bufPool.Put(bp)
 		a.Close()
 	}()
 
 	go func() {
 		defer wg.Done()
-		io.Copy(b, &rateLimitedReader{r: a, n: aToB, limit: bytesPerSec, bucket: bytesPerSec, lastFill: now})
+		bp := bufPool.Get().(*[]byte)
+		io.CopyBuffer(b, &rateLimitedReader{r: a, n: aToB, limit: bytesPerSec, bucket: bytesPerSec * 2, lastFill: now}, *bp)
+		bufPool.Put(bp)
 		b.Close()
 	}()
 

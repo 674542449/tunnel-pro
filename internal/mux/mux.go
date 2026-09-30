@@ -15,7 +15,11 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-const maxPayload = 16 * 1024
+const maxPayload = 64 * 1024
+
+var framePool = sync.Pool{
+	New: func() any { return make([]byte, 0, maxPayload+proto.HeaderSize) },
+}
 
 // Stream is one logical connection inside a Mux.
 type Stream struct {
@@ -78,6 +82,12 @@ func (s *Stream) SendAck(status byte) error {
 
 func (s *Stream) UserID() string { return s.m.UserID() }
 
+const (
+	wsBufSize = 256 * 1024
+)
+
+func WsBufSize() int { return wsBufSize }
+
 // Mux multiplexes many Streams over one WebSocket.
 type Mux struct {
 	ws      *websocket.Conn
@@ -112,7 +122,7 @@ func (m *Mux) newStream(id uint32) *Stream {
 	s := &Stream{
 		id:     id,
 		m:      m,
-		readCh: make(chan []byte, 128),
+		readCh: make(chan []byte, 256),
 		done:   make(chan struct{}),
 	}
 	m.streams.Store(id, s)
@@ -144,11 +154,19 @@ func (m *Mux) Close() error {
 	return nil
 }
 
+func (m *Mux) StreamCount() int {
+	n := 0
+	m.streams.Range(func(_, _ any) bool { n++; return true })
+	return n
+}
+
 // ---------- client side ----------
 
 func NewClientMux(ws *websocket.Conn, psk string) (*Mux, error) {
 	m := &Mux{ws: ws, doneCh: make(chan struct{})}
 	m.nextID.Store(1)
+
+	ws.SetReadLimit(512 * 1024)
 
 	if err := m.writeFrame(proto.MakeFrame(0, proto.CmdAuth, proto.MakeAuthPayload(psk))); err != nil {
 		return nil, fmt.Errorf("send auth: %w", err)
@@ -267,12 +285,101 @@ func (m *Mux) OpenStream(host string, port uint16) (*Stream, error) {
 	return s, nil
 }
 
+// ---------- MuxPool: multiple parallel connections ----------
+
+type DialFunc func() (*Mux, error)
+
+type MuxPool struct {
+	mu    sync.Mutex
+	muxes []*Mux
+	size  int
+	dial  DialFunc
+	idx   atomic.Uint32
+}
+
+func NewMuxPool(size int, dial DialFunc) *MuxPool {
+	if size < 1 {
+		size = 1
+	}
+	return &MuxPool{size: size, dial: dial}
+}
+
+func (p *MuxPool) Get() (*Mux, error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	// clean dead connections
+	alive := p.muxes[:0]
+	for _, m := range p.muxes {
+		if !m.IsClosed() {
+			alive = append(alive, m)
+		}
+	}
+	p.muxes = alive
+
+	// fill up to pool size
+	for len(p.muxes) < p.size {
+		m, err := p.dial()
+		if err != nil {
+			if len(p.muxes) > 0 {
+				break
+			}
+			return nil, err
+		}
+		p.muxes = append(p.muxes, m)
+	}
+
+	if len(p.muxes) == 0 {
+		return nil, errors.New("no connections")
+	}
+
+	i := p.idx.Add(1) % uint32(len(p.muxes))
+	return p.muxes[i], nil
+}
+
+func (p *MuxPool) OpenStream(host string, port uint16) (*Stream, error) {
+	for attempt := 0; attempt < 2; attempt++ {
+		m, err := p.Get()
+		if err != nil {
+			return nil, err
+		}
+		s, err := m.OpenStream(host, port)
+		if err != nil {
+			continue
+		}
+		return s, nil
+	}
+	return nil, errors.New("tunnel unavailable")
+}
+
+func (p *MuxPool) Close() {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	for _, m := range p.muxes {
+		m.Close()
+	}
+	p.muxes = nil
+}
+
+func (p *MuxPool) IsClosed() bool {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	for _, m := range p.muxes {
+		if !m.IsClosed() {
+			return false
+		}
+	}
+	return true
+}
+
 // ---------- server side ----------
 
 type StreamHandler func(s *Stream, target string)
 
 func ServeConn(ws *websocket.Conn, psk string, handler StreamHandler) error {
 	m := &Mux{ws: ws, doneCh: make(chan struct{})}
+
+	ws.SetReadLimit(512 * 1024)
 
 	_, raw, err := ws.ReadMessage()
 	if err != nil {

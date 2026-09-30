@@ -128,25 +128,7 @@ type serverConfig struct {
 	Region string `json:"region,omitempty"`
 }
 
-type connPool struct {
-	mu   sync.Mutex
-	conn *mux.Mux
-	dial func() (*mux.Mux, error)
-}
-
-func (p *connPool) Get() (*mux.Mux, error) {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	if p.conn != nil && !p.conn.IsClosed() {
-		return p.conn, nil
-	}
-	m, err := p.dial()
-	if err != nil {
-		return nil, err
-	}
-	p.conn = m
-	return m, nil
-}
+const muxPoolSize = 4
 
 type UpdateInfo struct {
 	Available bool   `json:"available"`
@@ -179,7 +161,7 @@ type App struct {
 	trayDisconnect interface{ Enable(); Disable() }
 
 	mu          sync.RWMutex
-	pool        *connPool
+	pool        *mux.MuxPool
 	activeID    int64
 	proxyOn     bool
 	upBytes     atomic.Int64
@@ -1087,6 +1069,11 @@ func (a *App) Connect(nodeID int64) error {
 		a.sessionID = sid
 	}
 
+	uidStr := ""
+	if uid := parseJWTUID(a.auth.Token); uid > 0 {
+		uidStr = strconv.FormatInt(uid, 10)
+	}
+
 	dialFn := func() (*mux.Mux, error) {
 		ws, err := dialWS(*cfg)
 		if err != nil {
@@ -1097,19 +1084,19 @@ func (a *App) Connect(nodeID int64) error {
 			ws.Close()
 			return nil, err
 		}
+		if uidStr != "" {
+			mx.SendUserID(uidStr)
+		}
 		return mx, nil
 	}
 
-	mx, err := dialFn()
-	if err != nil {
+	pool := mux.NewMuxPool(muxPoolSize, dialFn)
+	if _, err := pool.Get(); err != nil {
 		return err
-	}
-	if uid := parseJWTUID(a.auth.Token); uid > 0 {
-		mx.SendUserID(strconv.FormatInt(uid, 10))
 	}
 
 	a.mu.Lock()
-	a.pool = &connPool{dial: dialFn, conn: mx}
+	a.pool = pool
 	a.activeID = nodeID
 	a.mu.Unlock()
 
@@ -1142,9 +1129,7 @@ func (a *App) Disconnect() {
 	}
 	a.mu.Lock()
 	if a.pool != nil {
-		if a.pool.conn != nil {
-			a.pool.conn.Close()
-		}
+		a.pool.Close()
 		a.pool = nil
 	}
 	a.activeID = -1
@@ -1225,21 +1210,7 @@ func (a *App) openStream(host string, port uint16) (*mux.Stream, error) {
 	if p == nil {
 		return nil, errors.New("not connected")
 	}
-	for i := 0; i < 2; i++ {
-		mx, err := p.Get()
-		if err != nil {
-			if i == 0 {
-				continue
-			}
-			return nil, err
-		}
-		s, err := mx.OpenStream(host, port)
-		if err != nil {
-			continue
-		}
-		return s, nil
-	}
-	return nil, errors.New("tunnel unavailable")
+	return p.OpenStream(host, port)
 }
 
 func (a *App) startMixed() {
@@ -1354,10 +1325,7 @@ func (a *App) healthCheck() {
 		if p == nil || id < 0 {
 			continue
 		}
-		p.mu.Lock()
-		conn := p.conn
-		p.mu.Unlock()
-		if conn == nil || !conn.IsClosed() {
+		if !p.IsClosed() {
 			continue
 		}
 		a.addConnLog("lost", "", "connection lost, attempting reconnect")
@@ -1370,17 +1338,10 @@ func (a *App) healthCheck() {
 			if retry > 0 {
 				time.Sleep(time.Duration(2<<retry) * time.Second)
 			}
-			mx, err := p.dial()
-			if err != nil {
+			if _, err := p.Get(); err != nil {
 				log.Printf("[health] retry %d failed: %v", retry+1, err)
 				continue
 			}
-			if uid := parseJWTUID(a.auth.Token); uid > 0 {
-				mx.SendUserID(strconv.FormatInt(uid, 10))
-			}
-			p.mu.Lock()
-			p.conn = mx
-			p.mu.Unlock()
 			ok = true
 			log.Println("[health] reconnected")
 			break
@@ -1445,10 +1406,17 @@ func dialWS(cfg serverConfig) (*websocket.Conn, error) {
 	dialer := &websocket.Dialer{
 		Proxy:            func(*http.Request) (*url.URL, error) { return nil, nil },
 		HandshakeTimeout: 15 * time.Second,
+		ReadBufferSize:   mux.WsBufSize(),
+		WriteBufferSize:  mux.WsBufSize(),
 		NetDialTLSContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
 			tcpConn, err := net.DialTimeout(network, dialAddr, 15*time.Second)
 			if err != nil {
 				return nil, err
+			}
+			if tc, ok := tcpConn.(*net.TCPConn); ok {
+				tc.SetNoDelay(true)
+				tc.SetReadBuffer(256 * 1024)
+				tc.SetWriteBuffer(256 * 1024)
 			}
 			tlsCfg := &utls.Config{ServerName: serverHost}
 			spec, err := utls.UTLSIdToSpec(utls.HelloChrome_Auto)
