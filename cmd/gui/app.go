@@ -183,6 +183,9 @@ type App struct {
 	speedLimitMbps int
 	deviceLimit    int
 	sessionID      string
+
+	chinaDomains   map[string]bool
+	chinaDomainsMu sync.RWMutex
 }
 
 func NewApp() *App {
@@ -205,6 +208,7 @@ func (a *App) startup(ctx context.Context) {
 	go a.healthCheck()
 	go a.startTray()
 	go a.checkUpdateOnStart()
+	go a.loadChinaDomains()
 }
 
 func (a *App) cleanStaleProxy() {
@@ -720,72 +724,94 @@ func (a *App) applyProxyMode() {
 	}
 }
 
-func pacContent() string {
-	return `var D={
-"cn":1,"com.cn":1,"net.cn":1,"org.cn":1,"gov.cn":1,"edu.cn":1,"mil.cn":1,"ac.cn":1,
-"baidu.com":1,"bdstatic.com":1,"bdimg.com":1,"baidupcs.com":1,"baiducontent.com":1,"bcebos.com":1,
-"qq.com":1,"gtimg.com":1,"qpic.cn":1,"qcloud.com":1,"myqcloud.com":1,"tencent.com":1,"wechat.com":1,"weixin.com":1,"tenpay.com":1,
-"alibaba.com":1,"alicdn.com":1,"aliyun.com":1,"aliyuncs.com":1,"alibabacloud.com":1,"alipay.com":1,
-"taobao.com":1,"tmall.com":1,"1688.com":1,"aliexpress.com":1,"dingtalk.com":1,
-"ele.me":1,"cainiao.com":1,"amap.com":1,"autonavi.com":1,"alikunlun.com":1,"tbcdn.cn":1,"mybank.cn":1,
-"163.com":1,"126.com":1,"netease.com":1,"yeah.net":1,"youdao.com":1,"nosdn.127.net":1,"lofter.com":1,
-"bytedance.com":1,"bytedance.net":1,"byteimg.com":1,"bytecdn.cn":1,"bytegoofy.com":1,
-"bytetos.com":1,"ibytedtos.com":1,"byted.org":1,"bytedapm.com":1,"bytednsdoc.com":1,"bytedns.net":1,"bytedance.map":1,
-"volcengine.com":1,"volces.com":1,"volccdn.com":1,"volcvideo.com":1,"volcimagex.com":1,"volcfcdnx.com":1,
-"douyin.com":1,"douyinpic.com":1,"douyincdn.com":1,"douyinstatic.com":1,"douyinvod.com":1,"amemv.com":1,
-"toutiao.com":1,"toutiaocdn.com":1,"toutiaoimg.com":1,"toutiaostatic.com":1,"toutiaocloud.com":1,"365yg.com":1,"pstatp.com":1,
-"snssdk.com":1,"sgsnssdk.com":1,"isnssdk.com":1,"ipstatp.com":1,"ibyteimg.com":1,
-"ixigua.com":1,"xiguashipin.com":1,"huoshan.com":1,"huoshanzhibo.com":1,"pipix.com":1,
-"feishu.cn":1,"feishu.net":1,"feishucdn.com":1,"feishupkg.com":1,"larksuite.com":1,"larkusercontent.com":1,
-"oceanengine.com":1,"zijieapi.com":1,"muscdn.com":1,"musical.ly":1,
-"jd.com":1,"jd.hk":1,"360buy.com":1,"jdcloud.com":1,"jdpay.com":1,
-"bilibili.com":1,"bilivideo.com":1,"hdslb.com":1,"biliapi.net":1,"acgvideo.com":1,
-"weibo.com":1,"sina.com.cn":1,"sinaimg.cn":1,"sinajs.cn":1,"sina.com":1,"weibo.cn":1,
-"zhihu.com":1,"zhimg.com":1,"douban.com":1,"doubanio.com":1,
-"sohu.com":1,"sogou.com":1,"sogo.com":1,"ifeng.com":1,
-"meituan.com":1,"dianping.com":1,"pinduoduo.com":1,"yangkeduo.com":1,
-"xiaomi.com":1,"mi.com":1,"miui.com":1,"huawei.com":1,"honor.com":1,"vmall.com":1,
-"oppo.com":1,"vivo.com":1,"realme.com":1,"oneplus.com":1,
-"youku.com":1,"tudou.com":1,"iqiyi.com":1,"iqiyipic.com":1,"mgtv.com":1,"cctv.com":1,"pptv.com":1,
-"kuaishou.com":1,"kwai.com":1,"gifshow.com":1,"xiaohongshu.com":1,"xhscdn.com":1,
-"csdn.net":1,"jianshu.com":1,"gitee.com":1,"oschina.net":1,"cnblogs.com":1,"51cto.com":1,
-"360.cn":1,"360safe.com":1,"qihoo.com":1,"2345.com":1,"hao123.com":1,
-"suning.com":1,"gome.com.cn":1,"vip.com":1,"kaola.com":1,
-"zhipin.com":1,"lagou.com":1,"liepin.com":1,"51job.com":1,
-"caixin.com":1,"36kr.com":1,"thepaper.cn":1,"yicai.com":1,"eastmoney.com":1,
-"kugou.com":1,"kuwo.com":1,"taihe.com":1,"music.163.com":1,
-"12306.cn":1,"cnki.net":1,"smzdm.com":1,"chsi.com.cn":1,
-"clouddn.com":1,"qiniu.com":1,"qiniucdn.com":1,"upyun.com":1,"upaiyun.com":1,"cdn.bcebos.com":1,
-"wps.com":1,"kingsoft.com":1,"xunlei.com":1,"meizu.com":1,"lenovo.com":1,"zol.com.cn":1,
-"58.com":1,"anjuke.com":1,"lianjia.com":1,"ke.com":1,"ziroom.com":1,
-"trip.com":1,"ctrip.com":1,"qunar.com":1,"fliggy.com":1,"ly.com":1,"tuniu.com":1,
-"58.com":1,"ganji.com":1,"baixing.com":1,
-"cnzz.com":1,"umeng.com":1,"growingio.com":1,"sensorsdata.cn":1,
-"chinaz.com":1,"iconfont.cn":1,"bootcss.com":1,"bootcdn.cn":1,
-"coolapk.com":1,"dcloud.net.cn":1,
-"wps.cn":1,"docer.com":1,
-"huya.com":1,"douyu.com":1,"yy.com":1,
-"haosou.com":1,"so.com":1,"soso.com":1,
-"unionpay.com":1,"95516.com":1,
-"mmstat.com":1,"tanx.com":1,"alikunlun.net":1,
-"huxiu.com":1,"geekpark.net":1,"qdaily.com":1
-};
-function FindProxyForURL(url,host){
-  if(isPlainHostName(host)||host==="127.0.0.1"||host==="localhost")return "DIRECT";
-  var h=host.toLowerCase();
-  var p=h.split(".");
-  for(var i=0;i<p.length-1;i++){
-    if(D[p.slice(i).join(".")])return "DIRECT";
-  }
-  if(/^\d+\.\d+\.\d+\.\d+$/.test(h)){
-    var n=(+p[0])*16777216+(+p[1])*65536+(+p[2])*256+(+p[3]);
-    if(n>=167772160&&n<=184549375)return "DIRECT";
-    if(n>=2886729728&&n<=2887778303)return "DIRECT";
-    if(n>=3232235520&&n<=3232301055)return "DIRECT";
-  }
-  return "PROXY 127.0.0.1:7890; SOCKS5 127.0.0.1:7890; DIRECT";
+const chinaDomainsURL = "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf"
+
+func (a *App) loadChinaDomains() {
+	exe, _ := os.Executable()
+	cacheFile := filepath.Join(filepath.Dir(exe), "china_domains.cache")
+
+	domains := make(map[string]bool)
+
+	client := &http.Client{Timeout: 30 * time.Second}
+	resp, err := client.Get(chinaDomainsURL)
+	if err == nil && resp.StatusCode == 200 {
+		scanner := bufio.NewScanner(resp.Body)
+		for scanner.Scan() {
+			line := scanner.Text()
+			if !strings.HasPrefix(line, "server=/") {
+				continue
+			}
+			parts := strings.SplitN(line, "/", 3)
+			if len(parts) < 3 {
+				continue
+			}
+			d := strings.TrimSpace(strings.ToLower(parts[1]))
+			if d != "" {
+				domains[d] = true
+			}
+		}
+		resp.Body.Close()
+		if len(domains) > 1000 {
+			var buf strings.Builder
+			for d := range domains {
+				buf.WriteString(d)
+				buf.WriteByte('\n')
+			}
+			os.WriteFile(cacheFile, []byte(buf.String()), 0644)
+			log.Printf("[PAC] downloaded %d China domains", len(domains))
+		}
+	} else {
+		if resp != nil {
+			resp.Body.Close()
+		}
+		if data, err2 := os.ReadFile(cacheFile); err2 == nil {
+			for _, line := range strings.Split(string(data), "\n") {
+				line = strings.TrimSpace(line)
+				if line != "" {
+					domains[line] = true
+				}
+			}
+			log.Printf("[PAC] loaded %d China domains from cache", len(domains))
+		} else {
+			log.Printf("[PAC] failed to download (%v) and no cache available", err)
+		}
+	}
+
+	a.chinaDomainsMu.Lock()
+	a.chinaDomains = domains
+	a.chinaDomainsMu.Unlock()
 }
-`
+
+func (a *App) pacContent() string {
+	a.chinaDomainsMu.RLock()
+	domains := a.chinaDomains
+	a.chinaDomainsMu.RUnlock()
+
+	var buf strings.Builder
+	buf.WriteString("var D={\n")
+	buf.WriteString(`"cn":1,"com.cn":1,"net.cn":1,"org.cn":1,"gov.cn":1,"edu.cn":1,"mil.cn":1,"ac.cn":1`)
+	if len(domains) > 0 {
+		for d := range domains {
+			buf.WriteString(",\"")
+			buf.WriteString(d)
+			buf.WriteString("\":1")
+		}
+	}
+	buf.WriteString("\n};\n")
+	buf.WriteString(`function FindProxyForURL(url,host){
+if(isPlainHostName(host)||host==="127.0.0.1"||host==="localhost"||host==="[::1]")return "DIRECT";
+var h=host.toLowerCase();var p=h.split(".");
+for(var i=0;i<p.length-1;i++){if(D[p.slice(i).join(".")])return "DIRECT";}
+if(D[h])return "DIRECT";
+if(/^\d+\.\d+\.\d+\.\d+$/.test(h)){
+var n=(+p[0])*16777216+(+p[1])*65536+(+p[2])*256+(+p[3]);
+if(n>=167772160&&n<=184549375)return "DIRECT";
+if(n>=2886729728&&n<=2887778303)return "DIRECT";
+if(n>=3232235520&&n<=3232301055)return "DIRECT";
+}
+return "PROXY 127.0.0.1:7890; SOCKS5 127.0.0.1:7890; DIRECT";
+}`)
+	return buf.String()
 }
 
 func setSystemProxyPAC(pacURL string) {
@@ -806,70 +832,122 @@ func isAdmin() bool {
 	return true
 }
 
+func getActiveInterface() (string, error) {
+	out, err := outputHidden("powershell", "-NoProfile", "-Command",
+		"(Get-NetRoute -DestinationPrefix '0.0.0.0/0' | Sort-Object RouteMetric | Select-Object -First 1 | Get-NetAdapter).Name")
+	if err != nil {
+		return "", fmt.Errorf("Get-NetAdapter failed: %w", err)
+	}
+	name := strings.TrimSpace(string(out))
+	if name == "" {
+		return "", errors.New("empty adapter name")
+	}
+	return name, nil
+}
+
+func (a *App) tunEmit(step, msg string) {
+	log.Printf("[TUN][%s] %s", step, msg)
+	wailsRT.EventsEmit(a.ctx, "tun-step", map[string]string{"step": step, "msg": msg})
+}
+
+func (a *App) tunFail(step, msg string) {
+	log.Printf("[TUN][%s] FAIL: %s", step, msg)
+	wailsRT.EventsEmit(a.ctx, "tun-error", fmt.Sprintf("[%s] %s", step, msg))
+	setSystemProxy(a.mixedAddr)
+}
+
 func (a *App) startTUN() {
 	exe, _ := os.Executable()
 	dir := filepath.Dir(exe)
 	t2sPath := filepath.Join(dir, "tun2socks.exe")
 	wintunPath := filepath.Join(dir, "wintun.dll")
 
+	// Step 1: check components
+	a.tunEmit("组件检查", "检查 tun2socks.exe 和 wintun.dll ...")
 	if !fileExists(t2sPath) || !fileExists(wintunPath) {
-		log.Println("[TUN] downloading components...")
+		a.tunEmit("组件下载", "组件缺失，正在下载 ...")
 		if err := downloadTUNComponents(dir); err != nil {
-			log.Printf("[TUN] download failed: %v, falling back to global", err)
-			wailsRT.EventsEmit(a.ctx, "tun-error", "TUN 组件下载失败: "+err.Error())
-			setSystemProxy(a.mixedAddr)
+			a.tunFail("组件下载", "下载失败: "+err.Error())
 			return
 		}
+		a.tunEmit("组件下载", "下载完成")
+	} else {
+		a.tunEmit("组件检查", "组件就绪")
 	}
 
+	// Step 2: admin check
+	a.tunEmit("权限检查", "检查管理员权限 ...")
 	if !isAdmin() {
-		log.Println("[TUN] not running as admin, requesting elevation...")
-		wailsRT.EventsEmit(a.ctx, "tun-error", "TUN 模式需要管理员权限，请右键以管理员身份运行程序")
-		setSystemProxy(a.mixedAddr)
+		a.tunFail("权限检查", "需要管理员权限，请右键以管理员身份运行程序")
 		return
 	}
+	a.tunEmit("权限检查", "管理员权限确认")
 
+	// Step 3: detect gateway
+	a.tunEmit("网关检测", "检测默认网关 ...")
 	gw, err := getDefaultGateway()
 	if err != nil {
-		log.Printf("[TUN] cannot detect gateway: %v, falling back to global", err)
-		wailsRT.EventsEmit(a.ctx, "tun-error", "无法检测默认网关")
-		setSystemProxy(a.mixedAddr)
+		a.tunFail("网关检测", "无法检测默认网关: "+err.Error())
 		return
 	}
 	a.origGateway = gw
-	log.Printf("[TUN] original gateway: %s", gw)
+	a.tunEmit("网关检测", "默认网关: "+gw)
 
+	// Step 4: detect active network interface
+	a.tunEmit("网卡检测", "检测物理网卡名称 ...")
+	ifaceName, err := getActiveInterface()
+	if err != nil {
+		a.tunFail("网卡检测", "无法检测网卡名称: "+err.Error())
+		return
+	}
+	a.tunEmit("网卡检测", "物理网卡: "+ifaceName)
+
+	// Step 5: start tun2socks
+	a.tunEmit("启动TUN", "启动 tun2socks 进程 ...")
 	var stderrBuf bytes.Buffer
 	a.tunCmd = exec.Command(t2sPath,
 		"-device", "wintun://TunnelPro",
 		"-proxy", "socks5://127.0.0.1:7890",
+		"-interface", ifaceName,
 		"-loglevel", "warn",
 	)
 	a.tunCmd.Dir = dir
 	a.tunCmd.Stderr = &stderrBuf
 	a.tunCmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	if err := a.tunCmd.Start(); err != nil {
-		log.Printf("[TUN] start failed: %v, falling back to global", err)
-		wailsRT.EventsEmit(a.ctx, "tun-error", "TUN 启动失败: "+err.Error())
-		setSystemProxy(a.mixedAddr)
+		a.tunFail("启动TUN", "进程启动失败: "+err.Error())
 		return
 	}
+	a.tunEmit("启动TUN", "进程已启动，等待适配器创建 ...")
 
+	// Step 6: wait and verify process alive
 	time.Sleep(3 * time.Second)
-
 	if a.tunCmd.ProcessState != nil {
 		errMsg := strings.TrimSpace(stderrBuf.String())
-		log.Printf("[TUN] process exited early: %s", errMsg)
-		wailsRT.EventsEmit(a.ctx, "tun-error", "TUN 进程异常退出: "+errMsg)
+		if errMsg == "" {
+			errMsg = "进程立即退出，无错误输出"
+		}
+		a.tunFail("启动TUN", "进程异常退出: "+errMsg)
 		a.tunCmd = nil
-		setSystemProxy(a.mixedAddr)
 		return
 	}
+	a.tunEmit("启动TUN", "tun2socks 运行中")
 
-	runHidden("netsh", "interface", "ip", "set", "address", "TunnelPro", "static", "10.0.85.2", "255.255.255.0", "10.0.85.1")
+	// Step 7: configure adapter
+	a.tunEmit("配置网卡", "设置 TunnelPro 适配器 IP/DNS ...")
+	if err := runHidden("netsh", "interface", "ip", "set", "address", "TunnelPro", "static", "10.0.85.2", "255.255.255.0", "10.0.85.1"); err != nil {
+		a.tunFail("配置网卡", "设置IP失败: "+err.Error())
+		a.tunCmd.Process.Kill()
+		a.tunCmd.Wait()
+		a.tunCmd = nil
+		return
+	}
 	runHidden("netsh", "interface", "ip", "set", "dns", "TunnelPro", "static", "8.8.8.8")
 	runHidden("netsh", "interface", "ip", "add", "dns", "TunnelPro", "1.1.1.1", "index=2")
+	a.tunEmit("配置网卡", "IP: 10.0.85.2, DNS: 8.8.8.8 / 1.1.1.1")
 
+	// Step 8: add routes
+	a.tunEmit("路由配置", "添加路由规则 ...")
 	var serverIP string
 	a.mu.RLock()
 	for _, n := range a.nodes {
@@ -888,13 +966,14 @@ func (a *App) startTUN() {
 
 	if serverIP != "" {
 		runHidden("route", "add", serverIP, "mask", "255.255.255.255", gw, "metric", "5")
-		log.Printf("[TUN] route: %s via %s", serverIP, gw)
+		a.tunEmit("路由配置", "节点 "+serverIP+" → 原网关 "+gw)
 	}
 	runHidden("route", "add", "0.0.0.0", "mask", "128.0.0.0", "10.0.85.1", "metric", "6")
 	runHidden("route", "add", "128.0.0.0", "mask", "128.0.0.0", "10.0.85.1", "metric", "6")
+	a.tunEmit("路由配置", "全局路由已添加")
 
 	a.tunRunning = true
-	log.Println("[TUN] started successfully")
+	a.tunEmit("完成", "TUN 模式启动成功")
 }
 
 func (a *App) stopTUN() {
@@ -1324,7 +1403,7 @@ func (a *App) handleHTTP(conn net.Conn) {
 		return
 	}
 	if req.Method == "GET" && req.URL.Path == "/proxy.pac" {
-		pac := pacContent()
+		pac := a.pacContent()
 		fmt.Fprintf(conn, "HTTP/1.1 200 OK\r\nContent-Type: application/x-ns-proxy-autoconfig\r\nContent-Length: %d\r\nConnection: close\r\n\r\n%s", len(pac), pac)
 		return
 	}
