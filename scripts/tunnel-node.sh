@@ -161,9 +161,16 @@ do_install() {
     systemctl restart caddy
     systemctl restart "$SERVICE_NAME"
 
+    # Save this script locally for future management
+    local script_url="https://raw.githubusercontent.com/${GITHUB_REPO}/master/scripts/tunnel-node.sh"
+    curl -fsSL -o "$INSTALL_DIR/manage.sh" "$script_url" 2>/dev/null && chmod +x "$INSTALL_DIR/manage.sh"
+    ln -sf "$INSTALL_DIR/manage.sh" /usr/local/bin/tunnel 2>/dev/null || true
+
     sleep 2
     if systemctl is-active --quiet "$SERVICE_NAME"; then
         info "Installation complete! Service is running."
+        echo ""
+        info "Management: run ${CYAN}tunnel${NC} to open the menu"
     else
         error "Service failed to start. Check: journalctl -u $SERVICE_NAME -n 20"
     fi
