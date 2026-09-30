@@ -20,6 +20,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+var Version = "dev"
+
 type Config struct {
 	Listen    string `json:"listen"`
 	PSK       string `json:"psk"`
@@ -144,6 +146,7 @@ func (app *App) startHeartbeat() {
 			"node_id":    app.cfg.NodeID,
 			"report_key": app.cfg.ReportKey,
 			"conn_count": app.connCount.Load(),
+			"version":    Version,
 		})
 		if err != nil {
 			log.Printf("[heartbeat] %v", err)
@@ -192,6 +195,7 @@ func main() {
 	}
 
 	app := NewApp(cfg)
+	log.Printf("tunnel-server %s", Version)
 
 	if cfg.APIURL != "" {
 		go app.startHeartbeat()

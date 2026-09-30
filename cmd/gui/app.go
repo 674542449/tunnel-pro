@@ -130,7 +130,10 @@ type serverConfig struct {
 
 const muxPoolSize = 4
 
-var wsBufPool sync.Pool
+var (
+	Version   = "dev"
+	wsBufPool sync.Pool
+)
 
 type UpdateInfo struct {
 	Available bool   `json:"available"`
@@ -207,7 +210,7 @@ func (a *App) startup(ctx context.Context) {
 func (a *App) cleanStaleProxy() {
 	regPath := `HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings`
 	query := func(val string) string {
-		out, err := exec.Command("reg", "query", regPath, "/v", val).Output()
+		out, err := outputHidden("reg", "query", regPath, "/v", val)
 		if err != nil {
 			return ""
 		}
@@ -263,7 +266,7 @@ func parseJWTUID(token string) int64 {
 }
 
 func getMachineID() string {
-	out, err := exec.Command("wmic", "csproduct", "get", "UUID").Output()
+	out, err := outputHidden("wmic", "csproduct", "get", "UUID")
 	if err != nil {
 		return fmt.Sprintf("win-%d", time.Now().UnixNano())
 	}
@@ -670,7 +673,7 @@ func (a *App) GetKillSwitch() bool {
 
 func (a *App) enableKillSwitch() {
 	regPath := `HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings`
-	run := func(args ...string) { exec.Command("reg", args...).Run() }
+	run := func(args ...string) { runHidden("reg", args...) }
 	run("add", regPath, "/v", "ProxyEnable", "/t", "REG_DWORD", "/d", "1", "/f")
 	run("add", regPath, "/v", "ProxyServer", "/t", "REG_SZ", "/d", "http=0.0.0.0:1;https=0.0.0.0:1", "/f")
 	run("add", regPath, "/v", "AutoConfigURL", "/t", "REG_SZ", "/d", "", "/f")
@@ -684,7 +687,7 @@ func (a *App) disableKillSwitch() {
 }
 
 func (a *App) CopyToClipboard(text string) {
-	exec.Command("cmd", "/c", "echo|set /p="+text+"|clip").Run()
+	runHidden("cmd", "/c", "echo|set /p="+text+"|clip")
 }
 
 func (a *App) GetProxyMode() string {
@@ -718,60 +721,73 @@ func (a *App) applyProxyMode() {
 }
 
 func pacContent() string {
-	return `function FindProxyOrReturn(url, host) {
-    var PROXY = "PROXY 127.0.0.1:7890; SOCKS5 127.0.0.1:7890; DIRECT";
-    var DIRECT_VAL = "DIRECT";
-    if (isPlainHostName(host) || host === "127.0.0.1" || host === "localhost") return DIRECT_VAL;
-    var cnDomains = [
-        ".cn", ".com.cn", ".net.cn", ".org.cn",
-        ".baidu.com", ".qq.com", ".taobao.com", ".tmall.com", ".jd.com",
-        ".alipay.com", ".aliyun.com", ".163.com", ".126.com", ".sina.com.cn",
-        ".weibo.com", ".sohu.com", ".youku.com", ".bilibili.com", ".zhihu.com",
-        ".douyin.com", ".toutiao.com", ".bytedance.com", ".csdn.net",
-        ".douban.com", ".meituan.com", ".pinduoduo.com", ".xiaomi.com",
-        ".huawei.com", ".tencent.com", ".wechat.com", ".weixin.qq.com",
-        ".sogou.com", ".360.cn", ".iqiyi.com", ".cctv.com",
-        ".gov.cn", ".edu.cn", ".mil.cn"
-    ];
-    for (var i = 0; i < cnDomains.length; i++) {
-        if (dnsDomainIs(host, cnDomains[i]) || host === cnDomains[i].substring(1)) return DIRECT_VAL;
-    }
-    var cnIpRanges = [
-        [167772160, 184549375],
-        [2886729728, 2887778303],
-        [3232235520, 3232301055],
-        [16777216, 33554431],
-        [1946157056, 2013265919],
-        [2030043136, 2046820351],
-        [2063597568, 2080374783],
-        [1811939328, 1879048191],
-        [3707764736, 3774873599],
-        [3758096384, 3825205247],
-        [637534208, 671088639],
-        [754974720, 788529151],
-        [3087007744, 3087007744+16777215]
-    ];
-    if (/^\d+\.\d+\.\d+\.\d+$/.test(host)) {
-        var parts = host.split(".");
-        var ip = (+parts[0])*16777216 + (+parts[1])*65536 + (+parts[2])*256 + (+parts[3]);
-        for (var j = 0; j < cnIpRanges.length; j++) {
-            if (ip >= cnIpRanges[j][0] && ip <= cnIpRanges[j][1]) return DIRECT_VAL;
-        }
-    }
-    return PROXY;
+	return `var D={
+"cn":1,"com.cn":1,"net.cn":1,"org.cn":1,"gov.cn":1,"edu.cn":1,"mil.cn":1,"ac.cn":1,
+"baidu.com":1,"bdstatic.com":1,"bdimg.com":1,"baidupcs.com":1,"baiducontent.com":1,"bcebos.com":1,
+"qq.com":1,"gtimg.com":1,"qpic.cn":1,"qcloud.com":1,"myqcloud.com":1,"tencent.com":1,"wechat.com":1,"weixin.com":1,"tenpay.com":1,
+"alibaba.com":1,"alicdn.com":1,"aliyun.com":1,"aliyuncs.com":1,"alibabacloud.com":1,"alipay.com":1,
+"taobao.com":1,"tmall.com":1,"1688.com":1,"aliexpress.com":1,"dingtalk.com":1,
+"ele.me":1,"cainiao.com":1,"amap.com":1,"autonavi.com":1,"alikunlun.com":1,"tbcdn.cn":1,"mybank.cn":1,
+"163.com":1,"126.com":1,"netease.com":1,"yeah.net":1,"youdao.com":1,"nosdn.127.net":1,"lofter.com":1,
+"bytedance.com":1,"bytedance.net":1,"byteimg.com":1,"bytecdn.cn":1,"bytegoofy.com":1,
+"douyin.com":1,"toutiao.com":1,"snssdk.com":1,"pstatp.com":1,"ixigua.com":1,"feishu.cn":1,"oceanengine.com":1,"zijieapi.com":1,
+"jd.com":1,"jd.hk":1,"360buy.com":1,"jdcloud.com":1,"jdpay.com":1,
+"bilibili.com":1,"bilivideo.com":1,"hdslb.com":1,"biliapi.net":1,"acgvideo.com":1,
+"weibo.com":1,"sina.com.cn":1,"sinaimg.cn":1,"sinajs.cn":1,"sina.com":1,"weibo.cn":1,
+"zhihu.com":1,"zhimg.com":1,"douban.com":1,"doubanio.com":1,
+"sohu.com":1,"sogou.com":1,"sogo.com":1,"ifeng.com":1,
+"meituan.com":1,"dianping.com":1,"pinduoduo.com":1,"yangkeduo.com":1,
+"xiaomi.com":1,"mi.com":1,"miui.com":1,"huawei.com":1,"honor.com":1,"vmall.com":1,
+"oppo.com":1,"vivo.com":1,"realme.com":1,"oneplus.com":1,
+"youku.com":1,"tudou.com":1,"iqiyi.com":1,"iqiyipic.com":1,"mgtv.com":1,"cctv.com":1,"pptv.com":1,
+"kuaishou.com":1,"kwai.com":1,"gifshow.com":1,"xiaohongshu.com":1,"xhscdn.com":1,
+"csdn.net":1,"jianshu.com":1,"gitee.com":1,"oschina.net":1,"cnblogs.com":1,"51cto.com":1,
+"360.cn":1,"360safe.com":1,"qihoo.com":1,"2345.com":1,"hao123.com":1,
+"suning.com":1,"gome.com.cn":1,"vip.com":1,"kaola.com":1,
+"zhipin.com":1,"lagou.com":1,"liepin.com":1,"51job.com":1,
+"caixin.com":1,"36kr.com":1,"thepaper.cn":1,"yicai.com":1,"eastmoney.com":1,
+"kugou.com":1,"kuwo.com":1,"taihe.com":1,"music.163.com":1,
+"12306.cn":1,"cnki.net":1,"smzdm.com":1,"chsi.com.cn":1,
+"clouddn.com":1,"qiniu.com":1,"qiniucdn.com":1,"upyun.com":1,"upaiyun.com":1,"cdn.bcebos.com":1,
+"wps.com":1,"kingsoft.com":1,"xunlei.com":1,"meizu.com":1,"lenovo.com":1,"zol.com.cn":1,
+"58.com":1,"anjuke.com":1,"lianjia.com":1,"ke.com":1,"ziroom.com":1,
+"trip.com":1,"ctrip.com":1,"qunar.com":1,"fliggy.com":1,"ly.com":1,"tuniu.com":1,
+"58.com":1,"ganji.com":1,"baixing.com":1
+};
+function FindProxyForURL(url,host){
+  if(isPlainHostName(host)||host==="127.0.0.1"||host==="localhost")return "DIRECT";
+  var h=host.toLowerCase();
+  var p=h.split(".");
+  for(var i=0;i<p.length-1;i++){
+    if(D[p.slice(i).join(".")])return "DIRECT";
+  }
+  if(/^\d+\.\d+\.\d+\.\d+$/.test(h)){
+    var n=(+p[0])*16777216+(+p[1])*65536+(+p[2])*256+(+p[3]);
+    if(n>=167772160&&n<=184549375)return "DIRECT";
+    if(n>=2886729728&&n<=2887778303)return "DIRECT";
+    if(n>=3232235520&&n<=3232301055)return "DIRECT";
+  }
+  return "PROXY 127.0.0.1:7890; SOCKS5 127.0.0.1:7890; DIRECT";
 }
-function FindProxyForURL(url, host) { return FindProxyOrReturn(url, host); }
 `
 }
 
 func setSystemProxyPAC(pacURL string) {
 	log.Printf("[proxy] PAC URL: %s", pacURL)
 	regPath := `HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings`
-	run := func(args ...string) { exec.Command("reg", args...).Run() }
+	run := func(args ...string) { runHidden("reg", args...) }
 	run("add", regPath, "/v", "ProxyEnable", "/t", "REG_DWORD", "/d", "0", "/f")
 	run("add", regPath, "/v", "ProxyServer", "/t", "REG_SZ", "/d", "", "/f")
 	run("add", regPath, "/v", "AutoConfigURL", "/t", "REG_SZ", "/d", pacURL, "/f")
 	refreshProxy()
+}
+
+func isAdmin() bool {
+	_, err := os.Open("\\\\.\\PHYSICALDRIVE0")
+	if err != nil {
+		return false
+	}
+	return true
 }
 
 func (a *App) startTUN() {
@@ -784,38 +800,59 @@ func (a *App) startTUN() {
 		log.Println("[TUN] downloading components...")
 		if err := downloadTUNComponents(dir); err != nil {
 			log.Printf("[TUN] download failed: %v, falling back to global", err)
+			wailsRT.EventsEmit(a.ctx, "tun-error", "TUN 组件下载失败: "+err.Error())
 			setSystemProxy(a.mixedAddr)
 			return
 		}
 	}
 
+	if !isAdmin() {
+		log.Println("[TUN] not running as admin, requesting elevation...")
+		wailsRT.EventsEmit(a.ctx, "tun-error", "TUN 模式需要管理员权限，请右键以管理员身份运行程序")
+		setSystemProxy(a.mixedAddr)
+		return
+	}
+
 	gw, err := getDefaultGateway()
 	if err != nil {
 		log.Printf("[TUN] cannot detect gateway: %v, falling back to global", err)
+		wailsRT.EventsEmit(a.ctx, "tun-error", "无法检测默认网关")
 		setSystemProxy(a.mixedAddr)
 		return
 	}
 	a.origGateway = gw
 	log.Printf("[TUN] original gateway: %s", gw)
 
+	var stderrBuf bytes.Buffer
 	a.tunCmd = exec.Command(t2sPath,
 		"-device", "wintun://TunnelPro",
 		"-proxy", "socks5://127.0.0.1:7890",
 		"-loglevel", "warn",
 	)
 	a.tunCmd.Dir = dir
+	a.tunCmd.Stderr = &stderrBuf
 	a.tunCmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	if err := a.tunCmd.Start(); err != nil {
 		log.Printf("[TUN] start failed: %v, falling back to global", err)
+		wailsRT.EventsEmit(a.ctx, "tun-error", "TUN 启动失败: "+err.Error())
 		setSystemProxy(a.mixedAddr)
 		return
 	}
 
 	time.Sleep(3 * time.Second)
 
-	exec.Command("netsh", "interface", "ip", "set", "address", "TunnelPro", "static", "10.0.85.2", "255.255.255.0", "10.0.85.1").Run()
-	exec.Command("netsh", "interface", "ip", "set", "dns", "TunnelPro", "static", "8.8.8.8").Run()
-	exec.Command("netsh", "interface", "ip", "add", "dns", "TunnelPro", "1.1.1.1", "index=2").Run()
+	if a.tunCmd.ProcessState != nil {
+		errMsg := strings.TrimSpace(stderrBuf.String())
+		log.Printf("[TUN] process exited early: %s", errMsg)
+		wailsRT.EventsEmit(a.ctx, "tun-error", "TUN 进程异常退出: "+errMsg)
+		a.tunCmd = nil
+		setSystemProxy(a.mixedAddr)
+		return
+	}
+
+	runHidden("netsh", "interface", "ip", "set", "address", "TunnelPro", "static", "10.0.85.2", "255.255.255.0", "10.0.85.1")
+	runHidden("netsh", "interface", "ip", "set", "dns", "TunnelPro", "static", "8.8.8.8")
+	runHidden("netsh", "interface", "ip", "add", "dns", "TunnelPro", "1.1.1.1", "index=2")
 
 	var serverIP string
 	a.mu.RLock()
@@ -834,11 +871,11 @@ func (a *App) startTUN() {
 	a.mu.RUnlock()
 
 	if serverIP != "" {
-		exec.Command("route", "add", serverIP, "mask", "255.255.255.255", gw, "metric", "5").Run()
+		runHidden("route", "add", serverIP, "mask", "255.255.255.255", gw, "metric", "5")
 		log.Printf("[TUN] route: %s via %s", serverIP, gw)
 	}
-	exec.Command("route", "add", "0.0.0.0", "mask", "128.0.0.0", "10.0.85.1", "metric", "6").Run()
-	exec.Command("route", "add", "128.0.0.0", "mask", "128.0.0.0", "10.0.85.1", "metric", "6").Run()
+	runHidden("route", "add", "0.0.0.0", "mask", "128.0.0.0", "10.0.85.1", "metric", "6")
+	runHidden("route", "add", "128.0.0.0", "mask", "128.0.0.0", "10.0.85.1", "metric", "6")
 
 	a.tunRunning = true
 	log.Println("[TUN] started successfully")
@@ -848,8 +885,8 @@ func (a *App) stopTUN() {
 	if !a.tunRunning {
 		return
 	}
-	exec.Command("route", "delete", "0.0.0.0", "mask", "128.0.0.0", "10.0.85.1").Run()
-	exec.Command("route", "delete", "128.0.0.0", "mask", "128.0.0.0", "10.0.85.1").Run()
+	runHidden("route", "delete", "0.0.0.0", "mask", "128.0.0.0", "10.0.85.1")
+	runHidden("route", "delete", "128.0.0.0", "mask", "128.0.0.0", "10.0.85.1")
 
 	if a.tunCmd != nil && a.tunCmd.Process != nil {
 		a.tunCmd.Process.Kill()
@@ -866,8 +903,8 @@ func fileExists(path string) bool {
 }
 
 func getDefaultGateway() (string, error) {
-	out, err := exec.Command("powershell", "-NoProfile", "-Command",
-		"(Get-NetRoute -DestinationPrefix '0.0.0.0/0' | Sort-Object RouteMetric | Select-Object -First 1).NextHop").Output()
+	out, err := outputHidden("powershell", "-NoProfile", "-Command",
+		"(Get-NetRoute -DestinationPrefix '0.0.0.0/0' | Sort-Object RouteMetric | Select-Object -First 1).NextHop")
 	if err != nil {
 		return "", err
 	}
@@ -1355,11 +1392,25 @@ func (a *App) healthCheck() {
 	}
 }
 
+// ---------- hidden exec ----------
+
+func runHidden(name string, args ...string) error {
+	cmd := exec.Command(name, args...)
+	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	return cmd.Run()
+}
+
+func outputHidden(name string, args ...string) ([]byte, error) {
+	cmd := exec.Command(name, args...)
+	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	return cmd.Output()
+}
+
 // ---------- system proxy ----------
 
 func setSystemProxy(addr string) {
 	regPath := `HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings`
-	run := func(args ...string) { exec.Command("reg", args...).Run() }
+	run := func(args ...string) { runHidden("reg", args...) }
 	run("add", regPath, "/v", "AutoConfigURL", "/t", "REG_SZ", "/d", "", "/f")
 	run("add", regPath, "/v", "ProxyEnable", "/t", "REG_DWORD", "/d", "1", "/f")
 	run("add", regPath, "/v", "ProxyServer", "/t", "REG_SZ", "/d",
@@ -1372,7 +1423,7 @@ func setSystemProxy(addr string) {
 
 func clearSystemProxy() {
 	regPath := `HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings`
-	run := func(args ...string) { exec.Command("reg", args...).Run() }
+	run := func(args ...string) { runHidden("reg", args...) }
 	run("add", regPath, "/v", "ProxyEnable", "/t", "REG_DWORD", "/d", "0", "/f")
 	run("add", regPath, "/v", "AutoConfigURL", "/t", "REG_SZ", "/d", "", "/f")
 	refreshProxy()

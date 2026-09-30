@@ -26,6 +26,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var Version = "dev"
+
 // -------- models --------
 
 type User struct {
@@ -773,8 +775,9 @@ type Config struct {
 }
 
 type NodeStatus struct {
-	NodeID    int64 `json:"node_id"`
-	ConnCount int   `json:"conn_count"`
+	NodeID    int64  `json:"node_id"`
+	ConnCount int    `json:"conn_count"`
+	Version   string `json:"version"`
 	LastSeen  int64 `json:"last_seen"`
 }
 
@@ -1486,10 +1489,27 @@ func (a *API) adminUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	users := a.store.AllUsers()
+	plans := a.store.AllPlans()
+	planMap := make(map[int64]*Plan)
+	for i := range plans {
+		planMap[plans[i].ID] = &plans[i]
+	}
+
 	safe := make([]map[string]any, len(users))
 	for i, u := range users {
 		safe[i] = safeUser(&u)
 		safe[i]["machine_id"] = u.MachineID
+		if p, ok := planMap[u.PlanID]; ok {
+			safe[i]["plan_name"] = p.Name
+			safe[i]["traffic_limit"] = p.TrafficLimit
+			safe[i]["speed_limit"] = p.SpeedLimit
+			safe[i]["device_limit"] = p.DeviceLimit
+		}
+		if u.PlanID > 0 {
+			since := monthlyResetTime(u.TrafficResetAt)
+			safe[i]["traffic_used"] = a.store.GetUserTrafficSince(u.ID, since)
+		}
+		safe[i]["online_count"] = a.countUserSessions(u.ID)
 	}
 	writeJ(w, map[string]any{"users": safe})
 }
@@ -1792,6 +1812,7 @@ func (a *API) handleNodeHeartbeat(w http.ResponseWriter, r *http.Request) {
 		NodeID    int64  `json:"node_id"`
 		ReportKey string `json:"report_key"`
 		ConnCount int    `json:"conn_count"`
+		Version   string `json:"version"`
 	}
 	json.NewDecoder(r.Body).Decode(&body)
 	if body.ReportKey != a.config.NodeReportKey {
@@ -1801,6 +1822,7 @@ func (a *API) handleNodeHeartbeat(w http.ResponseWriter, r *http.Request) {
 	a.nodeStatus.Store(body.NodeID, &NodeStatus{
 		NodeID:    body.NodeID,
 		ConnCount: body.ConnCount,
+		Version:   body.Version,
 		LastSeen:  time.Now().Unix(),
 	})
 	writeJ(w, map[string]bool{"ok": true})
@@ -1859,9 +1881,10 @@ func (a *API) adminNodeStatus(w http.ResponseWriter, r *http.Request) {
 	now := time.Now().Unix()
 	type nodeInfo struct {
 		Node
-		Online    bool  `json:"online"`
-		ConnCount int   `json:"conn_count"`
-		LastSeen  int64 `json:"last_seen"`
+		Online    bool   `json:"online"`
+		ConnCount int    `json:"conn_count"`
+		LastSeen  int64  `json:"last_seen"`
+		Version   string `json:"version"`
 	}
 	out := make([]nodeInfo, len(nodes))
 	for i, n := range nodes {
@@ -1871,6 +1894,7 @@ func (a *API) adminNodeStatus(w http.ResponseWriter, r *http.Request) {
 			out[i].Online = (now - st.LastSeen) < 60
 			out[i].ConnCount = st.ConnCount
 			out[i].LastSeen = st.LastSeen
+			out[i].Version = st.Version
 		}
 	}
 	writeJ(w, map[string]any{"nodes": out})
@@ -2396,6 +2420,11 @@ tr:hover td{background:#fdf9f3}
 .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
 .badge-ok{background:#dcfce7;color:#16a34a}
 .badge-exp{background:#fee2e2;color:#dc2626}
+.progress-track{width:100%;height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;transition:width .3s}
+.bar-ok{background:#16a34a}
+.bar-warn{background:#f59e0b}
+.bar-danger{background:#dc2626}
 .btn{padding:7px 16px;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-family:inherit;font-weight:500;transition:all .15s}
 .btn-primary{background:#da7756;color:#fff}
 .btn-primary:hover{background:#c4623e}
@@ -2794,20 +2823,34 @@ function loadUsers(){
   H("users").then(function(d){users=d.users||[];renderUsers()}).catch(function(){})
 }
 
+function fmtBytes(b){if(!b||b<=0)return "0 B";var u=["B","KB","MB","GB","TB"];var i=Math.floor(Math.log(b)/Math.log(1024));if(i>=u.length)i=u.length-1;return (b/Math.pow(1024,i)).toFixed(i>1?1:0)+" "+u[i]}
 function renderUsers(){
   var q=document.getElementById("userSearch").value.toLowerCase();
   var f=users.filter(function(u){return !q||String(u.id).indexOf(q)>=0||(u.email||"").toLowerCase().indexOf(q)>=0||(u.machine_id||"").toLowerCase().indexOf(q)>=0});
   document.getElementById("userCount").textContent=f.length+"/"+users.length+" 用户";
   if(f.length===0){document.getElementById("userTable").innerHTML='<div class="empty">暂无用户</div>';return}
   var now=Math.floor(Date.now()/1000);
-  var h='<table><tr><th>ID</th><th>邮箱</th><th>状态</th><th>到期时间</th><th>注册时间</th><th>操作</th></tr>';
+  var h='<table><tr><th>ID</th><th>邮箱</th><th>套餐</th><th>状态</th><th>在线</th><th>流量</th><th>到期时间</th><th>操作</th></tr>';
   f.forEach(function(u){
     var label=u.email||(u.machine_id?"游客:"+u.machine_id.substring(0,8)+"...":"未知");
     var st=u.disabled?"已禁用":(u.expires_at>now?"活跃":"已过期");
     var cls=u.disabled?"badge-exp":(u.expires_at>now?"badge-ok":"badge-exp");
+    var plan=u.plan_name||"无套餐";
+    var devLimit=u.device_limit||0;
+    var onCount=u.online_count||0;
+    var onHtml=onCount>0?'<span class="badge badge-ok">'+onCount+(devLimit>0?"/"+devLimit:"")+'台</span>':'<span style="color:#aaa">离线</span>';
+    var trafficHtml="-";
+    if(u.traffic_limit>0){
+      var used=u.traffic_used||0;var pct=Math.min(100,Math.round(used*100/u.traffic_limit));
+      var barCls=pct>=90?"bar-danger":(pct>=70?"bar-warn":"bar-ok");
+      trafficHtml='<div style="min-width:120px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px"><span>'+fmtBytes(used)+'</span><span>'+fmtBytes(u.traffic_limit)+'</span></div><div class="progress-track"><div class="progress-fill '+barCls+'" style="width:'+pct+'%"></div></div></div>'
+    }else if(u.plan_name){trafficHtml="不限量"}
     h+="<tr><td>"+u.id+"</td><td>"+label+"</td>";
+    h+="<td>"+plan+"</td>";
     h+='<td><span class="badge '+cls+'">'+st+"</span></td>";
-    h+="<td>"+fmtTime(u.expires_at)+"</td><td>"+fmtTime(u.created_at)+"</td>";
+    h+="<td>"+onHtml+"</td>";
+    h+="<td>"+trafficHtml+"</td>";
+    h+="<td>"+fmtTime(u.expires_at)+"</td>";
     h+='<td style="white-space:nowrap">';
     h+='<button class="btn btn-sm" onclick="showExtend('+u.id+",'"+label.replace(/'/g,"")+"')\">续期</button> ";
     if(u.disabled){
@@ -2879,12 +2922,13 @@ function loadNodes(){
 
 function renderNodes(){
   if(nodes.length===0){document.getElementById("nodeTable").innerHTML='<div class="empty">暂无节点</div>';return}
-  var h='<table><tr><th>ID</th><th>名称</th><th>域名</th><th>状态</th><th>连接数</th><th>地区</th><th>启用</th><th>操作</th></tr>';
+  var h='<table><tr><th>ID</th><th>名称</th><th>域名</th><th>状态</th><th>版本</th><th>连接数</th><th>地区</th><th>启用</th><th>操作</th></tr>';
   nodes.forEach(function(n){
     var online=n.online;
     var dot='<span class="online-dot '+(online?"on":"off")+'"></span>'+(online?"在线":"离线");
+    var ver=n.version||"-";
     h+="<tr><td>"+n.id+"</td><td>"+n.name+"</td><td style='color:#8b8077;font-size:12px'>"+n.addr+"</td>";
-    h+="<td>"+dot+"</td><td>"+(n.conn_count||0)+"</td><td>"+(n.region||"-")+"</td>";
+    h+="<td>"+dot+"</td><td><span style='font-family:monospace;font-size:12px;color:#8b8077'>"+ver+"</span></td><td>"+(n.conn_count||0)+"</td><td>"+(n.region||"-")+"</td>";
     h+='<td><span class="badge '+(n.enabled?"badge-ok":"badge-exp")+'">'+(n.enabled?"On":"Off")+"</span></td>";
     h+='<td style="white-space:nowrap"><button class="btn btn-sm" onclick="showEditNode('+n.id+')">编辑</button> ';
     h+='<button class="btn btn-success" onclick="showDeploy('+n.id+')">部署</button> ';
