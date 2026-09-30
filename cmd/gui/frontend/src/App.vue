@@ -164,11 +164,16 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
             TUN 模式
           </button>
+          <button :class="['mode-btn', { active: proxyMode === 'direct' }]" @click="setMode('direct')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M18 6L6 18M6 6l12 12"/></svg>
+            直连模式
+          </button>
         </div>
         <div class="mode-hint">
           <span v-if="proxyMode === 'global'">所有流量经过代理</span>
           <span v-else-if="proxyMode === 'bypass'">中国大陆网站直连，其余走代理</span>
-          <span v-else>虚拟网卡全局接管（首次需下载组件）</span>
+          <span v-else-if="proxyMode === 'tun'">虚拟网卡全局接管（首次需下载组件）</span>
+          <span v-else-if="proxyMode === 'direct'">不设置系统代理，仅启动本地端口</span>
         </div>
         <div class="settings-item">
           <span>Kill Switch</span>
@@ -732,7 +737,7 @@ function copyProxy() {
 async function setMode(mode) {
   proxyMode.value = mode
   await SetProxyMode(mode)
-  const labels = { global: '全局代理', bypass: '绕过大陆', tun: 'TUN 模式' }
+  const labels = { global: '全局代理', bypass: '绕过大陆', tun: 'TUN 模式', direct: '直连模式' }
   showToast('已切换：' + labels[mode], 'success')
 }
 

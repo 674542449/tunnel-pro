@@ -37,7 +37,6 @@ import (
 )
 
 const apiBase = "https://cloud.xiaguamail.com"
-const clientVersion = "1.0.0"
 
 var uaPool = []string{
 	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
@@ -408,7 +407,8 @@ func (a *App) CheckUpdate() UpdateInfo {
 	}
 	json.NewDecoder(resp.Body).Decode(&release)
 	ver := strings.TrimPrefix(release.TagName, "v")
-	if ver != "" && ver != clientVersion {
+	cur := strings.TrimPrefix(Version, "v")
+	if ver != "" && ver != cur {
 		dlURL := ""
 		for _, asset := range release.Assets {
 			if strings.HasSuffix(asset.Name, ".exe") {
@@ -623,7 +623,7 @@ func (a *App) GetDarkMode() *bool {
 	return a.auth.DarkMode
 }
 
-func (a *App) GetVersion() string { return clientVersion }
+func (a *App) GetVersion() string { return Version }
 
 func (a *App) GetAnnouncements() []AnnouncementInfo {
 	resp, err := http.Get(apiBase + "/api/announcements")
@@ -711,13 +711,15 @@ func (a *App) SetProxyMode(mode string) {
 
 func (a *App) applyProxyMode() {
 	a.stopTUN()
-	clearSystemProxy()
 
 	mode := a.GetProxyMode()
 	switch mode {
+	case "direct":
+		clearSystemProxy()
 	case "bypass":
 		setSystemProxyPAC(a.pacURL)
 	case "tun":
+		clearSystemProxy()
 		go a.startTUN()
 	default:
 		setSystemProxy(a.mixedAddr)
