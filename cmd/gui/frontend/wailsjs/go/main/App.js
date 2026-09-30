@@ -18,6 +18,10 @@ export function Disconnect() {
   return window['go']['main']['App']['Disconnect']();
 }
 
+export function GetLastNodeID() {
+  return window['go']['main']['App']['GetLastNodeID']();
+}
+
 export function GetNodes() {
   return window['go']['main']['App']['GetNodes']();
 }
@@ -60,10 +64,6 @@ export function OpenURL(arg1) {
 
 export function Register(arg1, arg2) {
   return window['go']['main']['App']['Register'](arg1, arg2);
-}
-
-export function ResetSpeed() {
-  return window['go']['main']['App']['ResetSpeed']();
 }
 
 export function ShowWindow() {

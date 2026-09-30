@@ -10,6 +10,8 @@ export function Connect(arg1:number):Promise<void>;
 
 export function Disconnect():Promise<void>;
 
+export function GetLastNodeID():Promise<number>;
+
 export function GetNodes():Promise<Array<main.NodeInfo>>;
 
 export function GetSpeed():Promise<main.SpeedInfo>;
@@ -31,8 +33,6 @@ export function Logout():Promise<void>;
 export function OpenURL(arg1:string):Promise<void>;
 
 export function Register(arg1:string,arg2:string):Promise<void>;
-
-export function ResetSpeed():Promise<void>;
 
 export function ShowWindow():Promise<void>;
 

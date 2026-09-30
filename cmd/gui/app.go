@@ -72,8 +72,9 @@ type StatusInfo struct {
 }
 
 type AuthState struct {
-	Token string          `json:"token,omitempty"`
-	User  json.RawMessage `json:"user,omitempty"`
+	Token      string          `json:"token,omitempty"`
+	User       json.RawMessage `json:"user,omitempty"`
+	LastNodeID int64           `json:"last_node_id,omitempty"`
 }
 
 type serverConfig struct {
@@ -140,10 +141,37 @@ func NewApp() *App {
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 	a.loadAuth()
+	a.cleanStaleProxy()
 	go a.startMixed()
 	go a.healthCheck()
 	go a.startTray()
 	go a.checkUpdateOnStart()
+}
+
+func (a *App) cleanStaleProxy() {
+	out, err := exec.Command("reg", "query",
+		`HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings`,
+		"/v", "ProxyEnable").Output()
+	if err != nil {
+		return
+	}
+	if !strings.Contains(string(out), "0x1") {
+		return
+	}
+	out, err = exec.Command("reg", "query",
+		`HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings`,
+		"/v", "ProxyServer").Output()
+	if err != nil {
+		return
+	}
+	if strings.Contains(string(out), a.mixedAddr) {
+		clearSystemProxy()
+		log.Println("[startup] cleared stale proxy from previous session")
+	}
+}
+
+func (a *App) GetLastNodeID() int64 {
+	return a.auth.LastNodeID
 }
 
 func (a *App) shutdown(ctx context.Context) {
@@ -433,6 +461,9 @@ func (a *App) Connect(nodeID int64) error {
 	setSystemProxy(a.mixedAddr)
 	a.proxyOn = true
 
+	a.auth.LastNodeID = nodeID
+	a.saveAuth()
+
 	a.updateTrayTooltip(true, cfg.Name)
 	wailsRT.EventsEmit(a.ctx, "connection-changed", StatusInfo{Connected: true, NodeName: cfg.Name, NodeID: nodeID})
 	return nil
@@ -478,14 +509,9 @@ func (a *App) GetStatus() StatusInfo {
 
 func (a *App) GetSpeed() SpeedInfo {
 	return SpeedInfo{
-		Upload:   a.upBytes.Load(),
-		Download: a.downBytes.Load(),
+		Upload:   a.upBytes.Swap(0),
+		Download: a.downBytes.Swap(0),
 	}
-}
-
-func (a *App) ResetSpeed() {
-	a.upBytes.Store(0)
-	a.downBytes.Store(0)
 }
 
 func (a *App) TestLatency(nodeID int64) int {
@@ -656,7 +682,10 @@ func (a *App) healthCheck() {
 		if conn == nil || !conn.IsClosed() {
 			continue
 		}
-		log.Println("[health] reconnecting...")
+		log.Println("[health] connection lost, reconnecting...")
+		if a.ctx != nil {
+			wailsRT.EventsEmit(a.ctx, "reconnecting", true)
+		}
 		ok := false
 		for retry := 0; retry < 5; retry++ {
 			if retry > 0 {
@@ -664,13 +693,21 @@ func (a *App) healthCheck() {
 			}
 			mx, err := p.dial()
 			if err != nil {
+				log.Printf("[health] retry %d failed: %v", retry+1, err)
 				continue
+			}
+			if uid := parseJWTUID(a.auth.Token); uid > 0 {
+				mx.SendUserID(strconv.FormatInt(uid, 10))
 			}
 			p.mu.Lock()
 			p.conn = mx
 			p.mu.Unlock()
 			ok = true
+			log.Println("[health] reconnected")
 			break
+		}
+		if a.ctx != nil {
+			wailsRT.EventsEmit(a.ctx, "reconnecting", false)
 		}
 		if !ok {
 			a.Disconnect()

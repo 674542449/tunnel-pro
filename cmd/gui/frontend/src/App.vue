@@ -64,8 +64,13 @@
         </button>
       </div>
 
+      <!-- Reconnecting banner -->
+      <div v-if="reconnecting" class="reconnect-banner">
+        正在重连...
+      </div>
+
       <!-- Update banner -->
-      <div v-if="updateInfo.available" class="update-banner" @click="openUpdate">
+      <div v-if="updateInfo.available && !reconnecting" class="update-banner" @click="openUpdate">
         发现新版本 {{ updateInfo.version }} — 点击下载
       </div>
 
@@ -151,7 +156,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { Login, Register, GuestLogin, IsLoggedIn, Logout, GetNodes, Connect, Disconnect, GetStatus, GetSpeed, ResetSpeed, TestLatency, HideWindow, OpenURL } from '../wailsjs/go/main/App'
+import { Login, Register, GuestLogin, IsLoggedIn, Logout, GetNodes, Connect, Disconnect, GetStatus, GetSpeed, TestLatency, HideWindow, OpenURL, GetLastNodeID } from '../wailsjs/go/main/App'
 import { WindowMinimise, EventsOn } from '../wailsjs/runtime/runtime'
 
 const loggedIn = ref(false)
@@ -168,6 +173,7 @@ const speed = ref({ upload: 0, download: 0 })
 const connecting = ref(false)
 const connectingId = ref(-1)
 const showSettings = ref(false)
+const reconnecting = ref(false)
 const updateInfo = ref({ available: false, version: '', url: '' })
 
 let speedInterval = null
@@ -220,28 +226,39 @@ async function doGuest() {
   loading.value = false
 }
 
-async function refreshNodes() {
+async function refreshNodes(autoConnectId) {
   loading.value = true
   try {
     const list = await GetNodes()
     nodes.value = list || []
-    for (const n of nodes.value) {
+    const promises = nodes.value.map(n =>
       TestLatency(n.id).then(ms => { n.latency = ms })
-    }
+    )
+    Promise.all(promises).then(() => {
+      nodes.value.sort((a, b) => {
+        const la = a.latency <= 0 ? 99999 : a.latency
+        const lb = b.latency <= 0 ? 99999 : b.latency
+        return la - lb
+      })
+      if (autoConnectId && autoConnectId > 0 && !connected.value) {
+        const node = nodes.value.find(n => n.id === autoConnectId)
+        if (node) connectNode(node, true)
+      }
+    })
   } catch (e) {
     console.error(e)
   }
   loading.value = false
 }
 
-async function connectNode(node) {
+async function connectNode(node, silent) {
   connecting.value = true
   connectingId.value = node.id
   try {
     await Connect(node.id)
   } catch (e) {
     error.value = e
-    alert('连接失败: ' + e)
+    if (!silent) alert('连接失败: ' + e)
   }
   connecting.value = false
   connectingId.value = -1
@@ -278,7 +295,6 @@ async function pollSpeed() {
   try {
     const s = await GetSpeed()
     speed.value = s
-    await ResetSpeed()
   } catch {}
 }
 
@@ -295,13 +311,18 @@ onMounted(async () => {
   const isLogged = await IsLoggedIn()
   if (isLogged) {
     loggedIn.value = true
-    await refreshNodes()
+    const lastId = await GetLastNodeID()
+    await refreshNodes(lastId)
   }
 
   EventsOn('connection-changed', (s) => {
     status.value = s
     connected.value = s.connected
     if (s.connected) currentNode.value = s.nodeName
+  })
+
+  EventsOn('reconnecting', (isReconnecting) => {
+    reconnecting.value = isReconnecting
   })
 
   EventsOn('update-available', (info) => {
@@ -450,6 +471,21 @@ onUnmounted(() => {
   transition: background .2s;
 }
 .update-banner:hover { background: #bfdbfe; }
+
+.reconnect-banner {
+  margin: 0 18px 8px;
+  padding: 10px 14px;
+  background: #fef3cd;
+  color: #856404;
+  font-size: 12px;
+  border-radius: 8px;
+  text-align: center;
+  animation: pulse-bg 1.5s ease-in-out infinite;
+}
+@keyframes pulse-bg {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
 
 .home-view {
   flex: 1;
