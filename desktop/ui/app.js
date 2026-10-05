@@ -159,7 +159,7 @@ function renderShell() {
   $('auth').hidden = workspace; $('account').hidden = !workspace; $('sidebar').hidden = !workspace;
   $('refresh').hidden = !status.logged_in; $('guest-back').hidden = status.logged_in || !guestSettings;
   $('header-account').hidden = !status.logged_in; $('header-account').textContent = status.logged_in ? (status.email || '') : '';
-  $('version').textContent = status.version || 'v0.6.16'; $('settings-version').textContent = status.version || 'v0.6.16';
+  $('version').textContent = status.version || 'v0.6.17'; $('settings-version').textContent = status.version || 'v0.6.17';
   if (!apiDraftDirty) $('api-url').value = status.api_url || '';
   $('startup-warning').textContent = status.startup_warning || ''; $('startup-warning').hidden = !status.startup_warning;
   showView(status.logged_in ? view : 'settings');
@@ -690,7 +690,7 @@ async function checkUpdates() {
     if (generation !== releaseGeneration || currentEpoch !== epoch || api !== status.api_url) return;
     const release = publicInfo?.release;
     if (!release?.version) { $('release').textContent = '服务商尚未发布 Windows 客户端。'; return; }
-    const comparison = compareVersion(release.version,status.version || 'v0.6.16');
+    const comparison = compareVersion(release.version,status.version || 'v0.6.17');
     const heading = comparison === 1 ? '发现更新：'+release.version : comparison === 0 ? '当前与服务商发布版本一致：'+release.version : comparison === -1 ? '服务商发布版本为 '+release.version+'。当前版本较新，无需降级。' : '服务商发布版本：'+release.version+'。版本格式无法比较，请向服务商确认。';
     $('release').replaceChildren(element('p',heading),element('p',release.notes || ''));
     let valid = false; try { valid = new URL(release.url).protocol === 'https:' && /^[a-f0-9]{64}$/i.test(release.sha256 || ''); } catch (_) { /* metadata is incomplete */ }
