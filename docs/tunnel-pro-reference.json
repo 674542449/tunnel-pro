@@ -1,6 +1,0 @@
-{
-  "url": "https://github.com/674542449/tunnel-pro",
-  "commit": "a6d50dec6f270dc3fe30ee1be35bad1344804a7a",
-  "license_declared": "MIT (README)",
-  "approach": "Independent management and desktop implementation around existing tunnelX H2 core; no upstream transport copied."
-}

@@ -1,7 +1,7 @@
 {
   "passed": true,
-  "desktop_version": "v0.6.11",
-  "checked_at": "2026-10-03T09:56:38.004798+00:00",
+  "desktop_version": "v0.6.17",
+  "checked_at": "2026-10-05T11:55:49.527480+00:00",
   "scope": "actual App.Query + desktop.Engine + vendored Wails Bindings, Dispatcher, ParseArgs, BoundMethod.Call and callback serializer",
   "gui_rendered": false,
   "remote_service_used": false,
@@ -40,5 +40,5 @@
   ],
   "failures": [],
   "exit_code": 0,
-  "test_log": "C:\\Users\\tanzh\\Desktop\\tunnelX\\.local\\wails-binding\\regression-eh1276x_\\go-test.jsonl"
+  "test_log": "C:\\Users\\Administrator\\Desktop\\pro\\.local\\wails-binding\\regression-_me_mzu8\\go-test.jsonl"
 }

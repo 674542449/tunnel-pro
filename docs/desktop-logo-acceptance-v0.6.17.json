@@ -1,7 +1,7 @@
 {
   "passed": true,
-  "version": "v0.6.15",
-  "desktop_sha256": "c713c586e97847914738753930c575903489a101d3a3cf3a1d7617ebb759d478",
+  "version": "v0.6.17",
+  "desktop_sha256": "70d3e8253b612ef538a3879a58e9a9058f8e69ccc491876bf69020f78eb3d15d",
   "windows_icon_group_id": 3,
   "icon_sizes": [
     16,
