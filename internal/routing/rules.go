@@ -255,7 +255,7 @@ func (r *Router) Decide(ctx context.Context, target string) Decision {
 	if ok && time.Now().Before(c.until) {
 		return c.value
 	}
-	resolve, cancel := context.WithTimeout(ctx, 500*time.Millisecond)
+	resolve, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
 	ips, e := r.Lookup(resolve, host)
 	decision := proxy

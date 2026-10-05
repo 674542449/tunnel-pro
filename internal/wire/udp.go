@@ -24,7 +24,7 @@ type PacketStream struct {
 
 func NewPacketStream(parent context.Context, rw io.ReadWriter, closeFn func()) *PacketStream {
 	ctx, cancel := context.WithCancel(parent)
-	s := &PacketStream{ctx: ctx, cancel: cancel, rw: rw, close: closeFn, packets: make(chan []byte, 64)}
+	s := &PacketStream{ctx: ctx, cancel: cancel, rw: rw, close: closeFn, packets: make(chan []byte, 256)}
 	go s.readCapsules()
 	return s
 }
@@ -132,14 +132,16 @@ func (s *PacketStream) Send(b []byte) error {
 		return s.ctx.Err()
 	default:
 	}
-	v := append([]byte{0}, b...)
+	n := 1 + len(b)
+	frame := make([]byte, 0, 10+len(b))
+	frame = appendVarint(frame, 0)
+	frame = appendVarint(frame, uint64(n))
+	frame = append(frame, 0)
+	frame = append(frame, b...)
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	h := appendVarint(nil, 0)
-	h = appendVarint(h, uint64(len(v)))
-	frame := append(h, v...)
-	n, e := s.rw.Write(frame)
-	if e == nil && n != len(frame) {
+	written, e := s.rw.Write(frame)
+	if e == nil && written != len(frame) {
 		e = io.ErrShortWrite
 	}
 	return e
