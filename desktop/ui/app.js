@@ -862,6 +862,34 @@ async function saveProxyMode(mode) {
 document.querySelectorAll('input[name="proxy-mode"]').forEach(input => input.addEventListener('change',() => { if (input.checked) operation('mode',() => saveProxyMode(input.value)); }));
 $('direct-domains').addEventListener('input',() => { routingDraftDirty = true; });
 $('save-routing').onclick = () => operation('mode',() => saveProxyMode(status.preferences?.proxy_mode || 'global'));
+$('probe-all').onclick = () => operation('probe-all',async () => {
+  $('probe-all').textContent = '正在测速…';
+  const results = await nativeRead(() => app().ProbeAll());
+  if (!Array.isArray(results)) return;
+  const currentEpoch = epoch;
+  for (const r of results) {
+    if (currentEpoch !== epoch) break;
+    if (r.error) probes.set(r.id,{error:r.error});
+    else probes.set(r.id,{ms:Number(r.ms),checked:Date.now()});
+  }
+  renderNodes(); message('全部线路延迟测试完成。','success');
+});
+$('refresh-connlogs').onclick = () => operation('connlogs',async () => {
+  const logs = await nativeRead(() => app().ConnLogs());
+  renderConnLogs(logs);
+});
+function renderConnLogs(logs) {
+  if (!Array.isArray(logs) || !logs.length) { $('conn-logs').textContent = '暂无连接记录'; return; }
+  const eventNames = {connect:'连接',disconnect:'断开'};
+  $('conn-logs').replaceChildren(...[...logs].reverse().slice(0,50).map(l => {
+    const row = element('div',undefined,'conn-log-row');
+    row.append(element('span',new Date(l.time).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}),'conn-log-time'));
+    row.append(element('span',eventNames[l.event] || l.event,'pill '+(l.event === 'connect' ? 'good' : 'neutral')));
+    row.append(element('span',l.node_name || l.node_id || '—','conn-log-node'));
+    if (l.detail) row.append(element('span',l.detail,'conn-log-detail'));
+    return row;
+  }));
+}
 $('update-rules').onclick = () => operation('rules',async () => {
   $('routing-result').textContent = '正在下载并校验 GitHub 规则…';
   try { await app().UpdateRoutingRules(); $('routing-result').textContent = '规则已更新，下次连接时使用新规则。'; }

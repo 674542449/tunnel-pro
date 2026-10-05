@@ -77,7 +77,8 @@ with (root / '.private-cert.lock').open('a') as lock:
             mode(generation, 0o750)
             key, cert, csr, ext = (generation / n for n in ('key.pem', 'cert.pem', 'request.pem', 'extensions'))
             ext.write_text('basicConstraints=critical,CA:FALSE\nkeyUsage=critical,digitalSignature\nextendedKeyUsage=serverAuth\nsubjectAltName=' + ','.join('DNS:' + n for n in dict.fromkeys(names)) + '\n')
-            run('openssl', 'req', '-new', '-newkey', 'ec', '-pkeyopt', 'ec_paramgen_curve:P-256', '-nodes', '-subj', '/CN=' + names[0], '-keyout', str(key), '-out', str(csr))
+            # DNS identity lives in SAN; CN has a shorter limit than a valid DNS name.
+            run('openssl', 'req', '-new', '-newkey', 'ec', '-pkeyopt', 'ec_paramgen_curve:P-256', '-nodes', '-subj', '/CN=tunnelX node', '-keyout', str(key), '-out', str(csr))
             run('openssl', 'x509', '-req', '-in', str(csr), '-CA', str(ca), '-CAkey', str(ca_key), '-set_serial', '0x' + secrets.token_hex(16), '-days', '90', '-sha256', '-extfile', str(ext), '-out', str(cert))
             key_matches(cert, key)
             for name in names:

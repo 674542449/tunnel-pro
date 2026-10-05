@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 	"tunnelx/internal/client"
 	"tunnelx/internal/config"
@@ -339,6 +340,7 @@ func (e *Engine) connect(id string, systemProxy bool, recovery uint64) (result e
 		}()
 	}
 	l.Record("client_started", map[string]any{"scope": "client", "client_version": DesktopVersion, "mode": "h2", "proxy_mode": mode, "privacy": "strict", "pid": os.Getpid(), "server": c.ServerIP, "server_port": c.Port, "health_interval_seconds": 30, "h2_connections": c.H2Connections})
+	e.recordConn("connect", id, profile.Node.Name, mode)
 	return nil
 }
 func (e *Engine) Disconnect() error {
@@ -394,6 +396,7 @@ func (e *Engine) disconnect() error {
 	if m == nil {
 		return e.recoverProxy()
 	}
+	e.recordConn("disconnect", "", "", "")
 	var tunErr error
 	if tun != nil {
 		tunErr = tun.Close()
@@ -455,4 +458,48 @@ func (e *Engine) Probe(id string) (int64, error) {
 		return 0, errors.New("节点检测失败")
 	}
 	return time.Since(started).Milliseconds(), nil
+}
+
+type ProbeResult struct {
+	ID    string `json:"id"`
+	Ms    int64  `json:"ms"`
+	Error string `json:"error,omitempty"`
+}
+
+func (e *Engine) ProbeAll() []ProbeResult {
+	e.mu.Lock()
+	base := e.settings.APIURL
+	token := e.login.Token
+	e.mu.Unlock()
+	if token == "" {
+		return nil
+	}
+	var nodes []struct {
+		ID string `json:"id"`
+	}
+	if err := e.request(context.Background(), "/api/nodes", nil, &nodes); err != nil || len(nodes) == 0 {
+		return nil
+	}
+	results := make([]ProbeResult, len(nodes))
+	var wg sync.WaitGroup
+	sem := make(chan struct{}, 4)
+	for i, n := range nodes {
+		results[i].ID = n.ID
+		wg.Add(1)
+		go func(idx int, id string) {
+			defer wg.Done()
+			sem <- struct{}{}
+			defer func() { <-sem }()
+			ms, err := e.Probe(id)
+			if err != nil {
+				results[idx].Error = err.Error()
+				results[idx].Ms = -1
+			} else {
+				results[idx].Ms = ms
+			}
+		}(i, n.ID)
+	}
+	wg.Wait()
+	_ = base
+	return results
 }

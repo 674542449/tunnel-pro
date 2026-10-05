@@ -26,6 +26,7 @@ func (g stressGate) Authorize(ctx context.Context, h []string, _ string) (server
 func (p *stressPermit) Context() context.Context { return p.ctx }
 func (p *stressPermit) Allowed() bool            { return p.ctx.Err() == nil }
 func (p *stressPermit) Account(bool, int)        {}
+func (p *stressPermit) SpeedLimit() int64        { return 0 }
 func (p *stressPermit) Close()                   { p.cancel() }
 func TestManagedCancellationStress(t *testing.T) {
 	env := start(t)

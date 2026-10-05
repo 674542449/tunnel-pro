@@ -30,6 +30,8 @@ type Server struct {
 	Active         atomic.Int64
 	Resolver       func(context.Context, string) ([]net.IP, error)
 	Access         AccessController
+	dns            *dnsCache
+	accessLog      *slog.Logger
 }
 
 func New(c config.Server) (*Server, error) {
@@ -42,11 +44,23 @@ func New(c config.Server) (*Server, error) {
 	}
 	s := &Server{Config: c, auth: config.NewAuth(c.Tokens), slots: make(chan struct{}, c.MaxConnections)}
 	s.Resolver = DefaultLookup
+	if c.DNSCacheTTL > 0 {
+		s.dns = &dnsCache{ttl: time.Duration(c.DNSCacheTTL) * time.Second, entries: map[string]dnsCacheEntry{}}
+		s.Resolver = s.dns.Lookup
+	}
 	_ = tlsCfg
 	return s, nil
 }
 
 func (s *Server) Serve(ctx context.Context) error {
+	if s.Config.AccessLog != "" {
+		f, e := os.OpenFile(s.Config.AccessLog, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
+		if e != nil {
+			return fmt.Errorf("access log: %w", e)
+		}
+		defer f.Close()
+		s.accessLog = slog.New(slog.NewJSONHandler(f, nil))
+	}
 	tlsCfg, e := s.Config.TLS()
 	if e != nil {
 		return e
@@ -87,6 +101,12 @@ func (s *Server) public(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" && r.URL.Path == "/health" {
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Cache-Control", "no-store")
+		fmt.Fprintf(w, `{"status":"ok","active":%d}`, s.Active.Load())
+		return
+	}
 	if s.Config.ManagedOnly || !s.auth.Valid(r.Header.Values("Authorization")) {
 		var p Permit
 		var ok bool
@@ -173,6 +193,10 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer conn.Close()
+	if s.Config.MaxLifetime > 0 {
+		lt := time.AfterFunc(time.Duration(s.Config.MaxLifetime)*time.Second, func() { conn.Close() })
+		defer lt.Stop()
+	}
 	w.WriteHeader(200)
 	http.NewResponseController(w).Flush()
 	cleanup := joinCancellation(r.Context(), func() {
@@ -184,12 +208,26 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	})
 	defer cleanup()
 	idle := time.Duration(s.Config.IdleTimeout) * time.Second
+	speedLimit := s.Config.BandwidthLimit
+	if p := permit(r.Context()); p != nil && p.SpeedLimit() > 0 {
+		speedLimit = p.SpeedLimit()
+	}
+	var th *throttle
+	if speedLimit > 0 {
+		th = &throttle{limit: speedLimit, start: time.Now()}
+	}
+	var upBytes, downBytes atomic.Int64
+	proxyStart := time.Now()
 	up := make(chan error, 1)
 	go func() {
 		var reader io.Reader = r.Body
+		if th != nil {
+			reader = throttledReader{r: reader, t: th}
+		}
 		if p := permit(r.Context()); p != nil {
 			reader = accountReader{reader: reader, access: p, upload: true}
 		}
+		reader = countReader{r: reader, n: &upBytes}
 		_, e := io.CopyBuffer(idleConn{Conn: conn, idle: idle}, reader, make([]byte, 32<<10))
 		if tcp, ok := conn.(*net.TCPConn); ok {
 			tcp.CloseWrite()
@@ -197,9 +235,13 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		up <- e
 	}()
 	var reader io.Reader = idleConn{Conn: conn, idle: idle}
+	if th != nil {
+		reader = throttledReader{r: reader, t: th}
+	}
 	if p := permit(r.Context()); p != nil {
 		reader = accountReader{reader: reader, access: p}
 	}
+	reader = countReader{r: reader, n: &downBytes}
 	_, downErr := io.CopyBuffer(flushWriter{w: w}, reader, make([]byte, 32<<10))
 	if downErr != nil {
 		conn.Close()
@@ -208,6 +250,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	select {
 	case <-up:
 	case <-r.Context().Done():
+	}
+	if s.accessLog != nil {
+		s.accessLog.Info("proxy", "target", target, "proto", "tcp", "upload", upBytes.Load(), "download", downBytes.Load(), "duration_ms", time.Since(proxyStart).Milliseconds())
 	}
 }
 func UDPAddress(u *url.URL) (string, error) {
@@ -322,6 +367,10 @@ func (s *Server) udp(w http.ResponseWriter, r *http.Request, ip net.IP, port int
 		return
 	}
 	defer conn.Close()
+	if s.Config.MaxLifetime > 0 {
+		lt := time.AfterFunc(time.Duration(s.Config.MaxLifetime)*time.Second, func() { conn.Close() })
+		defer lt.Stop()
+	}
 	w.Header().Set("Capsule-Protocol", "?1")
 	w.WriteHeader(200)
 	http.NewResponseController(w).Flush()
@@ -395,4 +444,99 @@ func LogError(e error) {
 		slog.Error("server stopped", "error", fmt.Sprint(e))
 		os.Exit(1)
 	}
+}
+
+type dnsCache struct {
+	mu      sync.RWMutex
+	entries map[string]dnsCacheEntry
+	ttl     time.Duration
+}
+type dnsCacheEntry struct {
+	ips     []net.IP
+	expires time.Time
+}
+
+func (c *dnsCache) Lookup(ctx context.Context, host string) ([]net.IP, error) {
+	c.mu.RLock()
+	if e, ok := c.entries[host]; ok && time.Now().Before(e.expires) {
+		c.mu.RUnlock()
+		return e.ips, nil
+	}
+	c.mu.RUnlock()
+	ips, err := DefaultLookup(ctx, host)
+	if err != nil {
+		return nil, err
+	}
+	c.mu.Lock()
+	if len(c.entries) >= 4096 {
+		now := time.Now()
+		for k, v := range c.entries {
+			if now.After(v.expires) {
+				delete(c.entries, k)
+			}
+		}
+		if len(c.entries) >= 4096 {
+			for k := range c.entries {
+				delete(c.entries, k)
+				break
+			}
+		}
+	}
+	c.entries[host] = dnsCacheEntry{ips: ips, expires: time.Now().Add(c.ttl)}
+	c.mu.Unlock()
+	return ips, nil
+}
+
+type throttle struct {
+	limit int64
+	mu    sync.Mutex
+	count int64
+	start time.Time
+}
+
+func (t *throttle) wait(n int) {
+	t.mu.Lock()
+	t.count += int64(n)
+	elapsed := time.Since(t.start)
+	if elapsed > 0 {
+		rate := float64(t.count) / elapsed.Seconds()
+		if rate > float64(t.limit) {
+			delay := time.Duration(float64(t.count)/float64(t.limit)*float64(time.Second)) - elapsed
+			if delay > 10*time.Second {
+				delay = 10 * time.Second
+			}
+			if delay > 0 {
+				t.mu.Unlock()
+				time.Sleep(delay)
+				return
+			}
+		}
+	}
+	t.mu.Unlock()
+}
+
+type throttledReader struct {
+	r io.Reader
+	t *throttle
+}
+
+func (r throttledReader) Read(b []byte) (int, error) {
+	n, e := r.r.Read(b)
+	if n > 0 {
+		r.t.wait(n)
+	}
+	return n, e
+}
+
+type countReader struct {
+	r io.Reader
+	n *atomic.Int64
+}
+
+func (c countReader) Read(b []byte) (int, error) {
+	n, e := c.r.Read(b)
+	if n > 0 {
+		c.n.Add(int64(n))
+	}
+	return n, e
 }

@@ -286,6 +286,14 @@ func (p *access) Account(upload bool, n int) {
 		p.cancel()
 	}
 }
+func (p *access) SpeedLimit() int64 {
+	p.agent.mu.Lock()
+	defer p.agent.mu.Unlock()
+	if g, ok := p.agent.grants[p.hash]; ok {
+		return g.SpeedLimit
+	}
+	return 0
+}
 func (p *access) Close() {
 	p.once.Do(func() { p.cancel(); p.agent.mu.Lock(); delete(p.agent.permits, p); p.agent.mu.Unlock() })
 }

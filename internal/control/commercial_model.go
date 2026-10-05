@@ -110,6 +110,7 @@ type Entitlement struct {
 	EndsAt     int64    `json:"ends_at"`
 	Bytes      int64    `json:"bytes"`
 	Devices    int      `json:"devices"`
+	SpeedLimit int64    `json:"speed_limit,omitempty"`
 	NodeIDs    []string `json:"node_ids,omitempty"`
 	RevokedAt  int64    `json:"revoked_at,omitempty"`
 	Test       bool     `json:"test"`

@@ -538,7 +538,26 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, actor *User, session
 					online++
 				}
 			}
-			reply(w, 200, map[string]any{"users": len(d.Users), "nodes": len(d.Nodes), "online_nodes": online, "orders": len(d.Orders), "version": ConsoleVersion, "transport": "h2"})
+			nt := map[string][2]int64{}
+			for key, counter := range d.Reports {
+				parts := strings.SplitN(key, ":", 3)
+				if len(parts) == 3 {
+					v := nt[parts[0]]
+					v[0] += counter.Upload
+					v[1] += counter.Download
+					nt[parts[0]] = v
+				}
+			}
+			nodeTraffic := []map[string]any{}
+			for _, n := range d.Nodes {
+				entry := map[string]any{"id": n.ID, "name": n.Name, "active": n.Active, "upload": int64(0), "download": int64(0)}
+				if t, ok := nt[n.ID]; ok {
+					entry["upload"] = t[0]
+					entry["download"] = t[1]
+				}
+				nodeTraffic = append(nodeTraffic, entry)
+			}
+			reply(w, 200, map[string]any{"users": len(d.Users), "nodes": len(d.Nodes), "online_nodes": online, "orders": len(d.Orders), "version": ConsoleVersion, "transport": "h2", "node_traffic": nodeTraffic, "traffic_history": d.TrafficHistory})
 			return
 		case "users":
 			v := []map[string]any{}
@@ -793,6 +812,7 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, actor *User, session
 			Days         int   `json:"days"`
 			TrafficBytes int64 `json:"traffic_bytes"`
 			Devices      int   `json:"devices"`
+			SpeedLimit   int64 `json:"speed_limit"`
 		}
 		if !decode(w, r, &b) {
 			return
@@ -802,7 +822,7 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, actor *User, session
 			if u == nil {
 				return errors.New("missing user")
 			}
-			if e := extend(u, b.Days, b.TrafficBytes, b.Devices); e != nil {
+			if e := extend(u, b.Days, b.TrafficBytes, b.Devices, b.SpeedLimit); e != nil {
 				return e
 			}
 			record(d, actor.ID, "user_renewed", u.ID)
@@ -837,7 +857,7 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, actor *User, session
 					if u == nil || u.Disabled {
 						return errors.New("missing or disabled user")
 					}
-					if e := extend(u, o.Plan.Days, o.Plan.TrafficBytes, o.Plan.Devices); e != nil {
+					if e := extend(u, o.Plan.Days, o.Plan.TrafficBytes, o.Plan.Devices, o.Plan.SpeedLimit); e != nil {
 						return e
 					}
 					o.Status = "paid"
@@ -996,7 +1016,7 @@ func (a *API) syncNode(w http.ResponseWriter, r *http.Request) {
 				}
 				if v.Active(time.Now().Unix()) && !(v.NeedsEmailVerification && v.EmailVerifiedAt == 0) {
 					remaining := v.Limit - v.Upload - v.Download
-					response.Grants = append(response.Grants, Grant{UserID: u.ID, Token: u.TunnelToken, ExpiresAt: v.ExpiresAt, Remaining: remaining, Unlimited: v.Limit == 0, Devices: v.Devices, RequireLeases: commercial})
+					response.Grants = append(response.Grants, Grant{UserID: u.ID, Token: u.TunnelToken, ExpiresAt: v.ExpiresAt, Remaining: remaining, Unlimited: v.Limit == 0, Devices: v.Devices, SpeedLimit: v.SpeedLimit, RequireLeases: commercial})
 				}
 			}
 		}

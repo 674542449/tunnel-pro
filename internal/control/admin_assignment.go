@@ -77,7 +77,7 @@ func assignPlan(d *State, actor, userID string, b assignmentRequest, now int64) 
 		}
 		end = start + int64(p.Days)*86400
 	}
-	g := Entitlement{ID: ID(), UserID: userID, Source: "admin_assignment", PlanID: p.ID, PlanName: p.Name, AssignedBy: actor, Reason: b.Reason, RequestID: b.RequestID, AssignMode: b.Mode, StartsAt: start, EndsAt: end, Bytes: p.TrafficBytes, Devices: devices, NodeIDs: append([]string(nil), p.NodeIDs...), Test: b.Test, Kind: p.Kind}
+	g := Entitlement{ID: ID(), UserID: userID, Source: "admin_assignment", PlanID: p.ID, PlanName: p.Name, AssignedBy: actor, Reason: b.Reason, RequestID: b.RequestID, AssignMode: b.Mode, StartsAt: start, EndsAt: end, Bytes: p.TrafficBytes, Devices: devices, SpeedLimit: p.SpeedLimit, NodeIDs: append([]string(nil), p.NodeIDs...), Test: b.Test, Kind: p.Kind}
 	d.Entitlements = append(d.Entitlements, g)
 	record(d, actor, "user_plan_assigned", g.ID)
 	return nil

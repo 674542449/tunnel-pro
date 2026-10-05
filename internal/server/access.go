@@ -13,6 +13,7 @@ type Permit interface {
 	Context() context.Context
 	Allowed() bool
 	Account(upload bool, n int)
+	SpeedLimit() int64
 	Close()
 }
 type permitKey struct{}

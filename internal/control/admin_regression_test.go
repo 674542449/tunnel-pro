@@ -257,11 +257,11 @@ func TestRevokedSessionCannotCommitAndSelfPasswordReset(t *testing.T) {
 
 func TestFiniteRenewalPreservesActiveUnlimitedAccount(t *testing.T) {
 	u := User{ExpiresAt: time.Now().Add(time.Hour).Unix(), Limit: 0, Devices: 3, Upload: 123}
-	if e := extend(&u, 30, 100<<30, 3); e != nil || u.Limit != 0 {
+	if e := extend(&u, 30, 100<<30, 3, 0); e != nil || u.Limit != 0 {
 		t.Fatal("finite renewal removed unlimited access", e)
 	}
 	u.ExpiresAt = time.Now().Add(-time.Hour).Unix()
-	if e := extend(&u, 30, 100<<30, 3); e != nil || u.Limit != u.Upload+(100<<30) {
+	if e := extend(&u, 30, 100<<30, 3, 0); e != nil || u.Limit != u.Upload+(100<<30) {
 		t.Fatal("expired renewal did not grant finite balance", e)
 	}
 }

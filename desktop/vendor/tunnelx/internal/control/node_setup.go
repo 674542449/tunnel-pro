@@ -53,6 +53,9 @@ func validateSetup(b *setupInput) error {
 	if b.InnerName != "" && !validSetupName(b.InnerName) {
 		return errors.New("内层证书名称格式无效")
 	}
+	if b.CertificateMode == "public" && b.InnerName != "" && b.InnerName == b.Domain {
+		return errors.New("公开证书模式的内层名称必须与外层域名不同")
+	}
 	ip := net.ParseIP(strings.TrimSpace(b.IP))
 	if b.Name == "" || len(b.Name) > 128 || len(b.Region) > 32 || ip == nil || !ip.IsGlobalUnicast() || ip.IsPrivate() || ip.IsLoopback() || b.Port < 1024 || b.Port > 65535 {
 		return errors.New("需要节点名称、公网 IP 和 1024–65535 端口")

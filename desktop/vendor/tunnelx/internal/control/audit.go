@@ -125,7 +125,12 @@ func auditSnapshot(d *State) auditView {
 		o.put("pending_install", "安装未完成", auditBool(n.Pending()))
 		o.put("certificate_configured", "节点证书已配置", auditBool(n.CAPEM != ""))
 		if n.Setup != nil {
-			o.put("public_domain", "公开域名", n.Setup.Domain)
+			o.put("public_domain", "外层证书名称", n.Setup.Domain)
+			mode := "公开证书"
+			if n.Setup.CertificateMode == "private" {
+				mode = "自建证书"
+			}
+			o.put("certificate_mode", "证书模式", mode)
 			o.put("install_expires_at", "安装命令有效期", auditTime(n.Setup.ExpiresAt))
 		}
 	}
