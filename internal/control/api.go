@@ -28,6 +28,7 @@ type API struct {
 	passwords   chan struct{}
 	dummyHash   string
 	origin      string
+	basePath    string
 	ArtifactDir string
 	PaymentHTTP *http.Client
 }
@@ -53,7 +54,7 @@ func NewAPI(c Config) (*API, error) {
 			return nil, e
 		}
 	}
-	return &API{Config: c, Store: s, limits: map[string]bucket{}, passwords: make(chan struct{}, 4), dummyHash: dummy, origin: u.Scheme + "://" + u.Host, ArtifactDir: filepath.Join(filepath.Dir(executable), "node-artifacts")}, nil
+	return &API{Config: c, Store: s, limits: map[string]bucket{}, passwords: make(chan struct{}, 4), dummyHash: dummy, origin: u.Scheme + "://" + u.Host, basePath: strings.TrimRight(u.Path, "/"), ArtifactDir: filepath.Join(filepath.Dir(executable), "node-artifacts")}, nil
 }
 func reply(w http.ResponseWriter, status int, v any) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -284,6 +285,20 @@ func (a *API) login(w http.ResponseWriter, r *http.Request, register bool) {
 	reply(w, 200, map[string]any{"token": token, "csrf": session.CSRF, "user": user.Public(), "version": ConsoleVersion})
 }
 func (a *API) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if a.basePath != "" {
+		if r.URL.Path == a.basePath {
+			http.Redirect(w, r, a.basePath+"/", http.StatusMovedPermanently)
+			return
+		}
+		if strings.HasPrefix(r.URL.Path, a.basePath+"/") {
+			r2 := new(http.Request)
+			*r2 = *r
+			r2.URL = new(url.URL)
+			*r2.URL = *r.URL
+			r2.URL.Path = strings.TrimPrefix(r.URL.Path, a.basePath)
+			r = r2
+		}
+	}
 	w.Header().Set("Cache-Control", "no-store")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.Header().Set("X-Frame-Options", "DENY")
