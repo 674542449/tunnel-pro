@@ -1,0 +1,152 @@
+{
+  "started_at": "2026-10-02T00:14:16+08:00",
+  "finished_at": "2026-10-02T00:14:58+08:00",
+  "platform": "windows/amd64",
+  "go_version": "go1.27.0",
+  "server": "146.56.99.255",
+  "passed": false,
+  "cases": [
+    {
+      "name": "normal/h3/public-TLS",
+      "passed": false,
+      "seconds": 15.0000337,
+      "error": "context deadline exceeded"
+    },
+    {
+      "name": "normal/h3/private-target-denied",
+      "passed": false,
+      "seconds": 5.0002019,
+      "error": "expected authenticated private-target denial: http3: parsing frame failed: deadline exceeded"
+    },
+    {
+      "name": "normal/h3/wrong-token-denied",
+      "passed": true,
+      "seconds": 5.181235,
+      "metrics": {
+        "denied": true,
+        "transport_fallbacks": 0
+      }
+    },
+    {
+      "name": "normal/h2/public-TLS",
+      "passed": true,
+      "seconds": 0.2794989,
+      "metrics": {
+        "cipher": "TLS_AES_128_GCM_SHA256",
+        "ech_accepted": false,
+        "http_major": 2,
+        "tls_version": "0x304"
+      }
+    },
+    {
+      "name": "normal/h2/private-target-denied",
+      "passed": true,
+      "seconds": 0.0907795,
+      "metrics": {
+        "http_status": 403
+      }
+    },
+    {
+      "name": "normal/h2/wrong-token-denied",
+      "passed": true,
+      "seconds": 0.2665685,
+      "metrics": {
+        "denied": true,
+        "transport_fallbacks": 0
+      }
+    },
+    {
+      "name": "strict/h3/public-TLS",
+      "passed": true,
+      "seconds": 0.1828821,
+      "metrics": {
+        "cipher": "TLS_AES_128_GCM_SHA256",
+        "ech_accepted": true,
+        "http_major": 3,
+        "tls_version": "0x304"
+      }
+    },
+    {
+      "name": "strict/h3/private-target-denied",
+      "passed": false,
+      "seconds": 5.0001528,
+      "error": "expected authenticated private-target denial: http3: parsing frame failed: deadline exceeded"
+    },
+    {
+      "name": "strict/h3/wrong-token-denied",
+      "passed": true,
+      "seconds": 0.1777397,
+      "metrics": {
+        "denied": true,
+        "transport_fallbacks": 0
+      }
+    },
+    {
+      "name": "strict/h2/public-TLS",
+      "passed": true,
+      "seconds": 0.2618977,
+      "metrics": {
+        "cipher": "TLS_AES_128_GCM_SHA256",
+        "ech_accepted": true,
+        "http_major": 2,
+        "tls_version": "0x304"
+      }
+    },
+    {
+      "name": "strict/h2/private-target-denied",
+      "passed": true,
+      "seconds": 0.0861483,
+      "metrics": {
+        "http_status": 403
+      }
+    },
+    {
+      "name": "strict/h2/wrong-token-denied",
+      "passed": true,
+      "seconds": 0.2626214,
+      "metrics": {
+        "denied": true,
+        "transport_fallbacks": 0
+      }
+    },
+    {
+      "name": "auto/certificate-error-no-downgrade",
+      "passed": true,
+      "seconds": 0.1703887,
+      "metrics": {
+        "denied": true,
+        "fallbacks": 0
+      }
+    },
+    {
+      "name": "strict/ECH-rejection-no-downgrade",
+      "passed": true,
+      "seconds": 0.1791409,
+      "metrics": {
+        "denied": true,
+        "fallbacks": 0
+      }
+    },
+    {
+      "name": "normal/auto/TCP-blocked-H3-fallback",
+      "passed": false,
+      "seconds": 10.000012,
+      "error": "context deadline exceeded"
+    },
+    {
+      "name": "strict/auto/TCP-blocked-H3-fallback",
+      "passed": true,
+      "seconds": 0.1794581,
+      "metrics": {
+        "ech_accepted": true,
+        "fallbacks": 1,
+        "http_major": 3
+      }
+    }
+  ],
+  "limitations": [
+    "Single client and server; not a multi-ISP or seven-day availability study.",
+    "Synthetic file transfer and UDP echo; no player rebuffer-rate measurement.",
+    "No proof of resistance to classification, IP blocking, or ISP QoS."
+  ]
+}

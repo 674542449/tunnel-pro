@@ -1,0 +1,30 @@
+[Unit]
+Description=tunnelX account and node management
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=tunnelx-control
+Group=tunnelx-control
+ExecStart=/opt/tunnelx/bin/tunnelx-control -config /etc/tunnelx-control/control.json
+StateDirectory=tunnelx-control
+StateDirectoryMode=0700
+Restart=on-failure
+RestartSec=3
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+CapabilityBoundingSet=
+LimitNOFILE=8192
+TasksMax=128
+MemoryMax=512M
+
+[Install]
+WantedBy=multi-user.target

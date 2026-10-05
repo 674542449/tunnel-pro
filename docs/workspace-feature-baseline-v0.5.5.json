@@ -1,0 +1,34 @@
+{
+  "passed": false,
+  "checked_at": "2026-10-02T18:37:09.829Z",
+  "console_version": "v0.5.5",
+  "served_assets": true,
+  "real_control_api": true,
+  "visual_rendered": false,
+  "real_charge": false,
+  "cases": [
+    "workspace_feature_browser_runs_have_no_runtime_errors"
+  ],
+  "failures": [
+    {
+      "name": "customer_refund_details_have_reason_reference_amount_and_no_other_customer_record",
+      "error": "Saved refund reason is absent from customer billing"
+    },
+    {
+      "name": "admin_can_review_all_persisted_refund_details",
+      "error": "Saved refund reason is absent from management"
+    },
+    {
+      "name": "finance_has_refund_review_without_payment_configuration_permission",
+      "error": "The expression evaluated to a falsy value:\n\n  assert.ok(buyer.d.getElementById('content').textContent.includes('Owner private refund reason'))\n"
+    },
+    {
+      "name": "commercial_trial_control_is_honestly_disabled",
+      "error": "Commercial mode exposes an editable trial value that the API always reports as zero\n\nfalse !== true\n"
+    },
+    {
+      "name": "test_mail_entry_follows_mail_configuration_instead_of_payment_mode",
+      "error": "The test mailbox API works but the button is hidden when payment mode is gateways"
+    }
+  ]
+}

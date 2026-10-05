@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f8f7f3">
+  <title>tunnelX · 管理中心</title>
+  <link rel="icon" href="./mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css?v=0.6.16">
+  <script src="./app.js?v=0.6.16" defer></script>
+</head>
+<body data-mode="guest">
+  <a class="skip-link" href="#content">跳到主要内容</a>
+  <aside aria-label="侧栏">
+    <a class="brand" href="./" aria-label="tunnelX 管理中心">
+      <span class="brand-mark"><svg class="icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="./icons.svg#brand"/></svg></span>
+      <span class="brand-name">tunnelX<span class="brand-label">管理中心</span></span>
+    </a>
+    <div class="workspace-tag"><svg class="icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="./icons.svg#globe"/></svg>我的工作空间</div>
+    <p class="nav-label">工作空间</p>
+    <nav id="nav" aria-label="主要导航"></nav>
+    <div class="aside-bottom">
+      <div class="network-note"><svg class="icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="./icons.svg#shield"/></svg><div><strong>tunnelX Network</strong><span id="network-state">安全连接，清晰管理</span></div></div>
+      <span class="sidebar-version">管理后台 v0.6.16</span>
+    </div>
+    <button data-action id="logout" class="logout-button" hidden><svg class="icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="./icons.svg#logout"/></svg><span>退出登录</span></button>
+  </aside>
+  <main>
+    <header class="page-header">
+      <div class="guest-brand"><span class="brand-mark"><svg class="icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="./icons.svg#brand"/></svg></span><span>tunnelX</span></div>
+      <div class="page-heading"><p class="eyebrow">工作空间 <span>/</span> <span id="breadcrumb">总览</span></p><h1 id="title">欢迎回来</h1><p id="page-description">在一个安静的空间，管理你的连接。</p></div>
+      <div id="identity" hidden></div>
+      <span class="guest-label"><svg class="icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="./icons.svg#shield"/></svg>安全管理中心</span>
+    </header>
+    <p id="message" role="status" aria-live="polite"></p>
+    <section id="mfa-gate" class="mfa-gate" hidden aria-label="二次验证设置引导">
+      <div><strong>先完成二次验证，再进入管理后台</strong><p id="mfa-gate-description">请在账号安全中绑定验证器，完成后会自动解锁管理页面。</p></div>
+      <a id="mfa-gate-link" href="#security">去开启二次验证</a>
+    </section>
+    <section id="login" class="auth-layout" aria-label="账号登录">
+      <div class="auth-story">
+        <div class="section-kicker"><span></span> 更清晰的连接体验</div>
+        <h2>让每一次连接，<br>都从容一点。</h2>
+        <p>节点、账号与日常管理，<br>在这里，井然有序。</p>
+        <img class="auth-art" src="./network.svg" width="480" height="330" alt="连接节点、账户与安全授权的网络插画">
+        <div class="auth-features"><span><svg class="icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="./icons.svg#shield"/></svg>安全接入</span><span><svg class="icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="./icons.svg#nodes"/></svg>节点管理</span><span><svg class="icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="./icons.svg#users"/></svg>账号授权</span></div>
+      </div>
+      <div class="auth-card">
+        <span class="auth-emblem"><svg class="icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="./icons.svg#key"/></svg></span>
+        <p class="section-kicker">你的管理空间</p><h2>欢迎回来</h2><p class="muted auth-description">登录后，继续管理你的网络与账号。</p>
+        <form id="auth-form">
+          <label for="email">邮箱地址</label><div class="input-with-icon"><svg class="icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="./icons.svg#mail"/></svg><input id="email" type="email" placeholder="you@example.com" autocomplete="username" required></div>
+          <label for="password">密码</label><div class="input-with-icon"><svg class="icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="./icons.svg#lock"/></svg><input id="password" type="password" placeholder="请输入密码" autocomplete="current-password" minlength="12" maxlength="256" required></div>
+          <button data-action class="primary auth-submit" type="submit"><span>登录</span><svg class="icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="./icons.svg#arrow"/></svg></button>
+          <label id="otp-wrap" hidden>验证器验证码或恢复码<input id="otp" autocomplete="one-time-code" maxlength="80"></label>
+          <label id="invite-wrap" hidden>试运营邀请码<input id="invite" autocomplete="off" maxlength="43"></label>
+          <div class="auth-register"><span>第一次使用 tunnelX？</span><button data-action id="register" type="button" class="text-button">注册账号</button></div>
+          <button data-action id="forgot" type="button" class="text-button">找回密码</button>
+          <a id="security-entry" class="text-button" href="#security">开启或管理二次验证</a>
+        </form>
+        <p class="auth-footnote"><svg class="icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="./icons.svg#lock"/></svg>使用你的账号，安全进入管理中心</p>
+      </div>
+    </section>
+    <section id="public-shop" class="card" hidden aria-label="套餐与服务说明"></section>
+    <div id="content" hidden tabindex="-1"></div>
+    <footer><span>tunnelX <span class="footer-separator">/</span> 管理中心</span><span>v0.6.16 <span class="footer-separator">·</span> HTTP/2</span></footer>
+  </main>
+  <dialog id="dialog" aria-labelledby="dialog-title" aria-describedby="dialog-description">
+    <form id="edit-form">
+      <div class="dialog-heading"><span class="dialog-emblem"><svg class="icon" viewBox="0 0 24 24" focusable="false" id="dialog-icon" aria-hidden="true"><use href="./icons.svg#edit"/></svg></span><div><p class="section-kicker">管理工作空间</p><h2 id="dialog-title"></h2></div></div>
+      <p id="dialog-description" class="muted">确认填写内容后保存，设置将立即更新。</p>
+      <p id="dialog-error" role="alert"></p><div id="fields"></div>
+      <div class="dialog-actions"><button id="cancel" type="button">取消</button><button id="save" class="primary" type="submit"><svg class="icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="./icons.svg#check"/></svg><span>保存</span></button></div>
+    </form>
+  </dialog>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-03T07:38:39.367856+00:00",
+  "console_version": "v0.6.5",
+  "controller_sha256": "ea97e081793a200dee0dc027b98db626a3127441c58aa7351e5e47735810989b",
+  "sites": {
+    "tunnelx-beta": {
+      "health": true,
+      "public_contract": true,
+      "configuration_preserved": true,
+      "node_artifacts_preserved": true,
+      "account_node_profile_contract": true
+    },
+    "tunnelx-control": {
+      "health": true,
+      "public_contract": true,
+      "configuration_preserved": true,
+      "node_artifacts_preserved": true
+    }
+  },
+  "core_unchanged": true,
+  "encrypted_backups": true,
+  "payment_settings_changed": false,
+  "rollback_directory": "/opt/tunnelx/rollback-alignment-v065-747fd4e2"
+}

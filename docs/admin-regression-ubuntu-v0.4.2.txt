@@ -1,0 +1,23 @@
+=== RUN   TestEmptyLegacyCollectionsReturnArrays
+--- PASS: TestEmptyLegacyCollectionsReturnArrays (0.37s)
+=== RUN   TestAdminCRUDValidationAndProfileBundle
+--- PASS: TestAdminCRUDValidationAndProfileBundle (0.39s)
+=== RUN   TestSettingsPartialSaveAndRuntimeAccess
+--- PASS: TestSettingsPartialSaveAndRuntimeAccess (0.49s)
+=== RUN   TestOrderCancellationIsolationAndFulfilmentRace
+--- PASS: TestOrderCancellationIsolationAndFulfilmentRace (0.61s)
+=== RUN   TestRevokedSessionCannotCommitAndSelfPasswordReset
+--- PASS: TestRevokedSessionCannotCommitAndSelfPasswordReset (0.61s)
+=== RUN   TestFiniteRenewalPreservesActiveUnlimitedAccount
+--- PASS: TestFiniteRenewalPreservesActiveUnlimitedAccount (0.00s)
+=== RUN   TestAccountIsolationOrdersAndDurability
+--- PASS: TestAccountIsolationOrdersAndDurability (0.49s)
+=== RUN   TestTrialCannotReduceExistingEntitlement
+--- PASS: TestTrialCannotReduceExistingEntitlement (0.48s)
+=== RUN   TestCookieCSRFAndMalformedStore
+--- PASS: TestCookieCSRFAndMalformedStore (0.36s)
+=== RUN   TestNodeCumulativeReportsAreIdempotent
+--- PASS: TestNodeCumulativeReportsAreIdempotent (0.36s)
+=== RUN   TestEmbeddedConsoleHasNoRedirectLoop
+--- PASS: TestEmbeddedConsoleHasNoRedirectLoop (0.00s)
+PASS

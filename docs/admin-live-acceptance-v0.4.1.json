@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-02T09:52:03.663923+00:00",
+  "public_url": "https://test.xiaguamail.com/control/",
+  "console_version": "v0.4.1",
+  "browser_rendered": false,
+  "cases": [
+    "secure_cookie_csrf",
+    "partial_settings_and_invalid_checksum",
+    "node_add_edit_disabled_and_private_key_rejection",
+    "profile_bundle_h2_strict_ech",
+    "order_cancel_fulfil_idempotency_and_snapshot",
+    "user_password_reset_revokes_sessions",
+    "fractional_plan_edit_and_disable",
+    "disabled_test_records_deleted",
+    "logout_session_revoked"
+  ],
+  "test_user_disabled_after_test": true,
+  "live_node_not_modified": true
+}

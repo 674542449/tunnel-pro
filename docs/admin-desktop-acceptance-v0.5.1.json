@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-02T18:49:09Z",
+  "desktop_version": "v0.5.1",
+  "desktop_sha256": "8ac07045de1a7722e9116d881363261931965c585b5257aac61744985ab42252",
+  "native_executable_used": true,
+  "window_rendered": false,
+  "scope": "isolated_beta_accounts_and_node",
+  "download_bytes": 8388608,
+  "cases": [
+    "native_desktop_secure_login",
+    "strict_h2_ech_paid_test_node_connection",
+    "native_desktop_large_download_byte_integrity",
+    "dpapi_state_no_plaintext_password",
+    "mfa_admin_login_without_code_denied",
+    "native_desktop_mfa_recovery_code_login",
+    "consumed_recovery_code_replay_denied",
+    "existing_system_proxy_preserved",
+    "persistent_h2_diagnostics"
+  ]
+}

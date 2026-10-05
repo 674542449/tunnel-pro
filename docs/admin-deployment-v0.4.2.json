@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-02T11:13:35.009903+00:00",
+  "console_version": "v0.4.2",
+  "core_version": "v0.4.0",
+  "transport": "h2",
+  "control_sha256": "abda16a5f59e5a8cba89df50821faacef94bf46d4fc2a373ccec52941e5aa411",
+  "node_process_unchanged": true,
+  "existing_users_nodes_orders_preserved": true,
+  "existing_settings_preserved": true,
+  "rollback_directory": "/opt/tunnelx/control-v0.4.2/rollback-20261002T111334Z",
+  "upgrade_begin": "2026-10-02T11:13:34Z",
+  "public_url": "https://test.xiaguamail.com/control/",
+  "linux_tests": {
+    "ubuntu": {
+      "passed": true,
+      "cases": 11
+    },
+    "debian": {
+      "passed": true,
+      "cases": 11
+    }
+  }
+}

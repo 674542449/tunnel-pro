@@ -1,0 +1,2 @@
+# Preserve the exact bytes used by release hash and redistribution checks.
+* -text

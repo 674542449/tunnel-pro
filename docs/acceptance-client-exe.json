@@ -1,0 +1,56 @@
+{
+  "finished_at": "2026-10-01T20:56:59.493652+08:00",
+  "platform": "windows/amd64",
+  "passed": true,
+  "checks": [
+    {
+      "name": "HTTP-proxy-MP4-hash",
+      "passed": true,
+      "seconds": 1.0540452001150697,
+      "metrics": {
+        "bytes": 10188735,
+        "sha256": "4d59a668f2f0c01a233ef7a47179dc898017fa90ef2a412dedbc1fc5cab0b8b1"
+      }
+    },
+    {
+      "name": "HTTPS-CONNECT-real-domain",
+      "passed": true,
+      "seconds": 0.4693555000703782,
+      "metrics": {
+        "http_status": 200,
+        "application_tls_verified": true
+      }
+    },
+    {
+      "name": "SOCKS5-UDP-associate",
+      "passed": true,
+      "seconds": 0.16951179993338883,
+      "metrics": {
+        "payload_bytes": 1000,
+        "echo_verified": true
+      }
+    },
+    {
+      "name": "strict-ECH-live-status",
+      "passed": true,
+      "seconds": 0.0009628999978303909,
+      "metrics": {
+        "active": 0,
+        "downloaded": 10193860,
+        "ech": true,
+        "fallbacks": 0,
+        "h2_streams": 0,
+        "h3_streams": 3,
+        "http": "127.0.0.1:8088",
+        "mode": "auto",
+        "name": "edge.tunnelx.invalid",
+        "privacy": "strict",
+        "server": "146.56.99.255",
+        "socks": "127.0.0.1:1080",
+        "system_proxy": false,
+        "udp_dropped": 0,
+        "uploaded": 1675
+      }
+    }
+  ]
+}

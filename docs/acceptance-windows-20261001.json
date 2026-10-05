@@ -1,0 +1,412 @@
+{
+  "started_at": "2026-10-01T20:17:11+08:00",
+  "finished_at": "2026-10-01T20:22:29+08:00",
+  "platform": "windows/amd64",
+  "go_version": "go1.27.0",
+  "server": "146.56.99.255",
+  "passed": false,
+  "cases": [
+    {
+      "name": "normal/h3/public-TLS",
+      "passed": true,
+      "seconds": 0.3099971,
+      "metrics": {
+        "cipher": "TLS_AES_128_GCM_SHA256",
+        "ech_accepted": false,
+        "http_major": 3,
+        "tls_version": "0x304"
+      }
+    },
+    {
+      "name": "normal/h3/download-64MiB-hash",
+      "passed": true,
+      "seconds": 2.3398438,
+      "metrics": {
+        "bytes": 67108864,
+        "carrier": "h3",
+        "duration_seconds": 2.303212,
+        "goodput_mbps": 233.0966111673611,
+        "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067"
+      }
+    },
+    {
+      "name": "normal/h3/upload-half-close-16MiB",
+      "passed": true,
+      "seconds": 12.8414084,
+      "metrics": {
+        "bytes": 16777216,
+        "carrier": "h3",
+        "duration_seconds": 12.8326262,
+        "goodput_mbps": 10.459100569764901,
+        "sha256": "a8493afe7658878d6e5f85be50cabb61eaf51bd82e6b164892a028372738c486"
+      }
+    },
+    {
+      "name": "normal/h3/UDP-echo",
+      "passed": true,
+      "seconds": 1.8342056,
+      "metrics": {
+        "loss_percent": 0,
+        "median_rtt_ms": 86.537,
+        "p95_rtt_ms": 93.3073,
+        "received": 20,
+        "sent": 20
+      }
+    },
+    {
+      "name": "normal/h3/concurrent-streams",
+      "passed": true,
+      "seconds": 2.845929,
+      "metrics": {
+        "seconds": 2.845929,
+        "streams": 8,
+        "total_bytes": 33554432
+      }
+    },
+    {
+      "name": "normal/h3/wrong-token-denied",
+      "passed": true,
+      "seconds": 0.275625,
+      "metrics": {
+        "denied": true,
+        "transport_fallbacks": 0
+      }
+    },
+    {
+      "name": "normal/h2/public-TLS",
+      "passed": true,
+      "seconds": 0.2680857,
+      "metrics": {
+        "cipher": "TLS_AES_128_GCM_SHA256",
+        "ech_accepted": false,
+        "http_major": 2,
+        "tls_version": "0x304"
+      }
+    },
+    {
+      "name": "normal/h2/download-64MiB-hash",
+      "passed": true,
+      "seconds": 2.8360589000000003,
+      "metrics": {
+        "bytes": 67108864,
+        "carrier": "h2",
+        "duration_seconds": 2.801288,
+        "goodput_mbps": 191.65145176076146,
+        "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067"
+      }
+    },
+    {
+      "name": "normal/h2/upload-half-close-16MiB",
+      "passed": true,
+      "seconds": 11.7081281,
+      "metrics": {
+        "bytes": 16777216,
+        "carrier": "h2",
+        "duration_seconds": 11.697727,
+        "goodput_mbps": 11.473829744872658,
+        "sha256": "a8493afe7658878d6e5f85be50cabb61eaf51bd82e6b164892a028372738c486"
+      }
+    },
+    {
+      "name": "normal/h2/UDP-echo",
+      "passed": true,
+      "seconds": 1.7889388,
+      "metrics": {
+        "loss_percent": 0,
+        "median_rtt_ms": 85.1581,
+        "p95_rtt_ms": 85.9854,
+        "received": 20,
+        "sent": 20
+      }
+    },
+    {
+      "name": "normal/h2/concurrent-streams",
+      "passed": true,
+      "seconds": 2.1833992,
+      "metrics": {
+        "seconds": 2.1833992,
+        "streams": 8,
+        "total_bytes": 33554432
+      }
+    },
+    {
+      "name": "normal/h2/wrong-token-denied",
+      "passed": true,
+      "seconds": 0.2699907,
+      "metrics": {
+        "denied": true,
+        "transport_fallbacks": 0
+      }
+    },
+    {
+      "name": "strict/h3/public-TLS",
+      "passed": true,
+      "seconds": 0.1823424,
+      "metrics": {
+        "cipher": "TLS_AES_128_GCM_SHA256",
+        "ech_accepted": true,
+        "http_major": 3,
+        "tls_version": "0x304"
+      }
+    },
+    {
+      "name": "strict/h3/download-64MiB-hash",
+      "passed": true,
+      "seconds": 2.8284485999999998,
+      "metrics": {
+        "bytes": 67108864,
+        "carrier": "h3",
+        "duration_seconds": 2.7950667,
+        "goodput_mbps": 192.07803234176845,
+        "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067"
+      }
+    },
+    {
+      "name": "strict/h3/upload-half-close-16MiB",
+      "passed": true,
+      "seconds": 3.2651114,
+      "metrics": {
+        "bytes": 16777216,
+        "carrier": "h3",
+        "duration_seconds": 3.2559877,
+        "goodput_mbps": 41.22181665489707,
+        "sha256": "a8493afe7658878d6e5f85be50cabb61eaf51bd82e6b164892a028372738c486"
+      }
+    },
+    {
+      "name": "strict/h3/UDP-echo",
+      "passed": true,
+      "seconds": 1.8384911000000002,
+      "metrics": {
+        "loss_percent": 0,
+        "median_rtt_ms": 85.1846,
+        "p95_rtt_ms": 94.766,
+        "received": 20,
+        "sent": 20
+      }
+    },
+    {
+      "name": "strict/h3/concurrent-streams",
+      "passed": true,
+      "seconds": 2.6838945,
+      "metrics": {
+        "seconds": 2.6838945,
+        "streams": 8,
+        "total_bytes": 33554432
+      }
+    },
+    {
+      "name": "strict/h3/wrong-token-denied",
+      "passed": true,
+      "seconds": 0.1819692,
+      "metrics": {
+        "denied": true,
+        "transport_fallbacks": 0
+      }
+    },
+    {
+      "name": "strict/h2/public-TLS",
+      "passed": true,
+      "seconds": 0.2610587,
+      "metrics": {
+        "cipher": "TLS_AES_128_GCM_SHA256",
+        "ech_accepted": true,
+        "http_major": 2,
+        "tls_version": "0x304"
+      }
+    },
+    {
+      "name": "strict/h2/download-64MiB-hash",
+      "passed": true,
+      "seconds": 2.8355303,
+      "metrics": {
+        "bytes": 67108864,
+        "carrier": "h2",
+        "duration_seconds": 2.8014721,
+        "goodput_mbps": 191.63885729934628,
+        "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067"
+      }
+    },
+    {
+      "name": "strict/h2/upload-half-close-16MiB",
+      "passed": true,
+      "seconds": 3.1218272,
+      "metrics": {
+        "bytes": 16777216,
+        "carrier": "h2",
+        "duration_seconds": 3.1136134,
+        "goodput_mbps": 43.10674151132571,
+        "sha256": "a8493afe7658878d6e5f85be50cabb61eaf51bd82e6b164892a028372738c486"
+      }
+    },
+    {
+      "name": "strict/h2/UDP-echo",
+      "passed": true,
+      "seconds": 1.8195183,
+      "metrics": {
+        "loss_percent": 0,
+        "median_rtt_ms": 85.4487,
+        "p95_rtt_ms": 92.37950000000001,
+        "received": 20,
+        "sent": 20
+      }
+    },
+    {
+      "name": "strict/h2/concurrent-streams",
+      "passed": true,
+      "seconds": 1.2383928,
+      "metrics": {
+        "seconds": 1.2383928,
+        "streams": 8,
+        "total_bytes": 33554432
+      }
+    },
+    {
+      "name": "strict/h2/wrong-token-denied",
+      "passed": true,
+      "seconds": 0.2640583,
+      "metrics": {
+        "denied": true,
+        "transport_fallbacks": 0
+      }
+    },
+    {
+      "name": "auto/certificate-error-no-downgrade",
+      "passed": true,
+      "seconds": 0.0914436,
+      "metrics": {
+        "denied": true,
+        "fallbacks": 0
+      }
+    },
+    {
+      "name": "strict/ECH-rejection-no-downgrade",
+      "passed": true,
+      "seconds": 0.1898782,
+      "metrics": {
+        "denied": true,
+        "fallbacks": 0
+      }
+    },
+    {
+      "name": "normal/auto/UDP-blocked-H2-fallback",
+      "passed": true,
+      "seconds": 3.0672648,
+      "metrics": {
+        "bytes": 4194304,
+        "carrier": "h2",
+        "duration_seconds": 3.0641643,
+        "ech_accepted": false,
+        "fallbacks": 1,
+        "goodput_mbps": 10.950598177780481,
+        "sha256": "d1e93d7a0e7b581d8084bc7f4fcc168ba2cd9e29b996616f6d07200be7d5e004"
+      }
+    },
+    {
+      "name": "strict/auto/UDP-blocked-H2-fallback",
+      "passed": true,
+      "seconds": 3.0199656,
+      "metrics": {
+        "bytes": 4194304,
+        "carrier": "h2",
+        "duration_seconds": 3.0173842,
+        "ech_accepted": true,
+        "fallbacks": 1,
+        "goodput_mbps": 11.120371081680616,
+        "sha256": "d1e93d7a0e7b581d8084bc7f4fcc168ba2cd9e29b996616f6d07200be7d5e004"
+      }
+    },
+    {
+      "name": "h3/weak/loss=1%/delay=0ms/mtu=0",
+      "passed": true,
+      "seconds": 34.7343285,
+      "metrics": {
+        "bytes": 8388608,
+        "carrier": "h3",
+        "duration_seconds": 34.7292011,
+        "fault": {
+          "loss_probability": 0.01,
+          "added_one_way_delay_ms": 0
+        },
+        "goodput_mbps": 1.9323468975507185,
+        "relay_dropped_packets": 98,
+        "relay_forwarded_packets": 8503,
+        "sha256": "3b0fafbafb72fef620edd278d18bdf2ce943a446a7df622c457fe1d94d2c0a7b"
+      }
+    },
+    {
+      "name": "h3/weak/loss=3%/delay=0ms/mtu=0",
+      "passed": true,
+      "seconds": 55.2129889,
+      "metrics": {
+        "bytes": 8388608,
+        "carrier": "h3",
+        "duration_seconds": 55.2074239,
+        "fault": {
+          "loss_probability": 0.03,
+          "added_one_way_delay_ms": 0
+        },
+        "goodput_mbps": 1.2155768057853538,
+        "relay_dropped_packets": 257,
+        "relay_forwarded_packets": 8614,
+        "sha256": "3b0fafbafb72fef620edd278d18bdf2ce943a446a7df622c457fe1d94d2c0a7b"
+      }
+    },
+    {
+      "name": "h3/weak/loss=5%/delay=0ms/mtu=0",
+      "passed": true,
+      "seconds": 74.605528,
+      "metrics": {
+        "bytes": 8388608,
+        "carrier": "h3",
+        "duration_seconds": 74.6003259,
+        "fault": {
+          "loss_probability": 0.05,
+          "added_one_way_delay_ms": 0
+        },
+        "goodput_mbps": 0.8995786974169238,
+        "relay_dropped_packets": 439,
+        "relay_forwarded_packets": 8605,
+        "sha256": "3b0fafbafb72fef620edd278d18bdf2ce943a446a7df622c457fe1d94d2c0a7b"
+      }
+    },
+    {
+      "name": "h3/weak/loss=3%/delay=25ms/mtu=0",
+      "passed": true,
+      "seconds": 83.612295,
+      "metrics": {
+        "bytes": 8388608,
+        "carrier": "h3",
+        "duration_seconds": 83.6076362,
+        "fault": {
+          "loss_probability": 0.03,
+          "added_one_way_delay_ms": 25
+        },
+        "goodput_mbps": 0.8026642906093786,
+        "relay_dropped_packets": 249,
+        "relay_forwarded_packets": 8392,
+        "sha256": "3b0fafbafb72fef620edd278d18bdf2ce943a446a7df622c457fe1d94d2c0a7b"
+      }
+    },
+    {
+      "name": "h3/weak/loss=0%/delay=0ms/mtu=1200",
+      "passed": false,
+      "seconds": 4.0011829,
+      "error": "timeout: no recent network activity",
+      "metrics": {
+        "fault": {
+          "loss_probability": 0,
+          "added_one_way_delay_ms": 0,
+          "max_udp_payload": 1200
+        },
+        "relay_dropped_packets": 9,
+        "relay_forwarded_packets": 0
+      }
+    }
+  ],
+  "limitations": [
+    "Single client and server; not a multi-ISP or seven-day availability study.",
+    "Synthetic file transfer and UDP echo; no player rebuffer-rate measurement.",
+    "No proof of resistance to classification, IP blocking, or ISP QoS."
+  ]
+}

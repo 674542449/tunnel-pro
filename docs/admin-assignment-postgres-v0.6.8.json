@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "console_version": "v0.6.8",
+  "isolated_schema": true,
+  "core_process_unchanged": true,
+  "real_charge": false,
+  "cases": [
+    "assignment_duplicate_retry",
+    "current_period_usage_and_exhaustion",
+    "subscription_expiry_preserved",
+    "future_renewal_not_spendable",
+    "immediate_replenishment",
+    "scope_validation",
+    "postgres_concurrent_retry_and_restart"
+  ]
+}

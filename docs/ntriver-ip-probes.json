@@ -1,0 +1,30 @@
+{
+  "checked_at": "2026-10-01T15:37:20.375581+00:00",
+  "filename": "zh-cn_windows_11_consumer_editions_version_26h2_x64_dvd_3622091b.iso",
+  "samples": [
+    {
+      "ip": "104.21.35.213",
+      "curl_exit_code": 0,
+      "status": 206,
+      "bytes": 8388608,
+      "seconds": 1.1749825871083885,
+      "MBps": 7.139346652484626,
+      "connect_seconds": 0.003413,
+      "tls_seconds": 0.018771,
+      "ttfb_seconds": 0.466926,
+      "complete_sample": true
+    },
+    {
+      "ip": "172.67.179.227",
+      "curl_exit_code": 28,
+      "status": 206,
+      "bytes": 1318163,
+      "seconds": 15.011009503854439,
+      "MBps": 0.08781308143609727,
+      "connect_seconds": 0.003245,
+      "tls_seconds": 0.017708,
+      "ttfb_seconds": 0.725106,
+      "complete_sample": false
+    }
+  ]
+}

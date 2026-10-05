@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-02T15:55:54Z",
+  "console_version": "v0.5.0",
+  "control_sha256": "8069cf8dcfec6478e5d0129cb71f4f63250f6ff7df806d02d0c713c14c0c7f67",
+  "storage": "postgresql",
+  "encrypted_backup": true,
+  "off_host_encrypted_copy": true,
+  "backup_timer": "hourly",
+  "payment_mode": "test",
+  "live_approved": false,
+  "original_core_pid": 1063191,
+  "original_core_restarts": 0,
+  "public_https_ready": true,
+  "postgresql_loopback_only": true,
+  "backup_timer_enabled": true,
+  "qa_node_final_binary_online": true,
+  "qa_node_sha256": "6b96e63c07552b8f3dd375a4ced36d84f7c687d0df1e119a514e75a050278cc0",
+  "original_core_sha256": "726c91b3e2155632e7a9e794b15b204cda11fdfc23d919b2843858ac38ff302e",
+  "private_fixture_stopped": true,
+  "continuous_node_probe_interval_seconds": 300
+}

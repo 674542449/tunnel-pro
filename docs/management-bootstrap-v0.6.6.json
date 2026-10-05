@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "scenario": "dead inherited HTTP(S)_PROXY; isolated native EXE; no account or system proxy changes",
+  "results": [
+    {
+      "version": "v0.6.5",
+      "site": "control",
+      "operation": "/api/public/settings",
+      "status": 400,
+      "elapsed_ms": 0,
+      "expected_success": false
+    },
+    {
+      "version": "v0.6.5",
+      "site": "control",
+      "operation": "/api/public/commerce",
+      "status": 400,
+      "elapsed_ms": 0,
+      "expected_success": false
+    },
+    {
+      "version": "v0.6.5",
+      "site": "beta",
+      "operation": "/api/public/settings",
+      "status": 400,
+      "elapsed_ms": 15,
+      "expected_success": false
+    },
+    {
+      "version": "v0.6.5",
+      "site": "beta",
+      "operation": "/api/public/commerce",
+      "status": 400,
+      "elapsed_ms": 0,
+      "expected_success": false
+    },
+    {
+      "version": "v0.6.6",
+      "site": "control",
+      "operation": "/api/public/settings",
+      "status": 200,
+      "elapsed_ms": 343,
+      "expected_success": true
+    },
+    {
+      "version": "v0.6.6",
+      "site": "control",
+      "operation": "/api/public/commerce",
+      "status": 200,
+      "elapsed_ms": 78,
+      "expected_success": true
+    },
+    {
+      "version": "v0.6.6",
+      "site": "beta",
+      "operation": "/api/public/settings",
+      "status": 200,
+      "elapsed_ms": 359,
+      "expected_success": true
+    },
+    {
+      "version": "v0.6.6",
+      "site": "beta",
+      "operation": "/api/public/commerce",
+      "status": 200,
+      "elapsed_ms": 94,
+      "expected_success": true
+    }
+  ]
+}

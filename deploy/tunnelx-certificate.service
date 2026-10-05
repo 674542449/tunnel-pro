@@ -1,0 +1,10 @@
+[Unit]
+Description=Copy renewed tunnelX certificate from Caddy
+
+[Service]
+Type=oneshot
+ExecStart=/opt/tunnelx/bin/sync-certificate.sh
+User=root
+Group=root
+UMask=0027
+NoNewPrivileges=true

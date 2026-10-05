@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "version": "v0.6.15",
+  "checked_at": "2026-10-03T14:48:22.860487+00:00",
+  "desktop_sha256": "c713c586e97847914738753930c575903489a101d3a3cf3a1d7617ebb759d478",
+  "archive_sha256": "f9af12333be16f027d58dab69ece15b0895c525f202040b5454d0a1b23171107",
+  "sites": [
+    {
+      "site": "https://test.xiaguamail.com/control",
+      "console_version": "v0.6.15",
+      "desktop_version": "v0.6.15",
+      "download_url": "https://test.xiaguamail.com/downloads/tunnelX-desktop-windows-x64-v0.6.15.zip"
+    },
+    {
+      "site": "https://test.xiaguamail.com/beta",
+      "console_version": "v0.6.15",
+      "desktop_version": "v0.6.15",
+      "download_url": "https://test.xiaguamail.com/downloads/tunnelX-desktop-windows-x64-v0.6.15.zip"
+    }
+  ],
+  "installed_clients_auto_updated": false
+}

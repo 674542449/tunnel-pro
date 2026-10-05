@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "version": "v0.6.16",
+  "checked_at": "2026-10-05T08:31:59.074873+00:00",
+  "platform": "Debian 13 ARM64 chroot on Ubuntu",
+  "installer_shell_syntax": true,
+  "certificate_generation_and_renewal": true,
+  "setup_api_regression": true,
+  "independent_systemd_tested": false
+}

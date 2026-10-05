@@ -1,0 +1,19 @@
+{
+  "checked_at": "2026-10-01T16:44:29.783714+00:00",
+  "passed": true,
+  "signed_url_removed": true,
+  "temporary_credentials_removed": true,
+  "temporary_fixture_port_closed": true,
+  "rollback_preserved": true,
+  "removed_files": [
+    "ntriver-link.json",
+    "origin-smoke-client.json",
+    "origin-smoke-strict.json",
+    "origin-ca.pem",
+    "measure-iso-range.py",
+    "tunnelx-check-v0.2.1",
+    "iso-sample.bin",
+    "iso-response-headers.txt",
+    "/etc/tunnelx/server-origin-smoke.json"
+  ]
+}

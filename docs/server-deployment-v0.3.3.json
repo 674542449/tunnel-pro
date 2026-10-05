@@ -1,0 +1,18 @@
+{
+  "checked_at": "2026-10-01T22:00:55.970871+00:00",
+  "passed": true,
+  "version": "v0.3.3",
+  "transport": "h2",
+  "server_sha256": "e3a83d6d83832fcc508769b2c061c08015d20d28f7b583531a1c0a6b7e9698c0",
+  "service_pid": 1041300,
+  "service_user": "tunnelx",
+  "production_config_unchanged": true,
+  "config_sha256": "d9f8cc35ed0db9bc0dd1451f1ff8d8cb2df8a552d9828bd1a746627ddbf4086b",
+  "strict_ech_accepted": true,
+  "production_acceptance_cases": 8,
+  "udp_listener_removed": true,
+  "rollback_available": true,
+  "rollback_directory": "/opt/tunnelx/rollback-h2-v0.3.3",
+  "planned_restart_begin": "2026-10-01T22:00:55Z",
+  "planned_restart_ready": "2026-10-01T22:00:55Z"
+}

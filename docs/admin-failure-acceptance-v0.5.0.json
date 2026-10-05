@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-02T14:58:52Z",
+  "console_version": "v0.5.0",
+  "outage_opened_at": 1790953133,
+  "outage_recovered_at": 1790953148,
+  "cases": [
+    "full_refund_duplicate_notification_and_live_tunnel_revocation",
+    "new_purchase_after_refund_restores_access_without_cycle_gap",
+    "node_down_heartbeat_alert",
+    "node_recovery_retains_incident_timeline",
+    "h2_download_resumes_after_node_restart",
+    "owner_core_untouched_during_failure_injection"
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-02T15:59:15.461603+00:00",
+  "console_version": "v0.5.0",
+  "payment_mode": "test",
+  "live_approved": false,
+  "live_gateway_exercised": false,
+  "checks": {
+    "admin-commerce-dom-v0.5.0.json": true,
+    "admin-debian-acceptance-v0.5.0.json": true,
+    "admin-desktop-acceptance-v0.5.0.json": true,
+    "admin-dom-acceptance-v0.5.0.json": true,
+    "admin-failure-acceptance-v0.5.0.json": true,
+    "admin-final-health-v0.5.0.json": true,
+    "admin-network-final-v0.5.0.json": true,
+    "admin-network-recovery-v0.5.0.json": true,
+    "admin-network-soak-v0.5.0.json": true,
+    "admin-node-crash-v0.5.0.json": true,
+    "admin-recovery-acceptance-v0.5.0.json": true,
+    "admin-recovery-production-v0.5.0.json": true,
+    "admin-recovery-staging-v0.5.0.json": true,
+    "admin-staging-acceptance-v0.5.0.json": true,
+    "admin-postgres-acceptance-v0.5.0.txt": true,
+    "admin-debian-control-v0.5.0.txt": true,
+    "admin-debian-integration-v0.5.0.txt": true,
+    "admin-client-release-v0.5.0.json": true,
+    "admin-package-verification-v0.5.0.json": true
+  },
+  "network_soak": {
+    "samples": 48,
+    "bytes": 402653184,
+    "all_passed": true
+  },
+  "acceptance_cases": [
+    "duplicate_payment_notification",
+    "full_refund_and_duplicate_refund",
+    "renewal_and_cycle_boundary",
+    "exact_quota_exhaustion",
+    "cross_node_reservations_and_device_limit",
+    "node_loss_and_recovery",
+    "forced_node_termination_and_quarantine",
+    "backend_restart",
+    "encrypted_backup_and_empty_database_restore",
+    "native_windows_desktop_mfa_download_and_logs"
+  ],
+  "remaining_live_inputs": [
+    "merchant_and_webhook_credentials",
+    "smtp_and_alert_recipient",
+    "owner_mfa_enrollment",
+    "approved_policies",
+    "non_test_commercial_node",
+    "real_gateway_payment_and_refund_acceptance"
+  ],
+  "published_client_url": "https://test.xiaguamail.com/downloads/tunnelX-desktop-windows-x64-v0.5.0.zip",
+  "published_client_sha256": "bf051b2d75c8e633802d847858b151bf80d8c7b3c03513f7bed39f275cb5e103",
+  "public_archive_matches_verified_client": true,
+  "original_core_unchanged": true,
+  "continuous_server_probe_interval_seconds": 300,
+  "mail_delivery_mode": "encrypted_test_outbox",
+  "visual_rendered": false
+}

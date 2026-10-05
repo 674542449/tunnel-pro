@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-02T12:52:10.446181+00:00",
+  "console_version": "v0.4.3",
+  "core_version": "v0.4.0",
+  "ubuntu_complete_systemd_install": true,
+  "debian_chroot_validation": true,
+  "debian_complete_systemd_install": false,
+  "new_node_port": 18447,
+  "connection_checks": "server loopback, strict ECH/H2",
+  "reused_valid_public_certificate": true,
+  "fresh_caddy_site_config_validated": true,
+  "live_acme_issuance_tested": false,
+  "original_node_process_unchanged": true,
+  "original_caddy_configuration_unchanged": true,
+  "cases": [
+    "failed_install_can_regenerate_and_resume",
+    "public_admin_creates_isolated_pending_node",
+    "exact_generated_command_installs_and_completes",
+    "automatic_completion_and_online_heartbeat",
+    "spent_bootstrap_rejected_and_completion_idempotent",
+    "strict_ech_h2_connection_and_authentication_cases",
+    "dedicated_service_cert_sync_and_existing_node_untouched",
+    "debian_bash_syntax_and_stable_config_generation",
+    "fresh_caddy_site_config_readable_by_service_user"
+  ],
+  "synthetic_node_deleted": true
+}

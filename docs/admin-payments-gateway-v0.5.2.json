@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-02T17:16:49.879839+00:00",
+  "console_version": "v0.5.2",
+  "storage": "postgresql",
+  "isolated_schema": true,
+  "real_http_api": true,
+  "mocked_payment_gateways": true,
+  "real_charge": false,
+  "core_process_unchanged": true,
+  "cases": [
+    "epay_v1_known_signing_vector",
+    "bepusdt_native_known_signing_vector",
+    "exact_amount_validation",
+    "mfa_protected_gateway_configuration",
+    "encrypted_keys_and_blank_key_preservation",
+    "unready_live_checkout_blocked",
+    "alipay_checkout_signed_callback_duplicate_and_refund",
+    "wechat_checkout_signed_callback_duplicate_and_refund",
+    "usdt_native_checkout_waiting_paid_duplicate_and_refund",
+    "gateway_response_amount_and_order_match",
+    "checkout_reuse_without_native_order_recreation",
+    "ambiguous_native_creation_persisted_without_retry",
+    "post_restart_gateway_keys_and_settings_preserved",
+    "private_gateway_snapshot_not_exposed"
+  ]
+}

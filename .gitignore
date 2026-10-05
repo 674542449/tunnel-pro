@@ -1,36 +1,35 @@
-# Binaries
-*.exe
-*.exe~
-*-linux-amd64
-*-linux-arm64
-
-# Config with credentials
-auth.json
-client.json
-servers.json
-deploy/server.json
-deploy/api.json
-deploy/deploy_node.py
-deploy/*-linux-*
-deploy/*.exe
-
-# Python
+.local/
+dist/
+*.log
+*.test
+coverage.out
 __pycache__/
-*.pyc
-
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-
-# Node
 node_modules/
 
-# Wails build
-cmd/gui/build/bin/
-cmd/gui/frontend/dist/
+desktop/build/bin/
+desktop/build/windows/*.syso
 
-# OS
-.DS_Store
-Thumbs.db
+# Local credentials, runtime state and generated binaries.
+*.syso
+*.exe
+!desktop/runtime/tun2socks.exe
+*.dpapi
+*.jsonl
+*.pyc
+.env
+.env.*
+!.env.example
+logs/
+state/
+ech-key.json
+inner-key.pem
+server.json
+agent.json
+control.json
+PRIVATE-ACCESS.txt
+system-proxy.json
+database.json
+staging-access.json
+production-config.json
+staging-config.json
+backup.key

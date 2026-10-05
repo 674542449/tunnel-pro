@@ -1,0 +1,47 @@
+{
+  "checked_at": "2026-10-02T08:41:42.023163+00:00",
+  "os_release": "Ubuntu 26.04 LTS",
+  "architecture": "aarch64",
+  "service": {
+    "ActiveState": "active",
+    "SubState": "running",
+    "NRestarts": "0",
+    "ExecMainStartTimestamp": "Fri 2026-10-02 08:40:10 UTC",
+    "MemoryCurrent": "8404992",
+    "MemoryPeak": "15646720",
+    "User": "tunnelx"
+  },
+  "caddy": {
+    "ActiveState": "active",
+    "SubState": "running",
+    "NRestarts": "0",
+    "ExecMainStartTimestamp": "Wed 2026-09-30 07:38:32 UTC",
+    "MemoryCurrent": "16519168",
+    "MemoryPeak": "48164864",
+    "User": "caddy"
+  },
+  "certificate_timer": {
+    "ActiveState": "active",
+    "SubState": "waiting"
+  },
+  "certificate": [
+    "subject=CN=test.xiaguamail.com",
+    "issuer=C=US, O=Let's Encrypt, CN=YE1",
+    "notBefore=Oct  1 10:34:41 2026 GMT",
+    "notAfter=Dec 30 10:34:40 2026 GMT"
+  ],
+  "server_sha256": "726c91b3e2155632e7a9e794b15b204cda11fdfc23d919b2843858ac38ff302e",
+  "private_target_allowlist_count": 0,
+  "acceptance_listeners": [],
+  "preferred_target_ips": {
+    "tempdelivery.13376767.xyz": [
+      "104.21.35.213"
+    ]
+  },
+  "main_listeners": [
+    "tcp LISTEN 0      4096                               *:8443        *:* users:((\"tunnelx-server\",pid=1063191,fd=4))                "
+  ],
+  "transport": "h2",
+  "udp_listener_removed": true,
+  "passed": true
+}

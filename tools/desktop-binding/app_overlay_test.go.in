@@ -1,0 +1,160 @@
+//go:build windows
+
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"strings"
+	"sync/atomic"
+	"testing"
+
+	bridge "github.com/wailsapp/wails/v2/pkg/assetserver"
+	"tunnelx/internal/desktop"
+)
+
+type legacyBindingApp struct{ called bool }
+
+func (a *legacyBindingApp) Query(_ string, _ any) (any, error) {
+	a.called = true
+	return true, nil
+}
+
+// Document the precise pre-fix failure in the actual framework: no management
+// request occurs and no callback with the request ID can settle the JS promise.
+func TestWailsBindingLegacyAnyNullLosesCallback(t *testing.T) {
+	app := &legacyBindingApp{}
+	callback, err := bridge.TunnelXBindingTestDispatch(app, `C{"name":"main.legacyBindingApp.Query","args":["/api/public/settings",null],"callbackID":"legacy-null"}`)
+	if err == nil || !strings.Contains(err.Error(), "zero Value") || callback != "" || app.called {
+		t.Fatalf("legacy null did not reproduce lost callback: callback=%q, error=%v, called=%v", callback, err, app.called)
+	}
+}
+
+func nativeBindingCallback(t *testing.T, app *App, args string, wantError bool) map[string]any {
+	t.Helper()
+	callback, dispatchErr := bridge.TunnelXBindingTestDispatch(app, `C{"name":"main.App.Query","args":`+args+`,"callbackID":"real-app-query"}`)
+	if callback == "" {
+		t.Fatalf("native binding lost callback: %v", dispatchErr)
+	}
+	var decoded struct {
+		ID     string         `json:"callbackid"`
+		Result map[string]any `json:"result"`
+		Error  any            `json:"error"`
+	}
+	if err := json.Unmarshal([]byte(strings.TrimPrefix(callback, "c")), &decoded); err != nil {
+		t.Fatalf("invalid native callback: %v", err)
+	}
+	if decoded.ID != "real-app-query" {
+		t.Fatalf("callback lost request identity: %q", decoded.ID)
+	}
+	if wantError {
+		if decoded.Error == nil {
+			t.Fatal("malformed or unauthorized binding call did not reject")
+		}
+	} else if dispatchErr != nil || decoded.Error != nil {
+		t.Fatalf("native call failed: dispatch=%v callback=%v", dispatchErr, decoded.Error)
+	}
+	return decoded.Result
+}
+
+func newBindingFixture(t *testing.T) (*App, *atomic.Int64) {
+	t.Helper()
+	t.Setenv("HTTP_PROXY", "http://127.0.0.1:1")
+	t.Setenv("HTTPS_PROXY", "http://127.0.0.1:1")
+	calls := &atomic.Int64{}
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls.Add(1)
+		var body any
+		if r.Method == http.MethodPost {
+			if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+				t.Errorf("POST body could not be decoded: %v", err)
+			}
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(map[string]any{"method": r.Method, "path": r.URL.Path, "body": body})
+	}))
+	t.Cleanup(server.Close)
+	// Keep synthetic state beside the test report. Windows may briefly retain
+	// antivirus handles after atomic JSON writes; that must not turn automatic
+	// TempDir removal into a false failure of the native dispatch assertions.
+	stateRoot := os.Getenv("TUNNELX_BINDING_STATE_ROOT")
+	if stateRoot == "" {
+		t.Fatal("run via tools/test-desktop-binding.py to isolate test state")
+	}
+	stateDir, err := os.MkdirTemp(stateRoot, "app-")
+	if err != nil {
+		t.Fatal(err)
+	}
+	engine, err := desktop.New(stateDir, desktop.Settings{APIURL: server.URL})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = engine.Close() })
+	return &App{engine: engine}, calls
+}
+
+func TestWailsBindingActualAppNullReadsReachHTTP(t *testing.T) {
+	for _, route := range []string{"/api/public/settings", "/api/public/commerce", "/api/me", "/api/nodes", "/api/plans", "/api/orders", "/api/release"} {
+		t.Run(strings.TrimPrefix(route, "/api/"), func(t *testing.T) {
+			app, calls := newBindingFixture(t)
+			result := nativeBindingCallback(t, app, fmt.Sprintf(`[%q,null]`, route), false)
+			if calls.Load() != 1 || result["method"] != "GET" || result["path"] != route || result["body"] != nil {
+				t.Fatalf("null read did not arrive as exactly one GET: calls=%d result=%v", calls.Load(), result)
+			}
+		})
+	}
+}
+
+func TestWailsBindingActualAppObjectMutationsRemainPOST(t *testing.T) {
+	for _, tc := range []struct{ name, route, body string }{
+		{"order", "/api/orders", `{"plan_id":"fixture-plan"}`},
+		{"trial", "/api/trial", `{}`},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			app, calls := newBindingFixture(t)
+			result := nativeBindingCallback(t, app, fmt.Sprintf(`[%q,%s]`, tc.route, tc.body), false)
+			body, ok := result["body"].(map[string]any)
+			if calls.Load() != 1 || result["method"] != "POST" || result["path"] != tc.route || !ok {
+				t.Fatalf("object did not arrive as exactly one JSON POST: calls=%d result=%v", calls.Load(), result)
+			}
+			if tc.name == "order" && body["plan_id"] != "fixture-plan" {
+				t.Fatal("order payload changed across native bridge")
+			}
+			if tc.name == "trial" && len(body) != 0 {
+				t.Fatal("empty trial object changed across native bridge")
+			}
+		})
+	}
+}
+
+func TestWailsBindingActualAppRejectsMalformedInputsWithCallback(t *testing.T) {
+	for _, tc := range []struct{ name, args string }{
+		{"array", `["/api/orders",[]]`},
+		{"string", `["/api/orders","invalid"]`},
+		{"number", `["/api/orders",1]`},
+		{"missing_body", `["/api/orders"]`},
+		{"read_with_object", `["/api/nodes",{}]`},
+		{"unlisted_route", `["/api/admin/users",null]`},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			app, calls := newBindingFixture(t)
+			nativeBindingCallback(t, app, tc.args, true)
+			if calls.Load() != 0 {
+				t.Fatal("rejected native call reached management HTTP")
+			}
+		})
+	}
+}
+
+func TestWailsBindingProxyModePersistence(t *testing.T) {
+ app,_:=newBindingFixture(t)
+ for _,mode:=range []string{"bypass_cn","global","tun"}{
+  callback,err:=bridge.TunnelXBindingTestDispatch(app,fmt.Sprintf(`C{"name":"main.App.SaveProxyMode","args":[%q,"qq.com"],"callbackID":"mode"}`,mode))
+  var result struct{Error any `json:"error"`}
+  if err!=nil||callback==""||json.Unmarshal([]byte(strings.TrimPrefix(callback,"c")),&result)!=nil||result.Error!=nil{t.Fatalf("mode callback failed: %v %s",err,callback)}
+  if app.engine.Status()["preferences"].(desktop.Preferences).ProxyMode!=mode{t.Fatal("mode not saved")}
+ }
+}

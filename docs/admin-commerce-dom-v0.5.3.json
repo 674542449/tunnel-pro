@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-02T17:44:30.746Z",
+  "console_version": "v0.5.3",
+  "visual_rendered": false,
+  "real_control_api": true,
+  "cases": [
+    "public_catalog_and_test_mode_disclosure",
+    "public_release_and_safe_windows_download_link",
+    "readiness_blocks_live_sales",
+    "three_network_svg_icons_and_valid_sprite",
+    "epay_and_bepusdt_configuration_encrypted_and_redacted",
+    "editing_gateway_preserves_saved_keys_without_echo",
+    "network_enable_disable_persistence_and_empty_selection_blocked",
+    "checkout_radio_svg_choices_submit_exact_network_and_live_gate_remains",
+    "legacy_payment_record_retains_network_label_and_svg",
+    "invalid_gateway_url_stays_in_form_without_changing_config",
+    "invite_registration_requires_email_verification",
+    "purchase_test_confirmation_and_scope_isolation",
+    "ticket_submission_history_and_xss_resistance",
+    "staff_reply_and_full_refund_flow",
+    "self_password_change_revokes_session"
+  ]
+}

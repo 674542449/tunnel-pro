@@ -1,0 +1,304 @@
+{
+  "client_version": "v0.6.4",
+  "node_endpoint": "146.56.99.255:18447",
+  "source": "controlled stream on same server, reached through H2 tunnel",
+  "started_at": "2026-10-03T07:11:50.355898+00:00",
+  "finished_test_at": "2026-10-03T07:21:50+00:00",
+  "requested_seconds": 600,
+  "completed_10_minutes": true,
+  "summary": {
+    "elapsed_seconds": 600,
+    "received_bytes": 19725337062,
+    "average_MBps": 32.876,
+    "completed_downloads": 0,
+    "download_attempts": 1,
+    "connections_opened": 1,
+    "download_failures": 0,
+    "minutes": [
+      {
+        "minute": 1,
+        "bytes": 2131590778,
+        "MBps": 35.527,
+        "Mbps": 284.21
+      },
+      {
+        "minute": 2,
+        "bytes": 2015428608,
+        "MBps": 33.59,
+        "Mbps": 268.72
+      },
+      {
+        "minute": 3,
+        "bytes": 1879900160,
+        "MBps": 31.332,
+        "Mbps": 250.65
+      },
+      {
+        "minute": 4,
+        "bytes": 2009612288,
+        "MBps": 33.494,
+        "Mbps": 267.95
+      },
+      {
+        "minute": 5,
+        "bytes": 1910964224,
+        "MBps": 31.849,
+        "Mbps": 254.8
+      },
+      {
+        "minute": 6,
+        "bytes": 1912406016,
+        "MBps": 31.873,
+        "Mbps": 254.99
+      },
+      {
+        "minute": 7,
+        "bytes": 1960230912,
+        "MBps": 32.671,
+        "Mbps": 261.36
+      },
+      {
+        "minute": 8,
+        "bytes": 1940783104,
+        "MBps": 32.346,
+        "Mbps": 258.77
+      },
+      {
+        "minute": 9,
+        "bytes": 1967801196,
+        "MBps": 32.797,
+        "Mbps": 262.37
+      },
+      {
+        "minute": 10,
+        "bytes": 1996619776,
+        "MBps": 33.277,
+        "Mbps": 266.22
+      }
+    ]
+  },
+  "max_concurrent_downloads": 1,
+  "download_streams_opened": 1,
+  "unexpected_download_reconnects": 0,
+  "path_probe_successes": 21,
+  "path_probe_failures": 0,
+  "health_events": [
+    {
+      "error_kind": "none",
+      "event": "path_probe_ok",
+      "scope": "health_probe",
+      "time": "2026-10-03T07:11:50.2669933Z"
+    },
+    {
+      "error_kind": "none",
+      "event": "path_probe_ok",
+      "scope": "health_probe",
+      "time": "2026-10-03T07:12:20.0955803Z"
+    },
+    {
+      "error_kind": "none",
+      "event": "path_probe_ok",
+      "scope": "health_probe",
+      "time": "2026-10-03T07:12:50.0947133Z"
+    },
+    {
+      "error_kind": "none",
+      "event": "path_probe_ok",
+      "scope": "health_probe",
+      "time": "2026-10-03T07:13:20.0955876Z"
+    },
+    {
+      "error_kind": "none",
+      "event": "path_probe_ok",
+      "scope": "health_probe",
+      "time": "2026-10-03T07:13:50.0950962Z"
+    },
+    {
+      "error_kind": "none",
+      "event": "path_probe_ok",
+      "scope": "health_probe",
+      "time": "2026-10-03T07:14:20.0952449Z"
+    },
+    {
+      "error_kind": "none",
+      "event": "path_probe_ok",
+      "scope": "health_probe",
+      "time": "2026-10-03T07:14:50.0977478Z"
+    },
+    {
+      "error_kind": "none",
+      "event": "path_probe_ok",
+      "scope": "health_probe",
+      "time": "2026-10-03T07:15:20.0951854Z"
+    },
+    {
+      "error_kind": "none",
+      "event": "path_probe_ok",
+      "scope": "health_probe",
+      "time": "2026-10-03T07:15:50.0948887Z"
+    },
+    {
+      "error_kind": "none",
+      "event": "path_probe_ok",
+      "scope": "health_probe",
+      "time": "2026-10-03T07:16:20.0950158Z"
+    },
+    {
+      "error_kind": "none",
+      "event": "path_probe_ok",
+      "scope": "health_probe",
+      "time": "2026-10-03T07:16:50.095427Z"
+    },
+    {
+      "error_kind": "none",
+      "event": "path_probe_ok",
+      "scope": "health_probe",
+      "time": "2026-10-03T07:17:20.0942787Z"
+    },
+    {
+      "error_kind": "none",
+      "event": "path_probe_ok",
+      "scope": "health_probe",
+      "time": "2026-10-03T07:17:50.0946116Z"
+    },
+    {
+      "error_kind": "none",
+      "event": "path_probe_ok",
+      "scope": "health_probe",
+      "time": "2026-10-03T07:18:20.0945852Z"
+    },
+    {
+      "error_kind": "none",
+      "event": "path_probe_ok",
+      "scope": "health_probe",
+      "time": "2026-10-03T07:18:50.0956069Z"
+    },
+    {
+      "error_kind": "none",
+      "event": "path_probe_ok",
+      "scope": "health_probe",
+      "time": "2026-10-03T07:19:20.0954662Z"
+    },
+    {
+      "error_kind": "none",
+      "event": "path_probe_ok",
+      "scope": "health_probe",
+      "time": "2026-10-03T07:19:50.0949656Z"
+    },
+    {
+      "error_kind": "none",
+      "event": "path_probe_ok",
+      "scope": "health_probe",
+      "time": "2026-10-03T07:20:20.095211Z"
+    },
+    {
+      "error_kind": "none",
+      "event": "path_probe_ok",
+      "scope": "health_probe",
+      "time": "2026-10-03T07:20:50.0951872Z"
+    },
+    {
+      "error_kind": "none",
+      "event": "path_probe_ok",
+      "scope": "health_probe",
+      "time": "2026-10-03T07:21:20.0948766Z"
+    },
+    {
+      "error_kind": "none",
+      "event": "path_probe_ok",
+      "scope": "health_probe",
+      "time": "2026-10-03T07:21:50.0948017Z"
+    }
+  ],
+  "connection_end_events": [
+    {
+      "carrier_id": "23f26abb-carrier-3",
+      "downloaded_bytes": 2,
+      "duration_ms": 341,
+      "event": "connection_ended",
+      "last_error_kind": "",
+      "result": "completed_or_eof",
+      "scope": "business",
+      "time": "2026-10-03T07:11:50.3553847Z"
+    },
+    {
+      "carrier_id": "23f26abb-carrier-5",
+      "downloaded_bytes": 19725369830,
+      "duration_ms": 599992,
+      "event": "connection_ended",
+      "last_error_kind": "connection_reset",
+      "result": "error_observed",
+      "scope": "business",
+      "time": "2026-10-03T07:21:50.3495415Z"
+    }
+  ],
+  "other_connection_events": [
+    {
+      "active_streams": 0,
+      "carrier_id": "",
+      "draining": false,
+      "event": "carrier_closed",
+      "reason": "observed_closed",
+      "scope": "carrier",
+      "time": "2026-10-03T07:13:52.0108433Z"
+    },
+    {
+      "active_streams": 0,
+      "carrier_id": "23f26abb-carrier-3",
+      "draining": false,
+      "event": "carrier_closed",
+      "reason": "observed_closed",
+      "scope": "carrier",
+      "time": "2026-10-03T07:13:52.0108433Z"
+    },
+    {
+      "carrier_id": "23f26abb-carrier-5",
+      "error_kind": "connection_reset",
+      "event": "connection_error",
+      "scope": "business",
+      "time": "2026-10-03T07:21:50.3495415Z"
+    },
+    {
+      "event": "client_stopped",
+      "reason": "requested_shutdown",
+      "scope": "client",
+      "time": "2026-10-03T07:21:50.3495415Z"
+    }
+  ],
+  "diagnostics_counts": {
+    "client_started": 1,
+    "heartbeat": 23,
+    "connection_requested": 2,
+    "carrier_opened": 13,
+    "path_probe_ok": 21,
+    "connection_opened": 2,
+    "http_response": 2,
+    "stream_direction_ended": 2,
+    "connection_ended": 2,
+    "connection_progress": 21,
+    "manual_probe_result": 10,
+    "carrier_closed": 2,
+    "connection_error": 1,
+    "client_stopped": 1
+  },
+  "diagnostics_error_kinds": {
+    "none": 22,
+    "connection_reset": 2
+  },
+  "final_stream_intentionally_cancelled_at_deadline": true,
+  "temporary_remote_service_stopped": true,
+  "temporary_remote_script_removed": true,
+  "original_core_status_after_test": [
+    "ActiveState=active",
+    "NRestarts=0",
+    "ExecMainStartTimestamp=Fri 2026-10-02 08:40:10 UTC"
+  ],
+  "cleanup_note": "The idle management SSH connection reset when cleanup began. Reconnected, stopped the temporary service, and reconstructed the report from the saved final 600-second counter snapshot and native diagnostic logs. Management SSH is separate from the measured H2 download.",
+  "limits": [
+    "Measures local computer to test node, not sustained speed from all external sites.",
+    "Initial Cloudflare attempt was excluded after HTTP 429 rate limiting.",
+    "The 64 GiB source was intentionally stopped at 600 seconds; complete-file count 0 is expected.",
+    "No packet-loss measurement or proof of QoS absence."
+  ],
+  "report_saved_at": "2026-10-03T07:23:17.861448+00:00"
+}

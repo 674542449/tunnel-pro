@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "desktop_version": "v0.6.16",
+  "checked_at": "2026-10-05T08:26:34.816Z",
+  "gui_rendered": false,
+  "runtime": "vendored Wails production runtime + DesktopIPC via jsdom script loader",
+  "native_boundary": "isolated controlled callbacks; no native GUI or proxy changes",
+  "cases": [
+    "actual_runtime_bindings_support_guest_login_and_node_loading",
+    "login_during_older_inflight_status_still_loads_account_and_nodes",
+    "late_runtime_initialisation_retries_complete_bootstrap_not_status_only",
+    "cached_session_is_loaded_through_actual_runtime",
+    "initial_status_failure_recovers_public_login_and_cached_nodes",
+    "temporary_node_failure_automatically_recovers_with_bounded_retries",
+    "guest_settings_always_has_a_working_return_to_login",
+    "logout_drains_old_status_without_restoring_account_view"
+  ]
+}

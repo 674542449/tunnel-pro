@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-02T16:32:45.004Z",
+  "console_version": "v0.5.1",
+  "require_admin_mfa": true,
+  "real_control_api": true,
+  "actual_embedded_assets": true,
+  "visual_rendered": false,
+  "cases": [
+    "warm_session_security_view_with_one_served_bundle",
+    "server_still_enforces_mfa_and_returns_actionable_security_url",
+    "all_blocked_navigation_guides_to_accessible_security_setup",
+    "password_totp_enrollment_recovery_codes_and_automatic_unlock",
+    "every_admin_page_accessible_after_mfa",
+    "direct_security_entry_and_existing_mfa_recovery_login",
+    "used_recovery_code_cannot_be_replayed",
+    "enrollment_revokes_other_sessions_and_recovery_login_remains_available"
+  ]
+}

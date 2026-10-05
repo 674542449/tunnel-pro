@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-02T12:54:36.146818+00:00",
+  "console_version": "v0.4.3",
+  "archives": [
+    "tunnelX-control-v0.4.3.zip",
+    "tunnelX-source-v0.4.3.zip"
+  ],
+  "zip_integrity": true,
+  "packaged_binaries_match": true,
+  "deployed_controller_match": true,
+  "deployment_credentials_excluded": true,
+  "source_has_reproducible_dom_tests": true,
+  "h2_only_dependencies": true,
+  "manifest": "SHA256-control-v0.4.3.json"
+}

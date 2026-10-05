@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-02T08:38:41.086738+00:00",
+  "architecture": "arm64",
+  "debian_shares_host_kernel": true,
+  "results": {
+    "ubuntu": {
+      "passed": true,
+      "repetitions": 5,
+      "tests_per_repetition": 2,
+      "abrupt_tcp_udp_closures": 1000
+    },
+    "debian": {
+      "passed": true,
+      "repetitions": 5,
+      "tests_per_repetition": 2,
+      "abrupt_tcp_udp_closures": 1000
+    }
+  },
+  "control_tests": {
+    "ubuntu": {
+      "passed": true,
+      "cases": 5
+    },
+    "debian": {
+      "passed": true,
+      "cases": 5
+    }
+  },
+  "server_sha256": "726c91b3e2155632e7a9e794b15b204cda11fdfc23d919b2843858ac38ff302e"
+}

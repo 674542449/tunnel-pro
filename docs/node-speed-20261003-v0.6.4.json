@@ -1,0 +1,376 @@
+{
+  "checked_at": "2026-10-03T07:03:43.110855+00:00",
+  "client_version": "v0.6.4",
+  "suites": [
+    {
+      "label": "desktop_v0.6.4_account_node",
+      "endpoint": "146.56.99.255:18447",
+      "transport": "h2",
+      "single": [
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 3.2313,
+          "MBps": 20.768,
+          "Mbps": 166.15,
+          "first_byte_ms": 370.21,
+          "http_status": 200,
+          "error": null
+        },
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 2.4988,
+          "MBps": 26.857,
+          "Mbps": 214.85,
+          "first_byte_ms": 371.07,
+          "http_status": 200,
+          "error": null
+        },
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 2.3898,
+          "MBps": 28.082,
+          "Mbps": 224.66,
+          "first_byte_ms": 207.56,
+          "http_status": 200,
+          "error": null
+        }
+      ],
+      "parallel4": {
+        "passed": true,
+        "seconds": 4.5755,
+        "MBps": 29.334,
+        "Mbps": 234.67,
+        "samples": [
+          {
+            "passed": true,
+            "bytes": 33554432,
+            "seconds": 2.8692,
+            "MBps": 11.694,
+            "Mbps": 93.56,
+            "first_byte_ms": 170.91,
+            "http_status": 200,
+            "error": null
+          },
+          {
+            "passed": true,
+            "bytes": 33554432,
+            "seconds": 1.5959,
+            "MBps": 21.026,
+            "Mbps": 168.21,
+            "first_byte_ms": 170.47,
+            "http_status": 200,
+            "error": null
+          },
+          {
+            "passed": true,
+            "bytes": 33554432,
+            "seconds": 4.526,
+            "MBps": 7.414,
+            "Mbps": 59.31,
+            "first_byte_ms": 188.32,
+            "http_status": 200,
+            "error": null
+          },
+          {
+            "passed": true,
+            "bytes": 33554432,
+            "seconds": 1.7826,
+            "MBps": 18.823,
+            "Mbps": 150.58,
+            "first_byte_ms": 179.3,
+            "http_status": 200,
+            "error": null
+          }
+        ]
+      },
+      "external_cloudflare": [
+        {
+          "passed": true,
+          "bytes": 33554432,
+          "seconds": 1.4398,
+          "MBps": 23.305,
+          "Mbps": 186.44,
+          "first_byte_ms": 324.97,
+          "http_status": 200,
+          "error": null
+        },
+        {
+          "passed": true,
+          "bytes": 33554432,
+          "seconds": 1.1083,
+          "MBps": 30.276,
+          "Mbps": 242.21,
+          "first_byte_ms": 325.19,
+          "http_status": 200,
+          "error": null
+        }
+      ],
+      "small_request_probe": {
+        "attempts": 10,
+        "failures": 0,
+        "median_ms": 171.825,
+        "max_ms": 185.44,
+        "samples": [
+          {
+            "passed": true,
+            "bytes": 1024,
+            "seconds": 0.1718,
+            "MBps": 0.006,
+            "Mbps": 0.05,
+            "first_byte_ms": 171.71,
+            "http_status": 200,
+            "error": null
+          },
+          {
+            "passed": true,
+            "bytes": 1024,
+            "seconds": 0.1717,
+            "MBps": 0.006,
+            "Mbps": 0.05,
+            "first_byte_ms": 171.65,
+            "http_status": 200,
+            "error": null
+          },
+          {
+            "passed": true,
+            "bytes": 1024,
+            "seconds": 0.1696,
+            "MBps": 0.006,
+            "Mbps": 0.05,
+            "first_byte_ms": 169.54,
+            "http_status": 200,
+            "error": null
+          },
+          {
+            "passed": true,
+            "bytes": 1024,
+            "seconds": 0.1855,
+            "MBps": 0.006,
+            "Mbps": 0.04,
+            "first_byte_ms": 185.44,
+            "http_status": 200,
+            "error": null
+          },
+          {
+            "passed": true,
+            "bytes": 1024,
+            "seconds": 0.1721,
+            "MBps": 0.006,
+            "Mbps": 0.05,
+            "first_byte_ms": 171.99,
+            "http_status": 200,
+            "error": null
+          },
+          {
+            "passed": true,
+            "bytes": 1024,
+            "seconds": 0.1719,
+            "MBps": 0.006,
+            "Mbps": 0.05,
+            "first_byte_ms": 171.78,
+            "http_status": 200,
+            "error": null
+          },
+          {
+            "passed": true,
+            "bytes": 1024,
+            "seconds": 0.1702,
+            "MBps": 0.006,
+            "Mbps": 0.05,
+            "first_byte_ms": 170.14,
+            "http_status": 200,
+            "error": null
+          },
+          {
+            "passed": true,
+            "bytes": 1024,
+            "seconds": 0.185,
+            "MBps": 0.006,
+            "Mbps": 0.04,
+            "first_byte_ms": 184.97,
+            "http_status": 200,
+            "error": null
+          },
+          {
+            "passed": true,
+            "bytes": 1024,
+            "seconds": 0.1721,
+            "MBps": 0.006,
+            "Mbps": 0.05,
+            "first_byte_ms": 172.03,
+            "http_status": 200,
+            "error": null
+          },
+          {
+            "passed": true,
+            "bytes": 1024,
+            "seconds": 0.172,
+            "MBps": 0.006,
+            "Mbps": 0.05,
+            "first_byte_ms": 171.87,
+            "http_status": 200,
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "label": "original_live_node_h2_core",
+      "endpoint": "146.56.99.255:8443",
+      "transport": "h2",
+      "single": [],
+      "warmup": {
+        "passed": false,
+        "bytes": 0,
+        "seconds": 0.2846,
+        "MBps": 0.0,
+        "Mbps": 0.0,
+        "first_byte_ms": 284.48,
+        "http_status": 502,
+        "error": "ValueError: HTTP 502"
+      }
+    },
+    {
+      "label": "original_live_node_external_retest",
+      "endpoint": "146.56.99.255:8443",
+      "transport": "h2",
+      "target": "speed.cloudflare.com",
+      "single": [
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 2.865,
+          "MBps": 23.424,
+          "Mbps": 187.39,
+          "first_byte_ms": 515.4,
+          "http_status": 200,
+          "error": null
+        },
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 2.6348,
+          "MBps": 25.47,
+          "Mbps": 203.76,
+          "first_byte_ms": 511.01,
+          "http_status": 200,
+          "error": null
+        },
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 2.6366,
+          "MBps": 25.453,
+          "Mbps": 203.62,
+          "first_byte_ms": 507.89,
+          "http_status": 200,
+          "error": null
+        }
+      ],
+      "warmup": {
+        "passed": true,
+        "bytes": 2097152,
+        "seconds": 1.0575,
+        "MBps": 1.983,
+        "Mbps": 15.86,
+        "first_byte_ms": 492.92,
+        "http_status": 200,
+        "error": null
+      },
+      "parallel4": {
+        "passed": true,
+        "MBps": 55.103,
+        "Mbps": 440.82,
+        "samples": [
+          {
+            "passed": true,
+            "bytes": 33554432,
+            "seconds": 2.4319,
+            "MBps": 13.797,
+            "Mbps": 110.38,
+            "first_byte_ms": 375.29,
+            "http_status": 200,
+            "error": null
+          },
+          {
+            "passed": true,
+            "bytes": 33554432,
+            "seconds": 1.8195,
+            "MBps": 18.442,
+            "Mbps": 147.53,
+            "first_byte_ms": 370.89,
+            "http_status": 200,
+            "error": null
+          },
+          {
+            "passed": true,
+            "bytes": 33554432,
+            "seconds": 1.8879,
+            "MBps": 17.774,
+            "Mbps": 142.19,
+            "first_byte_ms": 361.81,
+            "http_status": 200,
+            "error": null
+          },
+          {
+            "passed": true,
+            "bytes": 33554432,
+            "seconds": 1.6644,
+            "MBps": 20.159,
+            "Mbps": 161.28,
+            "first_byte_ms": 345.95,
+            "http_status": 200,
+            "error": null
+          }
+        ]
+      },
+      "windows_proxy_unchanged": true
+    }
+  ],
+  "native_node_probes": [
+    273,
+    265,
+    268
+  ],
+  "native_health": {
+    "connected": true,
+    "health": {
+      "checked_at": 1791011028,
+      "last_success": 1791011028,
+      "consecutive_failures": 0,
+      "error_kind": ""
+    },
+    "mode": "h2",
+    "ech": true,
+    "h2_streams": 21
+  },
+  "original_service_unchanged": true,
+  "windows_proxy_unchanged": true,
+  "completed_at": "2026-10-03T07:05:40.921255+00:00",
+  "original_external_retest_diagnostics": {
+    "events": {
+      "client_started": 1,
+      "heartbeat": 1,
+      "carrier_opened": 5,
+      "path_probe_ok": 1,
+      "connection_requested": 8,
+      "connection_opened": 8,
+      "stream_direction_ended": 16,
+      "connection_error": 8,
+      "connection_ended": 8
+    },
+    "error_kinds": {
+      "none": 9,
+      "cancelled": 16
+    }
+  },
+  "limitations": [
+    "Short burst tests; not sustained peak-hour or packet-loss measurement.",
+    "Beta account node is port 18447; original node is port 8443 on the same server.",
+    "8443 rejected the loopback fixture with HTTP 403; external Cloudflare retest completed successfully.",
+    "Parallel comparisons use different download origins and do not isolate client differences."
+  ]
+}

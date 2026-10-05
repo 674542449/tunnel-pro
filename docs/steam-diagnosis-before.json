@@ -1,0 +1,98 @@
+{
+  "checked_at": "2026-10-02 03:15:17",
+  "results": [
+    {
+      "host": "xz.pphimalayanrt.com",
+      "route": "http-proxy",
+      "status": 502,
+      "bytes": 16,
+      "sha256": "fe09b79f9564bcb1a0e7af426e2bf8e9fdea13083d7e0fbb70d75a3916707026",
+      "proxy_error": "Response failed",
+      "seconds": 0.847
+    },
+    {
+      "host": "xz.pphimalayanrt.com",
+      "route": "socks-open",
+      "status": 200,
+      "bytes": 476,
+      "sha256": "96ab473b03a90a20f1ffc278e0392c476fc85ffafc9c5e084879359782dc31d6",
+      "seconds": 0.849
+    },
+    {
+      "host": "xz.pphimalayanrt.com",
+      "route": "socks-half-close",
+      "error": "RemoteDisconnected",
+      "seconds": 0.851
+    },
+    {
+      "host": "dl.steam.clngaa.com",
+      "route": "http-proxy",
+      "status": 502,
+      "bytes": 16,
+      "sha256": "fe09b79f9564bcb1a0e7af426e2bf8e9fdea13083d7e0fbb70d75a3916707026",
+      "proxy_error": "Response failed",
+      "seconds": 0.875
+    },
+    {
+      "host": "dl.steam.clngaa.com",
+      "route": "socks-open",
+      "status": 200,
+      "bytes": 477,
+      "sha256": "4534c23304b78048d6291f595a4f52ab7235111c7d27a338a1520814328b674d",
+      "seconds": 0.907
+    },
+    {
+      "host": "dl.steam.clngaa.com",
+      "route": "socks-half-close",
+      "error": "RemoteDisconnected",
+      "seconds": 0.88
+    },
+    {
+      "host": "st.dl.eccdnx.com",
+      "route": "http-proxy",
+      "status": 502,
+      "bytes": 16,
+      "sha256": "fe09b79f9564bcb1a0e7af426e2bf8e9fdea13083d7e0fbb70d75a3916707026",
+      "proxy_error": "Response failed",
+      "seconds": 1.374
+    },
+    {
+      "host": "st.dl.eccdnx.com",
+      "route": "socks-open",
+      "status": 200,
+      "bytes": 477,
+      "sha256": "4534c23304b78048d6291f595a4f52ab7235111c7d27a338a1520814328b674d",
+      "seconds": 1.354
+    },
+    {
+      "host": "st.dl.eccdnx.com",
+      "route": "socks-half-close",
+      "error": "RemoteDisconnected",
+      "seconds": 1.293
+    },
+    {
+      "host": "cache7-hkg1.steamcontent.com",
+      "route": "http-proxy",
+      "status": 200,
+      "bytes": 1216,
+      "sha256": "25ae3aa4e115dc154455530bf3bb517cbea76803e1fc2be9d90c8b864d5c413e",
+      "seconds": 0.297
+    },
+    {
+      "host": "cache7-hkg1.steamcontent.com",
+      "route": "socks-open",
+      "status": 200,
+      "bytes": 1216,
+      "sha256": "25ae3aa4e115dc154455530bf3bb517cbea76803e1fc2be9d90c8b864d5c413e",
+      "seconds": 0.294
+    },
+    {
+      "host": "cache7-hkg1.steamcontent.com",
+      "route": "socks-half-close",
+      "status": 200,
+      "bytes": 1216,
+      "sha256": "25ae3aa4e115dc154455530bf3bb517cbea76803e1fc2be9d90c8b864d5c413e",
+      "seconds": 0.339
+    }
+  ]
+}

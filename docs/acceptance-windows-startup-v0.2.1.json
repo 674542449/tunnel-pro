@@ -1,0 +1,33 @@
+{
+  "checked_at": "2026-10-02T00:42:39.895812+08:00",
+  "passed": true,
+  "exe_sha256": "c09109de91d1714ea26fadaac74e30d2a578acfde08b6337378a69e40c0a2f28",
+  "isolated_ports": [
+    31280,
+    31288,
+    31290
+  ],
+  "independent_h3_probe_passed": true,
+  "tcp_h2_udp_h3_after_probe_passed": true,
+  "iso_32MiB_sha256_verified": true,
+  "duplicate_startup_checks": [
+    {
+      "case": "same-proxy-ports",
+      "duplicate_exit": 1,
+      "clear_port_error": true,
+      "backup_unchanged": true,
+      "running_client_preserved": true,
+      "registry_unchanged": true
+    },
+    {
+      "case": "web-port-only",
+      "duplicate_exit": 1,
+      "clear_port_error": true,
+      "backup_unchanged": true,
+      "running_client_preserved": true,
+      "registry_unchanged": true
+    }
+  ],
+  "test_client_exited": true,
+  "system_proxy_unchanged": true
+}

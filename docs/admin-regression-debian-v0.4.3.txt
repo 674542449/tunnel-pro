@@ -1,0 +1,33 @@
+=== RUN   TestEmptyLegacyCollectionsReturnArrays
+--- PASS: TestEmptyLegacyCollectionsReturnArrays (0.38s)
+=== RUN   TestAdminCRUDValidationAndProfileBundle
+--- PASS: TestAdminCRUDValidationAndProfileBundle (0.43s)
+=== RUN   TestSettingsPartialSaveAndRuntimeAccess
+--- PASS: TestSettingsPartialSaveAndRuntimeAccess (0.52s)
+=== RUN   TestOrderCancellationIsolationAndFulfilmentRace
+--- PASS: TestOrderCancellationIsolationAndFulfilmentRace (0.65s)
+=== RUN   TestRevokedSessionCannotCommitAndSelfPasswordReset
+--- PASS: TestRevokedSessionCannotCommitAndSelfPasswordReset (0.62s)
+=== RUN   TestFiniteRenewalPreservesActiveUnlimitedAccount
+--- PASS: TestFiniteRenewalPreservesActiveUnlimitedAccount (0.00s)
+=== RUN   TestAccountIsolationOrdersAndDurability
+--- PASS: TestAccountIsolationOrdersAndDurability (0.53s)
+=== RUN   TestTrialCannotReduceExistingEntitlement
+--- PASS: TestTrialCannotReduceExistingEntitlement (0.50s)
+=== RUN   TestCookieCSRFAndMalformedStore
+--- PASS: TestCookieCSRFAndMalformedStore (0.37s)
+=== RUN   TestNodeCumulativeReportsAreIdempotent
+--- PASS: TestNodeCumulativeReportsAreIdempotent (0.39s)
+=== RUN   TestNodeInstallValidationAndArtifactReadiness
+--- PASS: TestNodeInstallValidationAndArtifactReadiness (0.50s)
+=== RUN   TestNodeInstallPendingIsolationAndCredentials
+--- PASS: TestNodeInstallPendingIsolationAndCredentials (0.39s)
+=== RUN   TestNodeInstallScopedDownloadsAndErrorReporting
+--- PASS: TestNodeInstallScopedDownloadsAndErrorReporting (0.38s)
+=== RUN   TestNodeInstallCompletionAndIdempotentRetry
+--- PASS: TestNodeInstallCompletionAndIdempotentRetry (0.38s)
+=== RUN   TestNodeInstallScriptIsPublicAndCommandPinsDigest
+--- PASS: TestNodeInstallScriptIsPublicAndCommandPinsDigest (0.37s)
+=== RUN   TestEmbeddedConsoleHasNoRedirectLoop
+--- PASS: TestEmbeddedConsoleHasNoRedirectLoop (0.00s)
+PASS

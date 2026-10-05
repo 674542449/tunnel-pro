@@ -1,0 +1,23 @@
+{
+  "checked_at": "2026-10-02T00:08:51.121397+08:00",
+  "route": "Windows-running-H2-after-4GiB-offset",
+  "filename": "zh-cn_windows_11_consumer_editions_version_26h2_x64_dvd_3622091b.iso",
+  "requested_bytes": 16777216,
+  "offset": 4294967296,
+  "limit_seconds": 30,
+  "download_host": "tempdelivery.13376767.xyz",
+  "status": 206,
+  "content_range": "bytes 4294967296-4311744511/9112440832",
+  "range_honored": true,
+  "cache_status": null,
+  "cdn_location": "ICN",
+  "ttfb_seconds": 1.179620600072667,
+  "bytes": 16777216,
+  "seconds": 2.502858699997887,
+  "MBps": 6.703221400398737,
+  "Mbps": 53.6257712031899,
+  "sha256": "f4fa531ce4e713f69ae45cf211b93d92aa9374783ea76426ba151726b4f787a2",
+  "completed_sample": true,
+  "passed": true,
+  "bounded_partial_iso": true
+}

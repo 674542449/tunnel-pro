@@ -1,0 +1,49 @@
+{
+  "checked_at": "2026-10-02T04:54:30.404714+08:00",
+  "passed": true,
+  "client_sha256": "c0419d5c5f6a3b143a82b39ae617f2c883748fa76a7daa926204e8048fab44bf",
+  "faults_local_to_test_relay": true,
+  "test_log_directory": "C:\\Users\\tanzh\\Desktop\\tunnelX\\.local\\windows-diagnostics-smoke-v0.3.2\\logs-16ed4b78",
+  "windows_application_pid_and_name_verified": true,
+  "https_socks_udp_and_manual_probe_verified": true,
+  "tcp_fault": {
+    "application_request_recovered_seconds": 2.341,
+    "fallback_reason": "timeout",
+    "fallback_confirmed": true,
+    "probe_failure_time": "2026-10-01T20:54:39.4380596Z",
+    "probe_recovery_time": "2026-10-01T20:54:43.2868782Z",
+    "flow_id_and_application_present": true
+  },
+  "udp_fault": {
+    "tcp_business_still_succeeded": true,
+    "probe_failure_time": "2026-10-01T20:54:48.4365747Z",
+    "probe_recovery_time": "2026-10-01T20:54:53.5229792Z"
+  },
+  "private_query_and_node_token_absent": true,
+  "event_counts": {
+    "client_started": 1,
+    "heartbeat": 26,
+    "carrier_opened": 8,
+    "path_probe_ok": 28,
+    "manual_probe_result": 1,
+    "connection_requested": 5,
+    "connection_opened": 5,
+    "stream_direction_ended": 8,
+    "connection_error": 5,
+    "connection_ended": 5,
+    "udp_association_ended": 1,
+    "udp_receive_ended": 1,
+    "connection_progress": 1,
+    "carrier_dial_failed": 2,
+    "transport_fallback": 2,
+    "carrier_closed": 5,
+    "path_probe_failed": 5,
+    "path_probe_recovered": 2,
+    "open_attempt_failed": 1,
+    "client_stopped": 1
+  },
+  "logging_started_and_stopped_recorded": true,
+  "system_proxy_unchanged": true,
+  "test_client_exited": true,
+  "analysis_tool_verified": true
+}

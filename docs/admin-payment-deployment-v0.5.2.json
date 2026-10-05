@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-02T17:20:38.247712+00:00",
+  "console_version": "v0.5.2",
+  "controller_sha256": "1e395c54fdb6d1c680d5eef0d655599e009628be1349056679c42fb481653ffc",
+  "admin_mfa_enforced": true,
+  "configuration_unchanged": true,
+  "node_artifacts_unchanged": true,
+  "original_core_process_unchanged": true,
+  "original_core_sha256": "726c91b3e2155632e7a9e794b15b204cda11fdfc23d919b2843858ac38ff302e",
+  "encrypted_backup_before_upgrade": true,
+  "off_host_encrypted_backup": true,
+  "live_payments_enabled": false,
+  "sites": {
+    "tunnelx-beta": {
+      "health": true,
+      "one_script": true,
+      "security_entry": true,
+      "full_bundle": true,
+      "cache_no_store": true,
+      "bundle_sha256": "2b289d2a066a3272f18bc8859a41305be0cd4f3573c11cadbe928a1a36e56869",
+      "authenticated_mfa_admin_apis": 13,
+      "gateway_config_entry_ready": true
+    },
+    "tunnelx-control": {
+      "health": true,
+      "one_script": true,
+      "security_entry": true,
+      "full_bundle": true,
+      "cache_no_store": true,
+      "bundle_sha256": "2b289d2a066a3272f18bc8859a41305be0cd4f3573c11cadbe928a1a36e56869"
+    }
+  },
+  "production_owner_mfa_modified": false,
+  "payment_keys_preconfigured": false,
+  "unsigned_callbacks_rejected": true,
+  "visual_rendered": false
+}

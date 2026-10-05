@@ -1,0 +1,325 @@
+{
+  "started_at": "2026-10-01T12:37:36Z",
+  "finished_at": "2026-10-01T12:37:43Z",
+  "platform": "linux/arm64",
+  "go_version": "go1.27.0",
+  "server": "127.0.0.1",
+  "passed": true,
+  "cases": [
+    {
+      "name": "normal/h3/public-TLS",
+      "passed": true,
+      "seconds": 0.01517247,
+      "metrics": {
+        "cipher": "TLS_AES_128_GCM_SHA256",
+        "ech_accepted": false,
+        "http_major": 3,
+        "tls_version": "0x304"
+      }
+    },
+    {
+      "name": "normal/h3/download-64MiB-hash",
+      "passed": true,
+      "seconds": 0.307364445,
+      "metrics": {
+        "bytes": 67108864,
+        "carrier": "h3",
+        "duration_seconds": 0.271263894,
+        "goodput_mbps": 1979.1462257782084,
+        "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067"
+      }
+    },
+    {
+      "name": "normal/h3/upload-half-close-16MiB",
+      "passed": true,
+      "seconds": 0.08620037,
+      "metrics": {
+        "bytes": 16777216,
+        "carrier": "h3",
+        "duration_seconds": 0.077064952,
+        "goodput_mbps": 1741.6182650707417,
+        "sha256": "a8493afe7658878d6e5f85be50cabb61eaf51bd82e6b164892a028372738c486"
+      }
+    },
+    {
+      "name": "normal/h3/UDP-echo",
+      "passed": true,
+      "seconds": 0.006809373,
+      "metrics": {
+        "loss_percent": 0,
+        "median_rtt_ms": 0.30356,
+        "p95_rtt_ms": 0.36844,
+        "received": 20,
+        "sent": 20
+      }
+    },
+    {
+      "name": "normal/h3/concurrent-streams",
+      "passed": true,
+      "seconds": 0.137508631,
+      "metrics": {
+        "seconds": 0.137507191,
+        "streams": 8,
+        "total_bytes": 33554432
+      }
+    },
+    {
+      "name": "normal/h3/wrong-token-denied",
+      "passed": true,
+      "seconds": 0.010001859,
+      "metrics": {
+        "denied": true,
+        "transport_fallbacks": 0
+      }
+    },
+    {
+      "name": "normal/h2/public-TLS",
+      "passed": true,
+      "seconds": 0.009025138,
+      "metrics": {
+        "cipher": "TLS_AES_128_GCM_SHA256",
+        "ech_accepted": false,
+        "http_major": 2,
+        "tls_version": "0x304"
+      }
+    },
+    {
+      "name": "normal/h2/download-64MiB-hash",
+      "passed": true,
+      "seconds": 0.32526488,
+      "metrics": {
+        "bytes": 67108864,
+        "carrier": "h2",
+        "duration_seconds": 0.289191089,
+        "goodput_mbps": 1856.457312901505,
+        "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067"
+      }
+    },
+    {
+      "name": "normal/h2/upload-half-close-16MiB",
+      "passed": true,
+      "seconds": 0.053228265,
+      "metrics": {
+        "bytes": 16777216,
+        "carrier": "h2",
+        "duration_seconds": 0.044132807,
+        "goodput_mbps": 3041.223459908181,
+        "sha256": "a8493afe7658878d6e5f85be50cabb61eaf51bd82e6b164892a028372738c486"
+      }
+    },
+    {
+      "name": "normal/h2/UDP-echo",
+      "passed": true,
+      "seconds": 0.005462291,
+      "metrics": {
+        "loss_percent": 0,
+        "median_rtt_ms": 0.22808,
+        "p95_rtt_ms": 0.303841,
+        "received": 20,
+        "sent": 20
+      }
+    },
+    {
+      "name": "normal/h2/concurrent-streams",
+      "passed": true,
+      "seconds": 0.117774032,
+      "metrics": {
+        "seconds": 0.117771832,
+        "streams": 8,
+        "total_bytes": 33554432
+      }
+    },
+    {
+      "name": "normal/h2/wrong-token-denied",
+      "passed": true,
+      "seconds": 0.008940417,
+      "metrics": {
+        "denied": true,
+        "transport_fallbacks": 0
+      }
+    },
+    {
+      "name": "strict/h3/public-TLS",
+      "passed": true,
+      "seconds": 0.003494567,
+      "metrics": {
+        "cipher": "TLS_AES_128_GCM_SHA256",
+        "ech_accepted": true,
+        "http_major": 3,
+        "tls_version": "0x304"
+      }
+    },
+    {
+      "name": "strict/h3/download-64MiB-hash",
+      "passed": true,
+      "seconds": 0.313502897,
+      "metrics": {
+        "bytes": 67108864,
+        "carrier": "h3",
+        "duration_seconds": 0.277364865,
+        "goodput_mbps": 1935.6125441483007,
+        "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067"
+      }
+    },
+    {
+      "name": "strict/h3/upload-half-close-16MiB",
+      "passed": true,
+      "seconds": 0.082012041,
+      "metrics": {
+        "bytes": 16777216,
+        "carrier": "h3",
+        "duration_seconds": 0.072893823,
+        "goodput_mbps": 1841.2771134256466,
+        "sha256": "a8493afe7658878d6e5f85be50cabb61eaf51bd82e6b164892a028372738c486"
+      }
+    },
+    {
+      "name": "strict/h3/UDP-echo",
+      "passed": true,
+      "seconds": 0.006612413,
+      "metrics": {
+        "loss_percent": 0,
+        "median_rtt_ms": 0.289281,
+        "p95_rtt_ms": 0.365601,
+        "received": 20,
+        "sent": 20
+      }
+    },
+    {
+      "name": "strict/h3/concurrent-streams",
+      "passed": true,
+      "seconds": 0.131401739,
+      "metrics": {
+        "seconds": 0.131400299,
+        "streams": 8,
+        "total_bytes": 33554432
+      }
+    },
+    {
+      "name": "strict/h3/wrong-token-denied",
+      "passed": true,
+      "seconds": 0.004271968,
+      "metrics": {
+        "denied": true,
+        "transport_fallbacks": 0
+      }
+    },
+    {
+      "name": "strict/h2/public-TLS",
+      "passed": true,
+      "seconds": 0.002944125,
+      "metrics": {
+        "cipher": "TLS_AES_128_GCM_SHA256",
+        "ech_accepted": true,
+        "http_major": 2,
+        "tls_version": "0x304"
+      }
+    },
+    {
+      "name": "strict/h2/download-64MiB-hash",
+      "passed": true,
+      "seconds": 0.319325469,
+      "metrics": {
+        "bytes": 67108864,
+        "carrier": "h2",
+        "duration_seconds": 0.283072837,
+        "goodput_mbps": 1896.582228410704,
+        "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067"
+      }
+    },
+    {
+      "name": "strict/h2/upload-half-close-16MiB",
+      "passed": true,
+      "seconds": 0.057682433,
+      "metrics": {
+        "bytes": 16777216,
+        "carrier": "h2",
+        "duration_seconds": 0.048587495,
+        "goodput_mbps": 2762.392422165415,
+        "sha256": "a8493afe7658878d6e5f85be50cabb61eaf51bd82e6b164892a028372738c486"
+      }
+    },
+    {
+      "name": "strict/h2/UDP-echo",
+      "passed": true,
+      "seconds": 0.005354811,
+      "metrics": {
+        "loss_percent": 0,
+        "median_rtt_ms": 0.231601,
+        "p95_rtt_ms": 0.348281,
+        "received": 20,
+        "sent": 20
+      }
+    },
+    {
+      "name": "strict/h2/concurrent-streams",
+      "passed": true,
+      "seconds": 0.122848962,
+      "metrics": {
+        "seconds": 0.122847242,
+        "streams": 8,
+        "total_bytes": 33554432
+      }
+    },
+    {
+      "name": "strict/h2/wrong-token-denied",
+      "passed": true,
+      "seconds": 0.003614167,
+      "metrics": {
+        "denied": true,
+        "transport_fallbacks": 0
+      }
+    },
+    {
+      "name": "auto/certificate-error-no-downgrade",
+      "passed": true,
+      "seconds": 0.002162524,
+      "metrics": {
+        "denied": true,
+        "fallbacks": 0
+      }
+    },
+    {
+      "name": "strict/ECH-rejection-no-downgrade",
+      "passed": true,
+      "seconds": 0.00987638,
+      "metrics": {
+        "denied": true,
+        "fallbacks": 0
+      }
+    },
+    {
+      "name": "normal/auto/UDP-blocked-H2-fallback",
+      "passed": true,
+      "seconds": 2.028339351,
+      "metrics": {
+        "bytes": 4194304,
+        "carrier": "h2",
+        "duration_seconds": 2.025675546,
+        "ech_accepted": false,
+        "fallbacks": 1,
+        "goodput_mbps": 16.564563888949667,
+        "sha256": "d1e93d7a0e7b581d8084bc7f4fcc168ba2cd9e29b996616f6d07200be7d5e004"
+      }
+    },
+    {
+      "name": "strict/auto/UDP-blocked-H2-fallback",
+      "passed": true,
+      "seconds": 2.023618223,
+      "metrics": {
+        "bytes": 4194304,
+        "carrier": "h2",
+        "duration_seconds": 2.020884697,
+        "ech_accepted": true,
+        "fallbacks": 1,
+        "goodput_mbps": 16.60383298948797,
+        "sha256": "d1e93d7a0e7b581d8084bc7f4fcc168ba2cd9e29b996616f6d07200be7d5e004"
+      }
+    }
+  ],
+  "limitations": [
+    "Single client and server; not a multi-ISP or seven-day availability study.",
+    "Synthetic file transfer and UDP echo; no player rebuffer-rate measurement.",
+    "No proof of resistance to classification, IP blocking, or ISP QoS."
+  ]
+}

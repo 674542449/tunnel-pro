@@ -1,0 +1,17 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "tunnelX Desktop",
+  "outputfilename": "tunnelx-desktop",
+  "frontend:install": "",
+  "frontend:build": "",
+  "frontend:dev:watcher": "",
+  "assetdir": "ui",
+  "author": {"name": "tunnelX"},
+  "info": {
+    "companyName": "tunnelX",
+    "productName": "tunnelX",
+    "productVersion": "0.6.16",
+    "copyright": "tunnelX",
+    "comments": "tunnelX Windows Desktop"
+  }
+}

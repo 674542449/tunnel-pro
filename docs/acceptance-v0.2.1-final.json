@@ -1,0 +1,169 @@
+{
+  "started_at": "2026-10-02T00:40:16+08:00",
+  "finished_at": "2026-10-02T00:40:20+08:00",
+  "platform": "windows/amd64",
+  "go_version": "go1.27.0",
+  "server": "146.56.99.255",
+  "passed": true,
+  "cases": [
+    {
+      "name": "normal/h3/public-TLS",
+      "passed": true,
+      "seconds": 0.3288492,
+      "metrics": {
+        "cipher": "TLS_AES_128_GCM_SHA256",
+        "ech_accepted": false,
+        "http_major": 3,
+        "tls_version": "0x304"
+      }
+    },
+    {
+      "name": "normal/h3/private-target-denied",
+      "passed": true,
+      "seconds": 0.2757496,
+      "metrics": {
+        "http_status": 403
+      }
+    },
+    {
+      "name": "normal/h3/wrong-token-denied",
+      "passed": true,
+      "seconds": 0.2716939,
+      "metrics": {
+        "denied": true,
+        "http_status": 405,
+        "transport_fallbacks": 0
+      }
+    },
+    {
+      "name": "normal/h2/public-TLS",
+      "passed": true,
+      "seconds": 0.2575417,
+      "metrics": {
+        "cipher": "TLS_AES_128_GCM_SHA256",
+        "ech_accepted": false,
+        "http_major": 2,
+        "tls_version": "0x304"
+      }
+    },
+    {
+      "name": "normal/h2/private-target-denied",
+      "passed": true,
+      "seconds": 0.2813401,
+      "metrics": {
+        "http_status": 403
+      }
+    },
+    {
+      "name": "normal/h2/wrong-token-denied",
+      "passed": true,
+      "seconds": 0.2650691,
+      "metrics": {
+        "denied": true,
+        "http_status": 405,
+        "transport_fallbacks": 0
+      }
+    },
+    {
+      "name": "strict/h3/public-TLS",
+      "passed": true,
+      "seconds": 0.1861368,
+      "metrics": {
+        "cipher": "TLS_AES_128_GCM_SHA256",
+        "ech_accepted": true,
+        "http_major": 3,
+        "tls_version": "0x304"
+      }
+    },
+    {
+      "name": "strict/h3/private-target-denied",
+      "passed": true,
+      "seconds": 0.1785947,
+      "metrics": {
+        "http_status": 403
+      }
+    },
+    {
+      "name": "strict/h3/wrong-token-denied",
+      "passed": true,
+      "seconds": 0.1722341,
+      "metrics": {
+        "denied": true,
+        "http_status": 405,
+        "transport_fallbacks": 0
+      }
+    },
+    {
+      "name": "strict/h2/public-TLS",
+      "passed": true,
+      "seconds": 0.2633293,
+      "metrics": {
+        "cipher": "TLS_AES_128_GCM_SHA256",
+        "ech_accepted": true,
+        "http_major": 2,
+        "tls_version": "0x304"
+      }
+    },
+    {
+      "name": "strict/h2/private-target-denied",
+      "passed": true,
+      "seconds": 0.2747712,
+      "metrics": {
+        "http_status": 403
+      }
+    },
+    {
+      "name": "strict/h2/wrong-token-denied",
+      "passed": true,
+      "seconds": 0.2630747,
+      "metrics": {
+        "denied": true,
+        "http_status": 405,
+        "transport_fallbacks": 0
+      }
+    },
+    {
+      "name": "auto/certificate-error-no-downgrade",
+      "passed": true,
+      "seconds": 0.1776749,
+      "metrics": {
+        "denied": true,
+        "fallbacks": 0
+      }
+    },
+    {
+      "name": "strict/ECH-rejection-no-downgrade",
+      "passed": true,
+      "seconds": 0.1792782,
+      "metrics": {
+        "denied": true,
+        "fallbacks": 0
+      }
+    },
+    {
+      "name": "normal/auto/TCP-blocked-H3-fallback",
+      "passed": true,
+      "seconds": 0.2723177,
+      "metrics": {
+        "ech_accepted": false,
+        "fallbacks": 1,
+        "http_major": 3
+      }
+    },
+    {
+      "name": "strict/auto/TCP-blocked-H3-fallback",
+      "passed": true,
+      "seconds": 0.1788058,
+      "metrics": {
+        "ech_accepted": true,
+        "fallbacks": 1,
+        "http_major": 3
+      }
+    }
+  ],
+  "limitations": [
+    "Single client and server; not a multi-ISP or seven-day availability study.",
+    "Synthetic file transfer and UDP echo; no player rebuffer-rate measurement.",
+    "No proof of resistance to classification, IP blocking, or ISP QoS."
+  ]
+}

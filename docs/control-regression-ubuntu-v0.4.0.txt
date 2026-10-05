@@ -1,0 +1,11 @@
+=== RUN   TestAccountIsolationOrdersAndDurability
+--- PASS: TestAccountIsolationOrdersAndDurability (0.49s)
+=== RUN   TestTrialCannotReduceExistingEntitlement
+--- PASS: TestTrialCannotReduceExistingEntitlement (0.49s)
+=== RUN   TestCookieCSRFAndMalformedStore
+--- PASS: TestCookieCSRFAndMalformedStore (0.37s)
+=== RUN   TestNodeCumulativeReportsAreIdempotent
+--- PASS: TestNodeCumulativeReportsAreIdempotent (0.37s)
+=== RUN   TestEmbeddedConsoleHasNoRedirectLoop
+--- PASS: TestEmbeddedConsoleHasNoRedirectLoop (0.00s)
+PASS

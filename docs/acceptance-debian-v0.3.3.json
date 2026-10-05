@@ -1,0 +1,163 @@
+{
+  "started_at": "2026-10-01T21:59:13Z",
+  "finished_at": "2026-10-01T21:59:15Z",
+  "platform": "linux/arm64",
+  "go_version": "go1.27.0",
+  "server": "127.0.0.1",
+  "passed": true,
+  "cases": [
+    {
+      "name": "normal/h2/public-TLS",
+      "passed": true,
+      "seconds": 0.015669788,
+      "metrics": {
+        "cipher": "TLS_AES_128_GCM_SHA256",
+        "ech_accepted": false,
+        "http_major": 2,
+        "tls_version": "0x304"
+      }
+    },
+    {
+      "name": "normal/h2/download-64MiB-hash",
+      "passed": true,
+      "seconds": 0.450428904,
+      "metrics": {
+        "bytes": 67108864,
+        "carrier": "h2",
+        "duration_seconds": 0.401285498,
+        "goodput_mbps": 1337.8776822879354,
+        "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067"
+      }
+    },
+    {
+      "name": "normal/h2/upload-half-close-16MiB",
+      "passed": true,
+      "seconds": 0.10357082,
+      "metrics": {
+        "bytes": 16777216,
+        "carrier": "h2",
+        "duration_seconds": 0.089904956,
+        "goodput_mbps": 1492.8846414206575,
+        "sha256": "a8493afe7658878d6e5f85be50cabb61eaf51bd82e6b164892a028372738c486"
+      }
+    },
+    {
+      "name": "normal/h2/UDP-echo",
+      "passed": true,
+      "seconds": 0.006139811,
+      "metrics": {
+        "loss_percent": 0,
+        "median_rtt_ms": 0.250281,
+        "p95_rtt_ms": 0.365721,
+        "received": 20,
+        "sent": 20
+      }
+    },
+    {
+      "name": "normal/h2/concurrent-streams",
+      "passed": true,
+      "seconds": 0.192839495,
+      "metrics": {
+        "seconds": 0.192836295,
+        "streams": 8,
+        "total_bytes": 33554432
+      }
+    },
+    {
+      "name": "normal/h2/wrong-token-denied",
+      "passed": true,
+      "seconds": 0.010828019,
+      "metrics": {
+        "denied": true,
+        "http_status": 405
+      }
+    },
+    {
+      "name": "strict/h2/public-TLS",
+      "passed": true,
+      "seconds": 0.004145767,
+      "metrics": {
+        "cipher": "TLS_AES_128_GCM_SHA256",
+        "ech_accepted": true,
+        "http_major": 2,
+        "tls_version": "0x304"
+      }
+    },
+    {
+      "name": "strict/h2/download-64MiB-hash",
+      "passed": true,
+      "seconds": 0.428274545,
+      "metrics": {
+        "bytes": 67108864,
+        "carrier": "h2",
+        "duration_seconds": 0.375542014,
+        "goodput_mbps": 1429.5894786355384,
+        "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067"
+      }
+    },
+    {
+      "name": "strict/h2/upload-half-close-16MiB",
+      "passed": true,
+      "seconds": 0.068308798,
+      "metrics": {
+        "bytes": 16777216,
+        "carrier": "h2",
+        "duration_seconds": 0.059191103,
+        "goodput_mbps": 2267.532132320629,
+        "sha256": "a8493afe7658878d6e5f85be50cabb61eaf51bd82e6b164892a028372738c486"
+      }
+    },
+    {
+      "name": "strict/h2/UDP-echo",
+      "passed": true,
+      "seconds": 0.006624332,
+      "metrics": {
+        "loss_percent": 0,
+        "median_rtt_ms": 0.25188,
+        "p95_rtt_ms": 0.44880099999999995,
+        "received": 20,
+        "sent": 20
+      }
+    },
+    {
+      "name": "strict/h2/concurrent-streams",
+      "passed": true,
+      "seconds": 0.136703958,
+      "metrics": {
+        "seconds": 0.136701958,
+        "streams": 8,
+        "total_bytes": 33554432
+      }
+    },
+    {
+      "name": "strict/h2/wrong-token-denied",
+      "passed": true,
+      "seconds": 0.003749847,
+      "metrics": {
+        "denied": true,
+        "http_status": 405
+      }
+    },
+    {
+      "name": "h2/certificate-error-no-downgrade",
+      "passed": true,
+      "seconds": 0.001905923,
+      "metrics": {
+        "denied": true
+      }
+    },
+    {
+      "name": "strict/ECH-rejection-no-downgrade",
+      "passed": true,
+      "seconds": 0.009200496,
+      "metrics": {
+        "denied": true
+      }
+    }
+  ],
+  "limitations": [
+    "Single client and server; not a multi-ISP or seven-day availability study.",
+    "Synthetic file transfer and UDP echo; no player rebuffer-rate measurement.",
+    "No proof of resistance to classification, IP blocking, or ISP QoS."
+  ]
+}

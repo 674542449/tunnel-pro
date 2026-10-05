@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none">
+  <title>tunnelX</title>
+  <defs><linearGradient id="tile" x1="128" y1="16" x2="128" y2="240" gradientUnits="userSpaceOnUse"><stop stop-color="#204975"/><stop offset="1" stop-color="#112236"/></linearGradient></defs>
+  <rect x="16" y="16" width="224" height="224" rx="54" fill="url(#tile)"/>
+  <g stroke-width="24" stroke-linecap="round">
+  <path d="M76 72 L180 184" stroke="#f5fbff"/>
+  <path d="M180 72 L146 109" stroke="#62e4d1"/>
+  <path d="M110 147 L76 184" stroke="#62e4d1"/>
+  </g>
+</svg>

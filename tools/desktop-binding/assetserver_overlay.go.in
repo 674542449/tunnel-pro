@@ -1,0 +1,20 @@
+package assetserver
+
+// This file is supplied only through go -overlay by the binding regression
+// runner. It is never added to the dependency tree or to a release executable.
+import (
+	"context"
+
+	"github.com/wailsapp/wails/v2/internal/binding"
+	"github.com/wailsapp/wails/v2/internal/frontend/dispatcher"
+	"github.com/wailsapp/wails/v2/internal/logger"
+)
+
+// TunnelXBindingTestDispatch runs the actual vendored native binding parser,
+// reflection invocation and callback serializer, without creating a WebView.
+func TunnelXBindingTestDispatch(receiver any, message string) (string, error) {
+	log := logger.New(nil)
+	bindings := binding.NewBindings(log, []interface{}{receiver}, nil, false, nil)
+	dispatch := dispatcher.NewDispatcher(context.Background(), log, bindings, nil, nil, false)
+	return dispatch.ProcessMessage(message, nil)
+}

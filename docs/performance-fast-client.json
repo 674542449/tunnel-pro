@@ -1,0 +1,43 @@
+{
+  "checked_at": "2026-10-01T21:39:12.236474+08:00",
+  "route": "Windows-running-client-H2",
+  "samples": [
+    {
+      "host": "ipv4-c009-ssn001-skbb-isp.1.oca.nflxvideo.net",
+      "passed": true,
+      "status": 206,
+      "bytes": 16777216,
+      "seconds": 2.0267019998282194,
+      "MBps": 8.278087257733013,
+      "Mbps": 66.2246980618641,
+      "ttfb_seconds": 0.9058505999855697,
+      "bounded_partial_sample": true
+    },
+    {
+      "host": "ipv4-c008-gmp001-skbb-isp.1.oca.nflxvideo.net",
+      "passed": true,
+      "status": 206,
+      "bytes": 16777216,
+      "seconds": 0.9743734002113342,
+      "MBps": 17.218466756544412,
+      "Mbps": 137.7477340523553,
+      "ttfb_seconds": 0.5630265001673251,
+      "bounded_partial_sample": true
+    },
+    {
+      "host": "ipv4-c016-ssn002-skbb-isp.1.oca.nflxvideo.net",
+      "passed": true,
+      "status": 206,
+      "bytes": 16777216,
+      "seconds": 0.9263061000965536,
+      "MBps": 18.1119567260231,
+      "Mbps": 144.8956538081848,
+      "ttfb_seconds": 0.43193949991837144,
+      "bounded_partial_sample": true
+    }
+  ],
+  "limitations": [
+    "Bounded 16MiB samples, not the FAST.com multi-connection/browser algorithm.",
+    "Discovery and sample times can differ from the user test."
+  ]
+}

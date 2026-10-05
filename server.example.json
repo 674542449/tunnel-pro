@@ -1,5 +1,0 @@
-{
-    "listen": "127.0.0.1:8080",
-    "psk": "change-me-to-a-random-string",
-    "ws_path": "/ws/feed"
-}

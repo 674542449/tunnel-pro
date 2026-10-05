@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-02T18:47:13.820Z",
+  "visual_rendered": false,
+  "bridge": "controlled DOM fixture; real engine and isolated registry covered separately",
+  "cases": [
+    "expired_session_returns_to_login_and_clears_old_account_content",
+    "orphan_proxy_warning_and_failed_recovery_remain_actionable",
+    "successful_recovery_clears_warning_and_retry_button",
+    "quit_failure_is_reported_without_unhandled_rejection",
+    "refresh_updates_nodes_account_plans_and_remote_payment_order_changes",
+    "plan_buttons_show_price_currency_and_correct_topup_period"
+  ]
+}

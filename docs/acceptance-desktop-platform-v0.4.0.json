@@ -1,0 +1,62 @@
+{
+  "version": "v0.4.0",
+  "desktop_sha256": "8ffc41c7fd12f8b316df0d5566913a316d300b9dcd316374fc920d357645c54d",
+  "native_executable_used": true,
+  "window_rendered": false,
+  "test_directory": "C:\\Users\\tanzh\\Desktop\\tunnelX\\.local\\desktop-acceptance-082d9255",
+  "login_registration_trial_and_node_selection_passed": true,
+  "strict_ech_accepted": true,
+  "https_and_udp_passed": true,
+  "plain_http_forwarding_passed": true,
+  "managed_large_file_download": {
+    "passed": true,
+    "controlled_same_node_https": true,
+    "samples": [
+      {
+        "bytes": 67108864,
+        "seconds": 2.446,
+        "MBps": 27.437,
+        "Mbps": 219.498,
+        "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067"
+      },
+      {
+        "bytes": 67108864,
+        "seconds": 2.476,
+        "MBps": 27.101,
+        "Mbps": 216.81,
+        "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067"
+      }
+    ]
+  },
+  "traffic_reported": {
+    "upload": 2283,
+    "download": 134411057
+  },
+  "ban_closed_existing_stream_seconds": 4.37,
+  "ban_denied_new_stream": true,
+  "unban_and_reconnect_passed": true,
+  "login_state_dpapi_protected": true,
+  "event_counts": {
+    "client_started": 2,
+    "heartbeat": 6,
+    "carrier_opened": 2,
+    "connection_requested": 7,
+    "path_probe_ok": 1,
+    "connection_opened": 6,
+    "stream_direction_ended": 9,
+    "connection_error": 7,
+    "connection_ended": 7,
+    "udp_association_ended": 1,
+    "udp_receive_ended": 1,
+    "http_response": 1,
+    "open_attempt_failed": 1,
+    "connection_open_failed": 1,
+    "client_stopped": 2,
+    "carrier_dial_failed": 1
+  },
+  "persistent_h2_logs_passed": true,
+  "system_proxy_unchanged": true,
+  "passed": true,
+  "checked_at": "2026-10-02T16:40:20.162937+08:00",
+  "acceptance_user_disabled_after_test": true
+}

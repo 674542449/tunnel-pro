@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-02T15:04:49Z",
+  "console_version": "v0.5.0",
+  "source": "off_host_encrypted_snapshot",
+  "target": "isolated_empty_postgresql_schema",
+  "all_records_equal": true,
+  "counts": {
+    "users": 8,
+    "nodes": 1,
+    "orders": 2,
+    "payments": 0,
+    "refunds": 0,
+    "entitlements": 0,
+    "tickets": 0,
+    "audit": 92
+  },
+  "production_overwritten": false
+}

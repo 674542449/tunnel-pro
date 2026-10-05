@@ -1,0 +1,29 @@
+[Unit]
+Description=tunnelX HTTP CONNECT proxy
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=tunnelx
+Group=tunnelx
+ExecStart=/opt/tunnelx/bin/tunnelx-server -config /etc/tunnelx/server.json
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=15
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+CapabilityBoundingSet=
+LimitNOFILE=16384
+TasksMax=512
+MemoryMax=512M
+
+[Install]
+WantedBy=multi-user.target

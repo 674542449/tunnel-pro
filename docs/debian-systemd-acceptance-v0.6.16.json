@@ -1,0 +1,72 @@
+{
+  "passed": true,
+  "version": "v0.6.16",
+  "checked_at": "2026-10-05T08:57:11.096317+00:00",
+  "platform": "Independent Debian 13 ARM64 QEMU virtual machine (TCG), own kernel and systemd PID 1",
+  "guest_os_and_kernel": "PRETTY_NAME=\"Debian GNU/Linux 13 (trixie)\"\nNAME=\"Debian GNU/Linux\"\nVERSION_ID=\"13\"\nVERSION=\"13 (trixie)\"\nVERSION_CODENAME=trixie\nDEBIAN_VERSION_FULL=13.7\nID=debian\nHOME_URL=\"https://www.debian.org/\"\nSUPPORT_URL=\"https://www.debian.org/support\"\nBUG_REPORT_URL=\"https://bugs.debian.org/\"\n6.12.111+deb13-cloud-arm64\nsystemd\nqemu\n",
+  "official_image": {
+    "source": "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-arm64.qcow2",
+    "sha512": "d8470b8c6c38fead046c794b5800a5a7b96672d5bcf543cc230ceb0c4b8ace05ed341a0c8928045422243fde26b2f1f2f58e99244c65709ffda2e3d4b674dd5a",
+    "bytes": 337510400
+  },
+  "controller_sha256": "35813b2751ef42b7db0aa7cf466b69f42ec9e161bc4ff7db89c4f64d2fb486f7",
+  "unchanged_released_binaries": true,
+  "generated_command_installed_node": true,
+  "authenticated_http2_ech_download": true,
+  "wrong_ca_and_name_rejected": true,
+  "sigkill_automatic_restart": true,
+  "actual_systemd_timer_renewed_near_expiry_certificate": true,
+  "renewal_preserved_ca_and_node_pid": true,
+  "full_vm_reboot_autostart_and_reconnect": true,
+  "node_and_timer_enabled_after_reboot": true,
+  "original_host_node_pid_restart_count_binary_unchanged": true,
+  "test_vm_stopped": true,
+  "phases": {
+    "install": {
+      "phase": "install",
+      "passed": true,
+      "probe": {
+        "passed": true,
+        "strict_ech_h2": true,
+        "wrong_ca_and_name_rejected": true,
+        "download_bytes": 577
+      }
+    },
+    "crash": {
+      "phase": "crash",
+      "passed": true,
+      "probe": {
+        "passed": true,
+        "strict_ech_h2": true,
+        "wrong_ca_and_name_rejected": true,
+        "download_bytes": 577
+      }
+    },
+    "renew": {
+      "phase": "renew",
+      "passed": true,
+      "actual_timer_triggered": true,
+      "probe": {
+        "passed": true,
+        "strict_ech_h2": true,
+        "wrong_ca_and_name_rejected": true,
+        "download_bytes": 577
+      }
+    },
+    "reboot": {
+      "phase": "reboot-verify",
+      "passed": true,
+      "boot_id_changed": true,
+      "probe": {
+        "passed": true,
+        "strict_ech_h2": true,
+        "wrong_ca_and_name_rejected": true,
+        "download_bytes": 577
+      }
+    }
+  },
+  "scope_limitations": [
+    "ARM64 tested; separate Debian AMD64 virtual machine not tested",
+    "Guest networking uses QEMU NAT; provider firewall differences not simulated"
+  ]
+}

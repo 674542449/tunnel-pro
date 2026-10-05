@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-03T13:16:41.947780+00:00",
+  "console_version": "v0.6.15",
+  "archives": [
+    "tunnelX-control-v0.6.15.zip",
+    "tunnelX-source-v0.6.15.zip",
+    "tunnelX-desktop-windows-x64-v0.6.15.zip"
+  ],
+  "desktop_packaged": true,
+  "desktop_version": "v0.6.15",
+  "zip_integrity": true,
+  "packaged_binaries_match": true,
+  "deployed_controller_match": true,
+  "native_desktop_acceptance_match": true,
+  "deployment_credentials_excluded": true,
+  "source_has_reproducible_dom_tests": true,
+  "h2_only_dependencies": true,
+  "manifest": "SHA256-control-v0.6.15.json"
+}

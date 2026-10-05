@@ -1,0 +1,37 @@
+{
+  "duration_seconds": 4.5986514,
+  "finished": "2026-10-02T15:53:33Z",
+  "node_port": 18447,
+  "passed": true,
+  "sample_count": 3,
+  "samples": [
+    {
+      "time": "2026-10-02T15:53:29Z",
+      "ok": true,
+      "bytes": 8388608,
+      "elapsed_ms": 1645,
+      "mbps": 5.099457750759878,
+      "ech": true
+    },
+    {
+      "time": "2026-10-02T15:53:30Z",
+      "ok": true,
+      "bytes": 8388608,
+      "elapsed_ms": 1434,
+      "mbps": 5.849796373779637,
+      "ech": true
+    },
+    {
+      "time": "2026-10-02T15:53:32Z",
+      "ok": true,
+      "bytes": 8388608,
+      "elapsed_ms": 1516,
+      "mbps": 5.533382585751979,
+      "ech": true
+    }
+  ],
+  "scope": "Windows to isolated QA node; private deterministic download fixture",
+  "server_ip": "146.56.99.255",
+  "started": "2026-10-02T15:53:29Z",
+  "transport": "h2"
+}

@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-02T18:47:16.902Z",
+  "console_version": "v0.5.6",
+  "real_control_api": true,
+  "visual_rendered": false,
+  "external_nodes_installed": false,
+  "cases": [
+    "fresh_owner_all_thirteen_pages_accessible",
+    "manual_test_node_add_disable_edit_enable_preserves_scope_and_credentials",
+    "installation_error_reissue_old_token_rejection_complete_and_one_time_access",
+    "decimal_scoped_plan_snapshot_disable_delete_and_admin_cancellation",
+    "traffic_topup_rejects_unlimited_quota_and_no_active_subscription",
+    "node_deletion_protects_existing_plans_and_paid_order_scope_after_plan_edit",
+    "refund_revokes_node_entitlement_and_allows_unreferenced_offline_node_cleanup",
+    "role_change_revokes_session_support_finance_navigation_and_api_permissions_ban_unban",
+    "restart_preserves_node_scopes_deletions_orders_refunds_roles_settings_and_audit"
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-02T18:54:25.480545+00:00",
+  "console_version": "v0.5.6",
+  "controller_sha256": "7534660df5882df540bf02499918c4650b4c46516a49df4611705b7f97a4b67e",
+  "admin_mfa_enforced": true,
+  "configuration_unchanged": true,
+  "node_artifacts_unchanged": true,
+  "original_core_process_unchanged": true,
+  "original_core_sha256": "726c91b3e2155632e7a9e794b15b204cda11fdfc23d919b2843858ac38ff302e",
+  "encrypted_backup_before_upgrade": true,
+  "off_host_encrypted_backup": true,
+  "payment_settings_modified": false,
+  "sites": {
+    "tunnelx-beta": {
+      "alipay_wechat_svg": true,
+      "usdt_three_network_svg": true,
+      "network_checkout_choices": true,
+      "health": true,
+      "one_script": true,
+      "security_entry": true,
+      "full_bundle": true,
+      "cache_no_store": true,
+      "bundle_sha256": "088adffd0f02e45207f8d56e91f595c8120232bf5ec7b19bb9077ad9b1d5ff6f",
+      "authenticated_mfa_admin_apis": 13,
+      "gateway_config_entry_ready": true
+    },
+    "tunnelx-control": {
+      "alipay_wechat_svg": true,
+      "usdt_three_network_svg": true,
+      "network_checkout_choices": true,
+      "health": true,
+      "one_script": true,
+      "security_entry": true,
+      "full_bundle": true,
+      "cache_no_store": true,
+      "bundle_sha256": "088adffd0f02e45207f8d56e91f595c8120232bf5ec7b19bb9077ad9b1d5ff6f"
+    }
+  },
+  "production_owner_mfa_modified": false,
+  "payment_keys_preconfigured": false,
+  "unsigned_callbacks_rejected": true,
+  "backup_failure_reporting_deployed": true,
+  "visual_rendered": false,
+  "supported_usdt_networks": [
+    "TRC20",
+    "BEP20",
+    "Polygon"
+  ]
+}

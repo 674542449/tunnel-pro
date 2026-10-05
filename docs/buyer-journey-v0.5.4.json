@@ -1,0 +1,30 @@
+{
+  "passed": false,
+  "checked_at": "2026-10-02T18:22:14.695Z",
+  "console_version": "v0.5.4",
+  "served_assets": true,
+  "real_control_api": true,
+  "visual_rendered": false,
+  "real_charge": false,
+  "cases": [
+    "guest_catalog_invite_and_no_private_navigation",
+    "registration_and_verification_gate",
+    "verification_link_opens_in_signed_in_browser",
+    "cancel_pending_order_from_customer_screen",
+    "customer_order_payment_confirmation_and_billing",
+    "buyer_ticket_reply_close_reopen_and_text_escaping",
+    "refund_visible_to_buyer_and_entitlement_revoked",
+    "logout_removes_private_data_and_restores_catalog",
+    "all_customer_browser_runs_have_no_runtime_errors"
+  ],
+  "failures": [
+    {
+      "name": "order_background_poll_preserves_active_search_input",
+      "error": "Background order refresh removed the focused search input\n+ actual - expected\n\n+ HTMLBodyElement {\n- HTMLInputElement {\n    Symbol(SameObject caches): [Object: null prototype] {\n+     dataset: DOMStringMap {}\n-     attributes: NamedNodeMap {}\n    }\n  }\n"
+    },
+    {
+      "name": "guest_reset_link_survives_initial_identity_401",
+      "error": "Initial identity check closed the password reset form\n\nfalse !== true\n"
+    }
+  ]
+}

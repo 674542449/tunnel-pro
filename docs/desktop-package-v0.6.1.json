@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-03T06:16:10.074144+00:00",
+  "desktop_version": "v0.6.1",
+  "archive": "tunnelX-desktop-windows-x64-v0.6.1.zip",
+  "archive_sha256": "430b4e0374532e7f1bdc8fcf65828ba05179c622b669749eebd4610f3e304cba",
+  "zip_integrity": true,
+  "exact_executable_accepted": true,
+  "product_interactions_accepted": true,
+  "credentials_excluded": true,
+  "h2_only": true,
+  "server_repackaged": false
+}

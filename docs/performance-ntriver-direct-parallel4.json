@@ -1,0 +1,67 @@
+{
+  "checked_at": "2026-10-01T23:36:57.036412+08:00",
+  "route": "Windows-direct-parallel4",
+  "filename": "zh-cn_windows_11_consumer_editions_version_26h2_x64_dvd_3622091b.iso",
+  "connections": 4,
+  "bytes": 33554432,
+  "seconds": 5.380556399933994,
+  "MBps": 6.236238319221341,
+  "Mbps": 49.88990655377073,
+  "sha256": "6a240ee4a7c6faf52b15a871a68d89f49923a737f1ccfa068b73cb5ee5cf8b8f",
+  "passed": true,
+  "bounded_partial_iso": true,
+  "samples": [
+    {
+      "index": 0,
+      "offset": 0,
+      "requested_bytes": 8388608,
+      "status": 206,
+      "content_range": "bytes 0-8388607/9112440832",
+      "ttfb_seconds": 1.712385900085792,
+      "cdn_location": "LAX",
+      "bytes": 8388608,
+      "seconds": 4.618779100012034,
+      "MBps": 1.8161959726496,
+      "passed": true
+    },
+    {
+      "index": 1,
+      "offset": 8388608,
+      "requested_bytes": 8388608,
+      "status": 206,
+      "content_range": "bytes 8388608-16777215/9112440832",
+      "ttfb_seconds": 2.1589184999465942,
+      "cdn_location": "LAX",
+      "bytes": 8388608,
+      "seconds": 5.378719199914485,
+      "MBps": 1.5595921051490045,
+      "passed": true
+    },
+    {
+      "index": 2,
+      "offset": 16777216,
+      "requested_bytes": 8388608,
+      "status": 206,
+      "content_range": "bytes 16777216-25165823/9112440832",
+      "ttfb_seconds": 2.078497199807316,
+      "cdn_location": "LAX",
+      "bytes": 8388608,
+      "seconds": 5.195281699998304,
+      "MBps": 1.6146589317770272,
+      "passed": true
+    },
+    {
+      "index": 3,
+      "offset": 25165824,
+      "requested_bytes": 8388608,
+      "status": 206,
+      "content_range": "bytes 25165824-33554431/9112440832",
+      "ttfb_seconds": 1.7856523001100868,
+      "cdn_location": "LAX",
+      "bytes": 8388608,
+      "seconds": 5.103963800007477,
+      "MBps": 1.6435477069778024,
+      "passed": true
+    }
+  ]
+}

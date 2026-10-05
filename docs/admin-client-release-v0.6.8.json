@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-03T08:48:16.400704+00:00",
+  "desktop_version": "v0.6.8",
+  "download_url": "https://test.xiaguamail.com/downloads/tunnelX-desktop-windows-x64-v0.6.8.zip",
+  "archive_sha256": "b86fcde6438dac027208a9f73107de851e86e8bfca8c6039223f75221a7d3944",
+  "public_archive_bytes": 6642892,
+  "https_download_verified": true,
+  "main_and_beta_release_registered": true,
+  "encrypted_backup_refreshed": true,
+  "original_core_untouched": true,
+  "running_local_client_replaced": false
+}

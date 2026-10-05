@@ -1,0 +1,54 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-03T06:26:28.155471+00:00",
+  "desktop_version": "v0.6.2",
+  "go_full_regression_passed": true,
+  "go_vet_passed": true,
+  "desktop_shell_test_and_vet_passed": true,
+  "desktop_race_passed": true,
+  "dom_cases": 43,
+  "runtime_cases": 8,
+  "native_cases": 20,
+  "native_sha256": "edb4d8c260b0579eacd13fde40090903b7e5defd0332cae7c6a0e23f256297a4",
+  "visual_rendered": false,
+  "real_charge": false,
+  "commands": [
+    "go test -tags=http2legacy ./...",
+    "go vet -tags=http2legacy ./...",
+    "go test -race -tags=http2legacy ./internal/desktop",
+    "desktop: go test/vet -tags=http2legacy ./...",
+    "node tools/test-desktop-product.mjs",
+    "node tools/test-desktop-runtime.mjs",
+    "isolated beta: tools/accept-desktop-product.py"
+  ],
+  "source_files": [
+    {
+      "path": "desktop/ui/app.js",
+      "sha256": "921541e9d819566307e08713f991beeaeee3fb5e09acc9cf53e9bfb01bdd1746"
+    },
+    {
+      "path": "desktop/ui/index.html",
+      "sha256": "c2633ee4be5ad01f0fd027ecb9efa4ed2ef9cd07e72360f51673ad7ed5b79796"
+    },
+    {
+      "path": "desktop/headless.go",
+      "sha256": "a78873f517718dde79f1b58cdb70d2d85834d012b2c97c627299ae9128a09a1c"
+    },
+    {
+      "path": "internal/desktop/engine.go",
+      "sha256": "1d3d65359cd3f6546e097a0f1b61d2c0207593bac2251ce474e20923ca871db6"
+    },
+    {
+      "path": "internal/desktop/url.go",
+      "sha256": "15b82cfaad570eb7fcf847efd55f4b15b07f111c59f7715214a12940940d20d7"
+    },
+    {
+      "path": "internal/desktop/request.go",
+      "sha256": "c591948dbb707adb8179116b42f7145567459154f0695e14342203320e21fd17"
+    },
+    {
+      "path": "internal/desktop/connection.go",
+      "sha256": "aa35071703e7decd54f002485387f1629b1ab3dcaebb4de4d207d6652f397db4"
+    }
+  ]
+}

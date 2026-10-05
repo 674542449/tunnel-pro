@@ -1,0 +1,4971 @@
+{
+  "started_at": "2026-10-02T01:34:57+08:00",
+  "finished_at": "2026-10-02T01:53:58+08:00",
+  "platform": "windows/amd64",
+  "completed": true,
+  "plans": [
+    {
+      "id": "A",
+      "name": "H2 single legacy",
+      "settings": {
+        "auto_tcp_preference": "h2",
+        "connect_timeout_seconds": 5,
+        "h2_connections": 1,
+        "h2_max_age_seconds": 0,
+        "h2_ping_timeout_seconds": 5,
+        "h2_read_idle_seconds": 25,
+        "h2_retry_new_connection": false,
+        "transport": "h2"
+      },
+      "serial_64MiB": [
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 2.6813900999999998,
+          "MBps": 25.02763920848369,
+          "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 1.8526638,
+          "MBps": 36.222904555052025,
+          "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 1.9032404,
+          "MBps": 35.260319190366076,
+          "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067",
+          "carrier": "h2",
+          "ech": true
+        }
+      ],
+      "parallel_4x16MiB": [
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 1.9512034,
+          "MBps": 34.39357680496047,
+          "ech": true
+        }
+      ],
+      "iso_32MiB": {
+        "passed": true,
+        "bytes": 33554432,
+        "seconds": 8.1137176,
+        "MBps": 4.135518840340216,
+        "sha256": "6a240ee4a7c6faf52b15a871a68d89f49923a737f1ccfa068b73cb5ee5cf8b8f",
+        "carrier": "h2",
+        "ech": true
+      },
+      "soak_probes": [
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.266026,
+          "MBps": 8.269868358731855e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2657425,
+          "MBps": 8.27869083793522e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2653813,
+          "MBps": 8.289958636874565e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2648432,
+          "MBps": 8.306801911470636e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2650719,
+          "MBps": 8.299634929239953e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2737238,
+          "MBps": 8.037298912261191e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2653104,
+          "MBps": 8.29217399694848e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2648477,
+          "MBps": 8.306660771454688e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2671195,
+          "MBps": 8.236014218355454e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2654005,
+          "MBps": 8.289358912285396e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2650987,
+          "MBps": 8.298795882439256e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2658284,
+          "MBps": 8.276015655212158e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2655214,
+          "MBps": 8.285584514091896e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2650977,
+          "MBps": 8.298827187108753e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2652402,
+          "MBps": 8.294368651509086e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2645996,
+          "MBps": 8.314449454950045e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2793979,
+          "MBps": 7.874074930412864e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2739062,
+          "MBps": 8.031946702922388e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2649899,
+          "MBps": 8.302203216047103e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2649069,
+          "MBps": 8.304804442617388e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2650124,
+          "MBps": 8.301498344983104e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2643239,
+          "MBps": 8.323121745706687e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2652449,
+          "MBps": 8.294221679662832e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.264952,
+          "MBps": 8.303390802862404e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2651132,
+          "MBps": 8.298341991270145e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2651984,
+          "MBps": 8.295675992012018e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.265109,
+          "MBps": 8.298473458087051e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2651692,
+          "MBps": 8.29658949832786e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2651715,
+          "MBps": 8.296517536763943e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2791823,
+          "MBps": 7.880155726204706e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2648008,
+          "MBps": 8.30813199960121e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2654476,
+          "MBps": 8.287888080359364e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2650158,
+          "MBps": 8.301391841543031e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2661292,
+          "MBps": 8.2666614561649e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2652321,
+          "MBps": 8.294621955638099e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2649333,
+          "MBps": 8.303976887767601e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2653321,
+          "MBps": 8.291495827304724e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2654161,
+          "MBps": 8.28887169994586e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2654678,
+          "MBps": 8.287257437625205e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2653125,
+          "MBps": 8.29210836277974e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2717454,
+          "MBps": 8.09581321339754e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2647096,
+          "MBps": 8.310994387812154e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2735637,
+          "MBps": 8.042002648743236e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2647361,
+          "MBps": 8.310162459898746e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2651706,
+          "MBps": 8.296545695488114e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2650445,
+          "MBps": 8.300492936091863e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2648108,
+          "MBps": 8.307818261188742e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2858525,
+          "MBps": 7.696276926037029e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2653076,
+          "MBps": 8.29226151078974e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2656509,
+          "MBps": 8.281545441780923e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2653758,
+          "MBps": 8.290130448970856e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.265338,
+          "MBps": 8.291311459346191e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2654156,
+          "MBps": 8.28888731483756e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2655459,
+          "MBps": 8.284820063122797e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        }
+      ],
+      "loaded_probes": [
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2644629,
+          "MBps": 8.318747166426746e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2852499,
+          "MBps": 7.712535569688192e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2902365,
+          "MBps": 7.580025255265964e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2882577,
+          "MBps": 7.632059785393418e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.265317,
+          "MBps": 8.291967721631105e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.5168218,
+          "MBps": 4.2567863816890075e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2777461,
+          "MBps": 7.920903299812311e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2657154,
+          "MBps": 8.279535171841752e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2811681,
+          "MBps": 7.824500716830964e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2651749,
+          "MBps": 8.296411161086514e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2759697,
+          "MBps": 7.971889667597567e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2648868,
+          "MBps": 8.305434623393843e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.4983741,
+          "MBps": 4.414354598282696e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2650942,
+          "MBps": 8.298936755311886e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2953256,
+          "MBps": 7.449404995706433e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.265135,
+          "MBps": 8.2976596828031e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.280534,
+          "MBps": 7.84218668681871e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2655845,
+          "MBps": 8.283615948972925e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.9180201,
+          "MBps": 2.3964616896732434e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2649508,
+          "MBps": 8.30342841010482e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.4110857,
+          "MBps": 5.351682143163822e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2653442,
+          "MBps": 8.291117725580586e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2896532,
+          "MBps": 7.595289815544935e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        }
+      ],
+      "soak_4x4MiB": [
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.9077322,
+          "MBps": 18.482561266417562,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.6620793,
+          "MBps": 25.340191122120867,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.6603023,
+          "MBps": 25.408386431487514,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.9080641,
+          "MBps": 18.47580583793589,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.6708613,
+          "MBps": 25.008471944946,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.6607919,
+          "MBps": 25.38956061658746,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 1.3837061,
+          "MBps": 12.124840672452047,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.7887926,
+          "MBps": 21.26948959713872,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.6671086,
+          "MBps": 25.149152626723744,
+          "ech": true
+        }
+      ],
+      "recoveries": [
+        {
+          "fault": "stale-established-TCP",
+          "recovered": true,
+          "recovery_seconds": 30.6420402,
+          "attempts": [
+            {
+              "passed": false,
+              "bytes": 0,
+              "seconds": 5.0004689,
+              "MBps": 0,
+              "ech": true,
+              "error_stage": "CONNECT",
+              "error_type": "context.deadlineExceededError"
+            },
+            {
+              "passed": false,
+              "bytes": 0,
+              "seconds": 5.0003437,
+              "MBps": 0,
+              "ech": true,
+              "error_stage": "CONNECT",
+              "error_type": "context.deadlineExceededError"
+            },
+            {
+              "passed": false,
+              "bytes": 0,
+              "seconds": 5.0003938,
+              "MBps": 0,
+              "ech": true,
+              "error_stage": "CONNECT",
+              "error_type": "context.deadlineExceededError"
+            },
+            {
+              "passed": false,
+              "bytes": 0,
+              "seconds": 5.0002812,
+              "MBps": 0,
+              "ech": true,
+              "error_stage": "CONNECT",
+              "error_type": "context.deadlineExceededError"
+            },
+            {
+              "passed": false,
+              "bytes": 0,
+              "seconds": 5.0002503,
+              "MBps": 0,
+              "ech": true,
+              "error_stage": "CONNECT",
+              "error_type": "context.deadlineExceededError"
+            },
+            {
+              "passed": false,
+              "bytes": 0,
+              "seconds": 3.9976032,
+              "MBps": 0,
+              "ech": true,
+              "error_stage": "CONNECT",
+              "error_type": "*errors.errorString"
+            },
+            {
+              "passed": true,
+              "bytes": 22,
+              "seconds": 0.4408382,
+              "MBps": 4.9904931106242606e-05,
+              "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+              "carrier": "h2",
+              "ech": true
+            }
+          ],
+          "fallbacks": 0,
+          "h2_new_connection_retries": 0,
+          "h2_retired": 0
+        },
+        {
+          "fault": "TCP-path-blocked-UDP-available-8s",
+          "recovered": true,
+          "recovery_seconds": 8.2736686,
+          "attempts": [
+            {
+              "passed": false,
+              "bytes": 0,
+              "seconds": 5.0003951,
+              "MBps": 0,
+              "ech": true,
+              "error_stage": "CONNECT",
+              "error_type": "context.deadlineExceededError"
+            },
+            {
+              "passed": true,
+              "bytes": 22,
+              "seconds": 3.0730273,
+              "MBps": 7.159064288169519e-06,
+              "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+              "carrier": "h2",
+              "ech": true
+            }
+          ],
+          "fallbacks": 0,
+          "h2_new_connection_retries": 0,
+          "h2_retired": 0
+        },
+        {
+          "fault": "UDP-path-blocked-TCP-available-8s",
+          "recovered": true,
+          "recovery_seconds": 0.2708593,
+          "attempts": [
+            {
+              "passed": true,
+              "bytes": 22,
+              "seconds": 0.2708593,
+              "MBps": 8.122298182118908e-05,
+              "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+              "carrier": "h2",
+              "ech": true
+            }
+          ],
+          "fallbacks": 0,
+          "h2_new_connection_retries": 0,
+          "h2_retired": 0
+        }
+      ],
+      "median_serial_MBps": 35.260319190366076,
+      "soak_success_ratio": 1,
+      "probe_p95_seconds": 0.4110857,
+      "h2_dials": 1,
+      "h2_retired": 0,
+      "score": 80.06899741104773,
+      "eligible": true
+    },
+    {
+      "id": "B",
+      "name": "H2 four carriers",
+      "settings": {
+        "auto_tcp_preference": "h2",
+        "connect_timeout_seconds": 5,
+        "h2_connections": 4,
+        "h2_max_age_seconds": 0,
+        "h2_ping_timeout_seconds": 5,
+        "h2_read_idle_seconds": 25,
+        "h2_retry_new_connection": false,
+        "transport": "h2"
+      },
+      "serial_64MiB": [
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 2.6202602,
+          "MBps": 25.611526672045773,
+          "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 2.7392198,
+          "MBps": 24.49926216216749,
+          "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 2.7635909,
+          "MBps": 24.283212106393897,
+          "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067",
+          "carrier": "h2",
+          "ech": true
+        }
+      ],
+      "parallel_4x16MiB": [
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 1.5710648,
+          "MBps": 42.71552898390951,
+          "ech": true
+        }
+      ],
+      "iso_32MiB": {
+        "passed": true,
+        "bytes": 33554432,
+        "seconds": 2.4625294,
+        "MBps": 13.626002597166961,
+        "sha256": "6a240ee4a7c6faf52b15a871a68d89f49923a737f1ccfa068b73cb5ee5cf8b8f",
+        "carrier": "h2",
+        "ech": true
+      },
+      "soak_probes": [
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2655896,
+          "MBps": 8.283456882347804e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2691437,
+          "MBps": 8.174072066334824e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2650953,
+          "MBps": 8.298902319279144e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2643167,
+          "MBps": 8.323348467955297e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2658335,
+          "MBps": 8.275856880340514e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2703192,
+          "MBps": 8.138526601144129e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2659681,
+          "MBps": 8.271668670039753e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2626923,
+          "MBps": 8.374817229130812e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2647595,
+          "MBps": 8.309427990308186e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2644536,
+          "MBps": 8.31903971055792e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2661794,
+          "MBps": 8.265102408375703e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2657299,
+          "MBps": 8.279083385046243e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2659345,
+          "MBps": 8.272713769744052e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2620122,
+          "MBps": 8.396555580236342e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2648708,
+          "MBps": 8.305936328202277e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.264589,
+          "MBps": 8.314782549539097e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2660842,
+          "MBps": 8.268059508982495e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2631298,
+          "MBps": 8.360892608894925e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2656979,
+          "MBps": 8.280080497437128e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2621016,
+          "MBps": 8.393691606613619e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2650859,
+          "MBps": 8.299196600045495e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2640848,
+          "MBps": 8.330657425190696e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2653935,
+          "MBps": 8.28957755182399e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2631902,
+          "MBps": 8.358973852369884e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2650565,
+          "MBps": 8.300117144835158e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2683362,
+          "MBps": 8.198670175697501e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2651144,
+          "MBps": 8.29830443008754e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2642177,
+          "MBps": 8.326467151897848e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.270866,
+          "MBps": 8.122097273190434e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2619929,
+          "MBps": 8.397174121894144e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2652987,
+          "MBps": 8.292539692052769e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2628006,
+          "MBps": 8.371365971006155e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2652503,
+          "MBps": 8.294052824822441e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2645787,
+          "MBps": 8.31510624249042e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2643218,
+          "MBps": 8.323187871753294e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2636772,
+          "MBps": 8.343535201375014e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2679768,
+          "MBps": 8.209665911377403e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2636368,
+          "MBps": 8.34481377410134e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2653757,
+          "MBps": 8.290133572893072e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2655573,
+          "MBps": 8.284464407493223e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.266196,
+          "MBps": 8.264586996048026e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.262866,
+          "MBps": 8.369283208935351e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2648863,
+          "MBps": 8.30545030075168e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2655416,
+          "MBps": 8.284954221862035e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2657201,
+          "MBps": 8.279388725203701e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2643692,
+          "MBps": 8.321695568167548e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2660559,
+          "MBps": 8.268938971095923e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2626938,
+          "MBps": 8.37476940833777e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2652175,
+          "MBps": 8.295078567590751e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2636241,
+          "MBps": 8.34521578262382e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2652997,
+          "MBps": 8.292508434800339e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2643197,
+          "MBps": 8.323253998850635e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2662398,
+          "MBps": 8.263227361198438e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        }
+      ],
+      "loaded_probes": [
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.437621,
+          "MBps": 5.027181053925657e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2862793,
+          "MBps": 7.68480291798953e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2648484,
+          "MBps": 8.306638816772162e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.4396728,
+          "MBps": 5.0037209488510546e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.3315418,
+          "MBps": 6.63566403994911e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2760099,
+          "MBps": 7.970728586184772e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2636627,
+          "MBps": 8.343994049973697e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.3469713,
+          "MBps": 6.340582059668913e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2639189,
+          "MBps": 8.335894094738951e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.3607576,
+          "MBps": 6.098277624643251e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.33816,
+          "MBps": 6.505796072864917e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.3614454,
+          "MBps": 6.0866731185401725e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.3322603,
+          "MBps": 6.62131467406729e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.3030016,
+          "MBps": 7.260687732342008e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.3772675,
+          "MBps": 5.831406097795331e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2650984,
+          "MBps": 8.298805273815308e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.5211916,
+          "MBps": 4.221096425959283e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.4491436,
+          "MBps": 4.898210728150195e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2654853,
+          "MBps": 8.28671116630563e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.4503459,
+          "MBps": 4.8851338493366986e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2655273,
+          "MBps": 8.285400408922171e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.3604535,
+          "MBps": 6.103422494163603e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.4174449,
+          "MBps": 5.2701566122858365e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        }
+      ],
+      "soak_4x4MiB": [
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 1.7599166,
+          "MBps": 9.532960823257193,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.9505771,
+          "MBps": 17.649505758133664,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.8022492,
+          "MBps": 20.91272387682032,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.8036662,
+          "MBps": 20.87585119294553,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.8590482,
+          "MBps": 19.53000541762383,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.8903211,
+          "MBps": 18.844005831154625,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.8087088,
+          "MBps": 20.745682500301715,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.8935365,
+          "MBps": 18.776195488376803,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.8043086,
+          "MBps": 20.85917768378953,
+          "ech": true
+        }
+      ],
+      "recoveries": [
+        {
+          "fault": "stale-established-TCP",
+          "recovered": true,
+          "recovery_seconds": 29.759051,
+          "attempts": [
+            {
+              "passed": false,
+              "bytes": 0,
+              "seconds": 5.0001688,
+              "MBps": 0,
+              "ech": true,
+              "error_stage": "CONNECT",
+              "error_type": "context.deadlineExceededError"
+            },
+            {
+              "passed": false,
+              "bytes": 0,
+              "seconds": 5.000426,
+              "MBps": 0,
+              "ech": true,
+              "error_stage": "CONNECT",
+              "error_type": "context.deadlineExceededError"
+            },
+            {
+              "passed": false,
+              "bytes": 0,
+              "seconds": 5.0000629,
+              "MBps": 0,
+              "ech": true,
+              "error_stage": "CONNECT",
+              "error_type": "context.deadlineExceededError"
+            },
+            {
+              "passed": false,
+              "bytes": 0,
+              "seconds": 5.0003548,
+              "MBps": 0,
+              "ech": true,
+              "error_stage": "CONNECT",
+              "error_type": "context.deadlineExceededError"
+            },
+            {
+              "passed": false,
+              "bytes": 0,
+              "seconds": 5.0004438,
+              "MBps": 0,
+              "ech": true,
+              "error_stage": "CONNECT",
+              "error_type": "context.deadlineExceededError"
+            },
+            {
+              "passed": false,
+              "bytes": 0,
+              "seconds": 3.1115386,
+              "MBps": 0,
+              "ech": true,
+              "error_stage": "CONNECT",
+              "error_type": "*errors.errorString"
+            },
+            {
+              "passed": true,
+              "bytes": 22,
+              "seconds": 0.4442548,
+              "MBps": 4.952113066645538e-05,
+              "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+              "carrier": "h2",
+              "ech": true
+            }
+          ],
+          "fallbacks": 0,
+          "h2_new_connection_retries": 0,
+          "h2_retired": 0
+        },
+        {
+          "fault": "TCP-path-blocked-UDP-available-8s",
+          "recovered": true,
+          "recovery_seconds": 8.2708266,
+          "attempts": [
+            {
+              "passed": false,
+              "bytes": 0,
+              "seconds": 5.0000715,
+              "MBps": 0,
+              "ech": true,
+              "error_stage": "CONNECT",
+              "error_type": "context.deadlineExceededError"
+            },
+            {
+              "passed": true,
+              "bytes": 22,
+              "seconds": 3.0705566,
+              "MBps": 7.164824774765591e-06,
+              "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+              "carrier": "h2",
+              "ech": true
+            }
+          ],
+          "fallbacks": 0,
+          "h2_new_connection_retries": 0,
+          "h2_retired": 0
+        },
+        {
+          "fault": "UDP-path-blocked-TCP-available-8s",
+          "recovered": true,
+          "recovery_seconds": 0.2716409,
+          "attempts": [
+            {
+              "passed": true,
+              "bytes": 22,
+              "seconds": 0.2716409,
+              "MBps": 8.098927665163824e-05,
+              "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+              "carrier": "h2",
+              "ech": true
+            }
+          ],
+          "fallbacks": 0,
+          "h2_new_connection_retries": 0,
+          "h2_retired": 0
+        }
+      ],
+      "median_serial_MBps": 24.49926216216749,
+      "soak_success_ratio": 1,
+      "probe_p95_seconds": 0.4396728,
+      "h2_dials": 8,
+      "h2_retired": 0,
+      "score": 72.04910056845696,
+      "eligible": true
+    },
+    {
+      "id": "C",
+      "name": "H2 pool fast health retry rotation",
+      "settings": {
+        "auto_tcp_preference": "h2",
+        "connect_timeout_seconds": 2,
+        "h2_connections": 4,
+        "h2_max_age_seconds": 120,
+        "h2_ping_timeout_seconds": 2,
+        "h2_read_idle_seconds": 5,
+        "h2_retry_new_connection": true,
+        "transport": "h2"
+      },
+      "serial_64MiB": [
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 2.7989108,
+          "MBps": 23.976778395367226,
+          "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 2.7139955000000002,
+          "MBps": 24.72696214861078,
+          "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 2.6026937,
+          "MBps": 25.784387920868287,
+          "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067",
+          "carrier": "h2",
+          "ech": true
+        }
+      ],
+      "parallel_4x16MiB": [
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 1.7631038,
+          "MBps": 38.06291155404463,
+          "ech": true
+        }
+      ],
+      "iso_32MiB": {
+        "passed": true,
+        "bytes": 33554432,
+        "seconds": 2.0921051,
+        "MBps": 16.038597678481832,
+        "sha256": "6a240ee4a7c6faf52b15a871a68d89f49923a737f1ccfa068b73cb5ee5cf8b8f",
+        "carrier": "h2",
+        "ech": true
+      },
+      "soak_probes": [
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2654634,
+          "MBps": 8.287394797173546e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2709857,
+          "MBps": 8.118509574490462e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2638145,
+          "MBps": 8.339192879845496e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2722141,
+          "MBps": 8.08187378978532e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2654286,
+          "MBps": 8.288481346772729e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2713913,
+          "MBps": 8.106376291354955e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2649442,
+          "MBps": 8.303635256027494e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2637525,
+          "MBps": 8.341153164424981e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.261869,
+          "MBps": 8.401147138454723e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2652425,
+          "MBps": 8.294296728465462e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2649546,
+          "MBps": 8.303309321672468e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2639609,
+          "MBps": 8.334567733327171e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2649711,
+          "MBps": 8.302792266779283e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2638223,
+          "MBps": 8.338946328646213e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2617131,
+          "MBps": 8.406151621756802e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2655672,
+          "MBps": 8.284155573429249e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2648177,
+          "MBps": 8.30760179549932e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2640634,
+          "MBps": 8.331332551197932e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2622308,
+          "MBps": 8.389556070453968e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2645157,
+          "MBps": 8.317086660640558e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2616579,
+          "MBps": 8.40792500436639e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2640902,
+          "MBps": 8.330487083579777e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2655024,
+          "MBps": 8.286177450749972e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2638733,
+          "MBps": 8.337334622335796e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2621696,
+          "MBps": 8.391514500537056e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2633862,
+          "MBps": 8.352753485186392e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2617575,
+          "MBps": 8.404725748068347e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2650669,
+          "MBps": 8.299791486602062e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2650796,
+          "MBps": 8.29939384245336e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2638654,
+          "MBps": 8.337584238024385e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2619962,
+          "MBps": 8.397068354426515e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2637531,
+          "MBps": 8.341134189512842e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2616813,
+          "MBps": 8.407173152991827e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2647314,
+          "MBps": 8.310309997227378e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2651016,
+          "MBps": 8.29870510023327e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2641186,
+          "MBps": 8.329591327532404e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2621252,
+          "MBps": 8.392935894755635e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2637403,
+          "MBps": 8.341539006363458e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2621335,
+          "MBps": 8.392670147081543e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2654554,
+          "MBps": 8.287644553473012e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2651299,
+          "MBps": 8.297819295371817e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2641296,
+          "MBps": 8.329244431521495e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2618531,
+          "MBps": 8.401657265084889e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2638907,
+          "MBps": 8.336784888592133e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2832824,
+          "MBps": 7.766101953386445e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2650204,
+          "MBps": 8.301247753003166e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2650007,
+          "MBps": 8.301864862998475e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2638439,
+          "MBps": 8.338263647558271e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2684791,
+          "MBps": 8.194306372451336e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.3606559,
+          "MBps": 6.0999972550012356e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.3764711,
+          "MBps": 5.843742056163143e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2778789,
+          "MBps": 7.917117852417006e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.5488232,
+          "MBps": 4.0085768968950296e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        }
+      ],
+      "loaded_probes": [
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.4613311,
+          "MBps": 4.768809213165989e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.5606139,
+          "MBps": 3.9242694481888516e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2560941,
+          "MBps": 8.590592286194802e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.4419256,
+          "MBps": 4.9782135273448746e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.3295231,
+          "MBps": 6.67631495333711e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2842024,
+          "MBps": 7.740962074915624e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2649447,
+          "MBps": 8.303619585521054e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.3412344,
+          "MBps": 6.44718117516874e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2654997,
+          "MBps": 8.286261717056554e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.3673284,
+          "MBps": 5.9891911434019254e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.264755,
+          "MBps": 8.309569224377253e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.3618169,
+          "MBps": 6.080423551249265e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.4183456,
+          "MBps": 5.258809940871853e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.3628783,
+          "MBps": 6.062638631188473e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2694343,
+          "MBps": 8.165255871282906e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.3682441,
+          "MBps": 5.974298026770829e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2643653,
+          "MBps": 8.321818332436216e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.3661075,
+          "MBps": 6.00916397506197e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2645532,
+          "MBps": 8.315907726687865e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.4478868,
+          "MBps": 4.911955431595663e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2644678,
+          "MBps": 8.318593038547604e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.4734281,
+          "MBps": 4.646956950802033e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.6967735,
+          "MBps": 3.157410550200316e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2711569,
+          "MBps": 8.113383801039178e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        }
+      ],
+      "soak_4x4MiB": [
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 1.7678864,
+          "MBps": 9.489985329374104,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.9778883,
+          "MBps": 17.156577085542388,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.8848979,
+          "MBps": 18.959493518969815,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.8075197,
+          "MBps": 20.776231217640884,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.8860765,
+          "MBps": 18.93427486227205,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.8942631,
+          "MBps": 18.760939593728065,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.7126466,
+          "MBps": 23.542125928896596,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.8067767,
+          "MBps": 20.795365061980593,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 1.9599753,
+          "MBps": 8.559911953992483,
+          "ech": true
+        }
+      ],
+      "recoveries": [
+        {
+          "fault": "stale-established-TCP",
+          "recovered": true,
+          "recovery_seconds": 4.4431147,
+          "attempts": [
+            {
+              "passed": true,
+              "bytes": 22,
+              "seconds": 4.4431147,
+              "MBps": 4.951481446112567e-06,
+              "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+              "carrier": "h2",
+              "ech": true
+            }
+          ],
+          "fallbacks": 0,
+          "h2_new_connection_retries": 1,
+          "h2_retired": 1
+        },
+        {
+          "fault": "TCP-path-blocked-UDP-available-8s",
+          "recovered": true,
+          "recovery_seconds": 8.3533778,
+          "attempts": [
+            {
+              "passed": false,
+              "bytes": 0,
+              "seconds": 6.0007377,
+              "MBps": 0,
+              "ech": true,
+              "error_stage": "CONNECT",
+              "error_type": "context.deadlineExceededError"
+            },
+            {
+              "passed": true,
+              "bytes": 22,
+              "seconds": 2.1524444,
+              "MBps": 1.0220937646519464e-05,
+              "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+              "carrier": "h2",
+              "ech": true
+            }
+          ],
+          "fallbacks": 0,
+          "h2_new_connection_retries": 1,
+          "h2_retired": 1
+        },
+        {
+          "fault": "UDP-path-blocked-TCP-available-8s",
+          "recovered": true,
+          "recovery_seconds": 0.2703863,
+          "attempts": [
+            {
+              "passed": true,
+              "bytes": 22,
+              "seconds": 0.2703863,
+              "MBps": 8.136506916215799e-05,
+              "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+              "carrier": "h2",
+              "ech": true
+            }
+          ],
+          "fallbacks": 0,
+          "h2_new_connection_retries": 0,
+          "h2_retired": 0
+        }
+      ],
+      "median_serial_MBps": 24.72696214861078,
+      "soak_success_ratio": 1,
+      "probe_p95_seconds": 0.4734281,
+      "h2_dials": 12,
+      "h2_retired": 4,
+      "score": 78.77621953954753,
+      "eligible": true
+    },
+    {
+      "id": "D",
+      "name": "H3 only",
+      "settings": {
+        "auto_tcp_preference": "h2",
+        "connect_timeout_seconds": 5,
+        "h2_connections": 1,
+        "h2_max_age_seconds": 0,
+        "h2_ping_timeout_seconds": 5,
+        "h2_read_idle_seconds": 25,
+        "h2_retry_new_connection": false,
+        "transport": "h3"
+      },
+      "serial_64MiB": [
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 2.4404097,
+          "MBps": 27.49901543171214,
+          "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 6.0824929,
+          "MBps": 11.033118345275833,
+          "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 9.5160999,
+          "MBps": 7.052139500973502,
+          "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067",
+          "carrier": "h3",
+          "ech": true
+        }
+      ],
+      "parallel_4x16MiB": [
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 8.6889679,
+          "MBps": 7.723456315220131,
+          "ech": true
+        }
+      ],
+      "iso_32MiB": {
+        "passed": true,
+        "bytes": 33554432,
+        "seconds": 8.3115813,
+        "MBps": 4.037069576640007,
+        "sha256": "6a240ee4a7c6faf52b15a871a68d89f49923a737f1ccfa068b73cb5ee5cf8b8f",
+        "carrier": "h3",
+        "ech": true
+      },
+      "soak_probes": [
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2703986,
+          "MBps": 8.13613679952485e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2747251,
+          "MBps": 8.008005093091239e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.5230906,
+          "MBps": 4.205772384363245e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2620018,
+          "MBps": 8.396888876335964e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2621105,
+          "MBps": 8.393406597599103e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2623935,
+          "MBps": 8.38435403316012e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2622098,
+          "MBps": 8.390227977749116e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2626459,
+          "MBps": 8.376296755441452e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.262441,
+          "MBps": 8.382836523256657e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2629177,
+          "MBps": 8.367637477431151e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2629635,
+          "MBps": 8.366180097237829e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2627244,
+          "MBps": 8.373793983352897e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2630164,
+          "MBps": 8.364497422974385e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2623596,
+          "MBps": 8.385437392037493e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.262527,
+          "MBps": 8.38009042879399e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2629163,
+          "MBps": 8.367682034168288e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2621474,
+          "MBps": 8.392225137460833e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.260831,
+          "MBps": 8.434580245446286e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2630491,
+          "MBps": 8.36345762064953e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2626248,
+          "MBps": 8.376969730200652e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2625976,
+          "MBps": 8.377837421210248e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2628825,
+          "MBps": 8.368757905147737e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2637621,
+          "MBps": 8.340849576190059e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2625607,
+          "MBps": 8.379014833522306e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2619709,
+          "MBps": 8.397879306442052e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2626567,
+          "MBps": 8.375952336262504e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2620178,
+          "MBps": 8.396376124064853e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2635333,
+          "MBps": 8.348091114102089e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2626424,
+          "MBps": 8.376408378845153e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2625086,
+          "MBps": 8.380677813983999e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2623493,
+          "MBps": 8.385766609630749e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.262832,
+          "MBps": 8.370365861082364e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2629349,
+          "MBps": 8.367090104813016e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2672695,
+          "MBps": 8.231391909664215e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2628186,
+          "MBps": 8.370792630354169e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2621936,
+          "MBps": 8.390746379774333e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.263508,
+          "MBps": 8.348892633240736e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2622666,
+          "MBps": 8.388410876566058e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2620763,
+          "MBps": 8.394501906505854e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2643993,
+          "MBps": 8.320748201678295e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2629169,
+          "MBps": 8.367662938365696e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.26713,
+          "MBps": 8.235690487777486e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.262665,
+          "MBps": 8.375687662992786e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2625024,
+          "MBps": 8.380875755802612e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2620975,
+          "MBps": 8.393822909413483e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2626483,
+          "MBps": 8.37622021539831e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2624691,
+          "MBps": 8.381939054921132e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        }
+      ],
+      "loaded_probes": [
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2635479,
+          "MBps": 8.347628647391993e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2673415,
+          "MBps": 8.229175043904519e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2857276,
+          "MBps": 7.699641196720231e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2672592,
+          "MBps": 8.231709142285841e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2732209,
+          "MBps": 8.052092647378001e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2710678,
+          "MBps": 8.116050670717805e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2784768,
+          "MBps": 7.900119507262363e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2782956,
+          "MBps": 7.905263324321333e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2672653,
+          "MBps": 8.231521263703145e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.27881,
+          "MBps": 7.890678239661418e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2675442,
+          "MBps": 8.222940359013576e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2684953,
+          "MBps": 8.193811958719575e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2752555,
+          "MBps": 7.992574171996563e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.267375,
+          "MBps": 8.22814399251987e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2927474,
+          "MBps": 7.515011234941796e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2678565,
+          "MBps": 8.213353045380643e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2751061,
+          "MBps": 7.996914644931535e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2739051,
+          "MBps": 8.031978959135846e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2636066,
+          "MBps": 8.345769794838216e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.368816,
+          "MBps": 5.965034054921696e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2669987,
+          "MBps": 8.239740493118506e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.5919164,
+          "MBps": 3.716741080328236e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2629109,
+          "MBps": 8.367853900313755e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2783077,
+          "MBps": 7.904919626729695e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2841894,
+          "MBps": 7.741316178576682e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2669236,
+          "MBps": 8.24205877636897e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2632139,
+          "MBps": 8.358221203363501e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2674836,
+          "MBps": 8.224803315044362e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2841749,
+          "MBps": 7.741711178573477e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2670027,
+          "MBps": 8.239617052561642e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2762516,
+          "MBps": 7.963754780062812e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2626635,
+          "MBps": 8.375735494273092e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2631115,
+          "MBps": 8.361474127888746e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2778255,
+          "MBps": 7.918639577720548e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2718279,
+          "MBps": 8.093356127167227e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2686621,
+          "MBps": 8.188724795942561e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2685816,
+          "MBps": 8.191179142577154e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2749033,
+          "MBps": 8.002814080442105e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2678041,
+          "MBps": 8.214960114501608e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2624512,
+          "MBps": 8.382510729613735e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2680387,
+          "MBps": 8.207769997392167e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2807705,
+          "MBps": 7.835581017236498e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2747881,
+          "MBps": 8.006169117221597e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2683478,
+          "MBps": 8.198315767820715e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2680668,
+          "MBps": 8.206909621034757e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.266482,
+          "MBps": 8.255717084080726e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2714813,
+          "MBps": 8.103688909696544e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2805406,
+          "MBps": 7.842002191483157e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2674933,
+          "MBps": 8.224505062369787e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2755234,
+          "MBps": 7.984802742707154e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2884921,
+          "MBps": 7.625858732353504e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2665733,
+          "MBps": 8.252889542951226e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2623747,
+          "MBps": 8.384954799376617e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2639057,
+          "MBps": 8.336311038374691e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2664319,
+          "MBps": 8.257269493630454e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2701713,
+          "MBps": 8.1429818785341e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2979633,
+          "MBps": 7.383459640834963e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2669912,
+          "MBps": 8.239971954131822e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2726616,
+          "MBps": 8.068609587855422e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2705583,
+          "MBps": 8.131334355663826e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2785144,
+          "MBps": 7.899052975357827e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2673438,
+          "MBps": 8.229104247040701e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2769698,
+          "MBps": 7.943104266241302e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2679377,
+          "MBps": 8.21086394337191e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2658173,
+          "MBps": 8.276361245110835e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2713402,
+          "MBps": 8.107902920392923e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2671205,
+          "MBps": 8.235983385775334e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2745348,
+          "MBps": 8.013556022770154e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.269348,
+          "MBps": 8.167872046571722e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2697184,
+          "MBps": 8.156655237462478e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2626508,
+          "MBps": 8.376140487674128e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h3",
+          "ech": true
+        }
+      ],
+      "soak_4x4MiB": [
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 1.5536455,
+          "MBps": 10.798612682236714,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 1.6753765999999999,
+          "MBps": 10.013996853006065,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 2.4338697,
+          "MBps": 6.893226864199017,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 3.2778054,
+          "MBps": 5.11842954435306,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 3.0579685,
+          "MBps": 5.486392681939007,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 3.011201,
+          "MBps": 5.571602825583547,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 2.8106536,
+          "MBps": 5.969151089981347,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 2.610215,
+          "MBps": 6.427522637024153,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 2.5064699,
+          "MBps": 6.693563724822709,
+          "ech": true
+        }
+      ],
+      "recoveries": [
+        {
+          "fault": "stale-established-TCP",
+          "recovered": true,
+          "recovery_seconds": 0.2662904,
+          "attempts": [
+            {
+              "passed": true,
+              "bytes": 22,
+              "seconds": 0.2662904,
+              "MBps": 8.261657198306811e-05,
+              "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+              "carrier": "h3",
+              "ech": true
+            }
+          ],
+          "fallbacks": 0,
+          "h2_new_connection_retries": 0,
+          "h2_retired": 0
+        },
+        {
+          "fault": "TCP-path-blocked-UDP-available-8s",
+          "recovered": true,
+          "recovery_seconds": 0.2680013,
+          "attempts": [
+            {
+              "passed": true,
+              "bytes": 22,
+              "seconds": 0.2680013,
+              "MBps": 8.20891540451483e-05,
+              "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+              "carrier": "h3",
+              "ech": true
+            }
+          ],
+          "fallbacks": 0,
+          "h2_new_connection_retries": 0,
+          "h2_retired": 0
+        },
+        {
+          "fault": "UDP-path-blocked-TCP-available-8s",
+          "recovered": true,
+          "recovery_seconds": 10.6592628,
+          "attempts": [
+            {
+              "passed": false,
+              "bytes": 0,
+              "seconds": 5.0003493,
+              "MBps": 0,
+              "ech": true,
+              "error_stage": "CONNECT",
+              "error_type": "*fmt.wrapError"
+            },
+            {
+              "passed": false,
+              "bytes": 0,
+              "seconds": 5.0004598,
+              "MBps": 0,
+              "ech": true,
+              "error_stage": "CONNECT",
+              "error_type": "*fmt.wrapError"
+            },
+            {
+              "passed": true,
+              "bytes": 22,
+              "seconds": 0.2579349,
+              "MBps": 8.52928393947465e-05,
+              "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+              "carrier": "h3",
+              "ech": true
+            }
+          ],
+          "fallbacks": 0,
+          "h2_new_connection_retries": 0,
+          "h2_retired": 0
+        }
+      ],
+      "median_serial_MBps": 11.033118345275833,
+      "soak_success_ratio": 1,
+      "probe_p95_seconds": 0.2884921,
+      "h2_dials": 0,
+      "h2_retired": 0,
+      "score": 74.13614570196341,
+      "eligible": true
+    },
+    {
+      "id": "E",
+      "name": "Auto H2 pool fast health rotation H3 fallback",
+      "settings": {
+        "auto_tcp_preference": "h2",
+        "connect_timeout_seconds": 2,
+        "h2_connections": 4,
+        "h2_max_age_seconds": 120,
+        "h2_ping_timeout_seconds": 2,
+        "h2_read_idle_seconds": 5,
+        "h2_retry_new_connection": false,
+        "transport": "auto"
+      },
+      "serial_64MiB": [
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 2.7015346,
+          "MBps": 24.841015917397467,
+          "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 3.5811083999999997,
+          "MBps": 18.73969076166474,
+          "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 2.6066811,
+          "MBps": 25.74494593911008,
+          "sha256": "f8dfeaaa09d17ea0e07bcd70bdbf38d55406a6099c6a263a0a27e8e313f12067",
+          "carrier": "h2",
+          "ech": true
+        }
+      ],
+      "parallel_4x16MiB": [
+        {
+          "passed": true,
+          "bytes": 67108864,
+          "seconds": 3.1582684,
+          "MBps": 21.24862598758231,
+          "ech": true
+        }
+      ],
+      "iso_32MiB": {
+        "passed": true,
+        "bytes": 33554432,
+        "seconds": 10.9189326,
+        "MBps": 3.0730505654005045,
+        "sha256": "6a240ee4a7c6faf52b15a871a68d89f49923a737f1ccfa068b73cb5ee5cf8b8f",
+        "carrier": "h2",
+        "ech": true
+      },
+      "soak_probes": [
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2636287,
+          "MBps": 8.345070168763871e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2650499,
+          "MBps": 8.300323825815441e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.26888,
+          "MBps": 8.182088664088068e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2655797,
+          "MBps": 8.283765664318471e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2634508,
+          "MBps": 8.350705330938453e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2626259,
+          "MBps": 8.37693464353668e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.270201,
+          "MBps": 8.142086816851158e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2622892,
+          "MBps": 8.387688093905506e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2554983,
+          "MBps": 8.61062480650556e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2657305,
+          "MBps": 8.279064691482536e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2641846,
+          "MBps": 8.327510384783973e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2625708,
+          "MBps": 8.378692527882003e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2647053,
+          "MBps": 8.311129395595783e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2635283,
+          "MBps": 8.348249504891885e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2629221,
+          "MBps": 8.367497445060724e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.256052,
+          "MBps": 8.592004749035352e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2654415,
+          "MBps": 8.2880785408461e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2632908,
+          "MBps": 8.35577999687038e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.262348,
+          "MBps": 8.385808163203073e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2633689,
+          "MBps": 8.353302155265864e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.262953,
+          "MBps": 8.366514167931152e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.256582,
+          "MBps": 8.574256962686394e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2731283,
+          "MBps": 8.054822587040596e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2635966,
+          "MBps": 8.346086406273829e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2628867,
+          "MBps": 8.368624201985115e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2631882,
+          "MBps": 8.359037373256096e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2629985,
+          "MBps": 8.365066720912855e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2556152,
+          "MBps": 8.606686926286075e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2649707,
+          "MBps": 8.302804800681736e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2632466,
+          "MBps": 8.357182960767585e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2627849,
+          "MBps": 8.371866115594922e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2622407,
+          "MBps": 8.389239351481293e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2856126,
+          "MBps": 7.702741405666277e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2559862,
+          "MBps": 8.594213281809722e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2653147,
+          "MBps": 8.292039604288794e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.26345,
+          "MBps": 8.350730688935282e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2624661,
+          "MBps": 8.382034860882988e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2636958,
+          "MBps": 8.342946683261546e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2626906,
+          "MBps": 8.374871426689801e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2565248,
+          "MBps": 8.576168853849608e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2651476,
+          "MBps": 8.297265372192696e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2639327,
+          "MBps": 8.335458243711369e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2625345,
+          "MBps": 8.379851029102843e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.263296,
+          "MBps": 8.355614973262033e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2680444,
+          "MBps": 8.207595458065901e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2563009,
+          "MBps": 8.583660845514004e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2651031,
+          "MBps": 8.298658144699176e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2634771,
+          "MBps": 8.349871772537347e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2631307,
+          "MBps": 8.360864011686968e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2711782,
+          "MBps": 8.112746526085061e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2553065,
+          "MBps": 8.617093571844039e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2649217,
+          "MBps": 8.304340490039133e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2554196,
+          "MBps": 8.613277916025238e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        }
+      ],
+      "loaded_probes": [
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.449682,
+          "MBps": 4.89234614683265e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2888191,
+          "MBps": 7.617224761104788e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 1.6616564,
+          "MBps": 1.3239800960054076e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.263815,
+          "MBps": 8.339177074844113e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.4389714,
+          "MBps": 5.011716025235357e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.7912104,
+          "MBps": 2.7805499017707553e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2655392,
+          "MBps": 8.285029103047687e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2643866,
+          "MBps": 8.321147894787405e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.5358394,
+          "MBps": 4.105707792297468e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.3686635,
+          "MBps": 5.9675015291722675e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.3645544,
+          "MBps": 6.0347646332070055e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.4543568,
+          "MBps": 4.842009627675871e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.361268,
+          "MBps": 6.089661968400191e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.3493637,
+          "MBps": 6.297162527188715e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.4401473,
+          "MBps": 4.9983266965399994e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.3667436,
+          "MBps": 5.998741354995697e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.3591444,
+          "MBps": 6.125669786303225e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2646312,
+          "MBps": 8.313456614337236e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.4445799,
+          "MBps": 4.9484918234045226e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.4186186,
+          "MBps": 5.255380434600851e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.4494996,
+          "MBps": 4.8943313853894414e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.7194657,
+          "MBps": 3.057824716313787e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 22,
+          "seconds": 0.2561641,
+          "MBps": 8.588244800891304e-05,
+          "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+          "carrier": "h2",
+          "ech": true
+        }
+      ],
+      "soak_4x4MiB": [
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 1.807201,
+          "MBps": 9.283536253023321,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.822591,
+          "MBps": 20.39557447139587,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.5534851,
+          "MBps": 30.31195600387436,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.8419521,
+          "MBps": 19.926568269145005,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.8018463,
+          "MBps": 20.923231796417845,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.8229982,
+          "MBps": 20.385483224629166,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.5692172,
+          "MBps": 29.474190168533205,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 0.8873057,
+          "MBps": 18.908044882389465,
+          "ech": true
+        },
+        {
+          "passed": true,
+          "bytes": 16777216,
+          "seconds": 1.6318633,
+          "MBps": 10.281018023997476,
+          "ech": true
+        }
+      ],
+      "recoveries": [
+        {
+          "fault": "stale-established-TCP",
+          "recovered": true,
+          "recovery_seconds": 4.3545435,
+          "attempts": [
+            {
+              "passed": true,
+              "bytes": 22,
+              "seconds": 4.3545435,
+              "MBps": 5.052194334492238e-06,
+              "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+              "carrier": "h3",
+              "ech": true
+            }
+          ],
+          "fallbacks": 1,
+          "h2_new_connection_retries": 0,
+          "h2_retired": 1
+        },
+        {
+          "fault": "TCP-path-blocked-UDP-available-8s",
+          "recovered": true,
+          "recovery_seconds": 4.3578525,
+          "attempts": [
+            {
+              "passed": true,
+              "bytes": 22,
+              "seconds": 4.3578525,
+              "MBps": 5.0483581075770696e-06,
+              "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+              "carrier": "h3",
+              "ech": true
+            }
+          ],
+          "fallbacks": 1,
+          "h2_new_connection_retries": 0,
+          "h2_retired": 1
+        },
+        {
+          "fault": "UDP-path-blocked-TCP-available-8s",
+          "recovered": true,
+          "recovery_seconds": 0.2703905,
+          "attempts": [
+            {
+              "passed": true,
+              "bytes": 22,
+              "seconds": 0.2703905,
+              "MBps": 8.136380531120731e-05,
+              "sha256": "7f211ca2bc334e96094db459cdec91789f0fb6d340e8be63d3180a2a5ae7f24a",
+              "carrier": "h2",
+              "ech": true
+            }
+          ],
+          "fallbacks": 0,
+          "h2_new_connection_retries": 0,
+          "h2_retired": 0
+        }
+      ],
+      "median_serial_MBps": 24.841015917397467,
+      "soak_success_ratio": 1,
+      "probe_p95_seconds": 0.5358394,
+      "h2_dials": 12,
+      "h2_retired": 4,
+      "score": 81.96583241748749,
+      "eligible": true
+    }
+  ],
+  "selected": "E",
+  "selection_rule": "Eligible: >=98% soak probes, all normal file integrity samples pass, all three recovery cases succeed. Score: 40% soak availability, 25% mean recovery quality (30s stale TCP / 8s TCP outage / 8s UDP outage), 25% relative serial throughput, 10% relative probe p95.",
+  "limitations": [
+    "One Windows client and one server; short serial experiments do not prove or exclude ISP QoS.",
+    "Performance connects directly to real WAN; recovery uses a local TCP/UDP relay to impose faults, not ISP shaping.",
+    "Faults affect only this lab; no global firewall, sysctl or system proxy changes.",
+    "Existing application streams are not migrated or replayed. Only new requests can recover or change carrier.",
+    "ISO testing is limited to 32MiB per strategy; no full-ISO or playback validation.",
+    "The final PING guard changes timeout handling only. All clean-path transfers passed without that branch; original performance measurements are retained, and all recovery cases were repeated on the final implementation."
+  ],
+  "performance_source_report": "five-plan-initial-v0.3.json",
+  "recovery_source_report": "five-plan-recovery-final-v0.3.json",
+  "recovery_retested_after_health_confirmation_guard": true,
+  "final_lab_sha256": "0f0f9aeccd0c31aa147cfa2e3781f889bdfddab5d527b2349185e647660e24cb"
+}

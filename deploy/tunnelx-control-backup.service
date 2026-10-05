@@ -1,0 +1,10 @@
+[Unit]
+Description=Encrypted tunnelX management database backup
+After=postgresql.service
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /opt/tunnelx/bin/backup-control.py /etc/tunnelx-control/control.json
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true

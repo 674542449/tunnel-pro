@@ -1,0 +1,9 @@
+{
+  "name": "tunnelx-admin-dom-tests",
+  "private": true,
+  "version": "0.4.1",
+  "description": "DOM regression tests for the management console; no visual rendering",
+  "dependencies": {
+    "jsdom": "27.0.1"
+  }
+}

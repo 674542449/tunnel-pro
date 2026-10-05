@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-02T18:47:15.432Z",
+  "console_version": "v0.5.6",
+  "served_assets": true,
+  "real_control_api": true,
+  "probe_metrics_are_fixture_data": true,
+  "legacy_audit_component_fixture": true,
+  "visual_rendered": false,
+  "real_charge": false,
+  "cases": [
+    "customer_refund_details_have_reason_reference_amount_and_no_other_customer_record",
+    "admin_can_review_all_persisted_refund_details",
+    "finance_has_refund_review_without_payment_configuration_permission",
+    "commercial_trial_control_is_honestly_disabled",
+    "persisted_audit_names_summary_and_before_after_are_visible",
+    "legacy_four_field_audit_and_untrusted_diff_text_remain_readable",
+    "admin_node_probe_is_separate_from_heartbeat_and_hidden_from_member_table",
+    "test_mail_entry_follows_mail_configuration_instead_of_payment_mode",
+    "workspace_feature_browser_runs_have_no_runtime_errors"
+  ],
+  "failures": []
+}

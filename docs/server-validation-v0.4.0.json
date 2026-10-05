@@ -1,0 +1,21 @@
+{
+  "checked_at": "2026-10-02T08:39:36.296595+00:00",
+  "passed": true,
+  "results": {
+    "ubuntu": {
+      "passed": true,
+      "cases": 14
+    },
+    "debian": {
+      "passed": true,
+      "cases": 14
+    }
+  },
+  "server_sha256": "726c91b3e2155632e7a9e794b15b204cda11fdfc23d919b2843858ac38ff302e",
+  "architecture": "arm64",
+  "debian_version": "13.7",
+  "ubuntu_os": "Ubuntu 26.04 LTS",
+  "debian_shares_host_kernel": true,
+  "validation_listeners_cleaned": true,
+  "production_service_untouched": true
+}

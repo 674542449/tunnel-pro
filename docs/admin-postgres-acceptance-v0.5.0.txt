@@ -1,0 +1,67 @@
+=== RUN   TestEmptyLegacyCollectionsReturnArrays
+--- PASS: TestEmptyLegacyCollectionsReturnArrays (0.37s)
+=== RUN   TestAdminCRUDValidationAndProfileBundle
+--- PASS: TestAdminCRUDValidationAndProfileBundle (0.39s)
+=== RUN   TestSettingsPartialSaveAndRuntimeAccess
+--- PASS: TestSettingsPartialSaveAndRuntimeAccess (0.49s)
+=== RUN   TestOrderCancellationIsolationAndFulfilmentRace
+--- PASS: TestOrderCancellationIsolationAndFulfilmentRace (0.62s)
+=== RUN   TestRevokedSessionCannotCommitAndSelfPasswordReset
+--- PASS: TestRevokedSessionCannotCommitAndSelfPasswordReset (0.61s)
+=== RUN   TestFiniteRenewalPreservesActiveUnlimitedAccount
+--- PASS: TestFiniteRenewalPreservesActiveUnlimitedAccount (0.00s)
+=== RUN   TestAccountIsolationOrdersAndDurability
+--- PASS: TestAccountIsolationOrdersAndDurability (0.50s)
+=== RUN   TestTrialCannotReduceExistingEntitlement
+--- PASS: TestTrialCannotReduceExistingEntitlement (0.49s)
+=== RUN   TestCookieCSRFAndMalformedStore
+--- PASS: TestCookieCSRFAndMalformedStore (0.36s)
+=== RUN   TestNodeCumulativeReportsAreIdempotent
+--- PASS: TestNodeCumulativeReportsAreIdempotent (0.37s)
+=== RUN   TestCommercialEncryptedBackupRestoreAndTamper
+--- PASS: TestCommercialEncryptedBackupRestoreAndTamper (0.36s)
+=== RUN   TestPostgresEncryptedRestoreIntoNewSchema
+--- PASS: TestPostgresEncryptedRestoreIntoNewSchema (0.20s)
+=== RUN   TestCommercialDuplicatePaymentRefundAndRenewal
+--- PASS: TestCommercialDuplicatePaymentRefundAndRenewal (0.50s)
+=== RUN   TestCommercialVerificationAndResetSingleUse
+--- PASS: TestCommercialVerificationAndResetSingleUse (0.85s)
+=== RUN   TestCommercialMFAReplayRecoveryAndRoleGate
+--- PASS: TestCommercialMFAReplayRecoveryAndRoleGate (0.49s)
+=== RUN   TestCommercialMultiNodeQuotaExhaustionAndDevices
+--- PASS: TestCommercialMultiNodeQuotaExhaustionAndDevices (0.00s)
+=== RUN   TestCommercialReservationsDoNotReleaseOnNodeLoss
+--- PASS: TestCommercialReservationsDoNotReleaseOnNodeLoss (0.00s)
+=== RUN   TestCommercialCycleBoundaryAddonAndExpiredOrder
+--- PASS: TestCommercialCycleBoundaryAddonAndExpiredOrder (0.00s)
+=== RUN   TestCommercialStripeWebhookSignatureAndIdempotency
+--- PASS: TestCommercialStripeWebhookSignatureAndIdempotency (0.36s)
+=== RUN   TestCommercialTicketsIsolationAndOfflineRecovery
+--- PASS: TestCommercialTicketsIsolationAndOfflineRecovery (0.50s)
+=== RUN   TestCommercialExportAndFailureRollback
+--- PASS: TestCommercialExportAndFailureRollback (0.36s)
+=== RUN   TestCommercialSMTPRejectsPlaintextAndAlertDeduplicates
+--- PASS: TestCommercialSMTPRejectsPlaintextAndAlertDeduplicates (0.37s)
+=== RUN   TestNodeInstallValidationAndArtifactReadiness
+--- PASS: TestNodeInstallValidationAndArtifactReadiness (0.49s)
+=== RUN   TestNodeInstallPendingIsolationAndCredentials
+--- PASS: TestNodeInstallPendingIsolationAndCredentials (0.37s)
+=== RUN   TestNodeInstallScopedDownloadsAndErrorReporting
+--- PASS: TestNodeInstallScopedDownloadsAndErrorReporting (0.37s)
+=== RUN   TestNodeInstallCompletionAndIdempotentRetry
+--- PASS: TestNodeInstallCompletionAndIdempotentRetry (0.37s)
+=== RUN   TestNodeInstallScriptIsPublicAndCommandPinsDigest
+--- PASS: TestNodeInstallScriptIsPublicAndCommandPinsDigest (0.36s)
+=== RUN   TestPostgresMigrationConcurrentWritersAndRestart
+--- PASS: TestPostgresMigrationConcurrentWritersAndRestart (0.21s)
+=== RUN   TestPostgresUniquePaymentEventsAndAtomicRollback
+--- PASS: TestPostgresUniquePaymentEventsAndAtomicRollback (0.15s)
+=== RUN   TestPostgresBackupExportAndEmptyDatabaseGuard
+--- PASS: TestPostgresBackupExportAndEmptyDatabaseGuard (0.16s)
+=== RUN   TestCommercialManualReconciliationRejectsLiveLease
+--- PASS: TestCommercialManualReconciliationRejectsLiveLease (0.36s)
+=== RUN   TestEmbeddedConsoleHasNoRedirectLoop
+--- PASS: TestEmbeddedConsoleHasNoRedirectLoop (0.00s)
+PASS
+
+

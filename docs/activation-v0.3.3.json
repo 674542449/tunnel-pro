@@ -1,0 +1,36 @@
+{
+  "checked_at": "2026-10-02T05:59:13.386162+08:00",
+  "passed": true,
+  "old_client_pid": 42516,
+  "new_client_pid": 81540,
+  "new_client_path": "C:\\Users\\tanzh\\Desktop\\tunnelX\\dist\\windows-client-v0.3.3\\tunnelx-client.exe",
+  "client_sha256": "4f8336229efbb5c0f371ebc464b80e3d6663294f1e7173d5d9a81a750655104b",
+  "selected_strategy": "H2-only",
+  "strict_ech_accepted": true,
+  "final_system_proxy_unchanged": true,
+  "original_proxy_restore_state_preserved": true,
+  "system_proxy_enabled": true,
+  "mode": "h2",
+  "h2_connections": 4,
+  "existing_streams_restarted_once": true,
+  "browser_opened": false,
+  "client_version": "v0.3.3",
+  "logging_enabled": true,
+  "logging_directory": "C:\\Users\\tanzh\\Desktop\\tunnelX\\dist\\windows-client-v0.3.3\\logs",
+  "logging_current_file": "C:\\Users\\tanzh\\Desktop\\tunnelX\\dist\\windows-client-v0.3.3\\logs\\events-20261001-215912-7a41d552-000000.jsonl",
+  "logging_session": "7a41d552",
+  "logging_started_at": "2026-10-01T21:59:12.6020146Z",
+  "logging_started_at_shanghai": "2026-10-02T05:59:12.602014+08:00",
+  "initial_h2_probe_passed": true,
+  "logging_dropped_events": 0,
+  "logging_io_errors": 0,
+  "historical_logs_preserved": [
+    {
+      "name": "events-20261001-205839-6b9557b0-000000.jsonl",
+      "bytes": 5767145,
+      "sha256": "8a98bd50b609c4bc1a91f3d5a912fe27e64693302a539f131e95aebbe47fdbba"
+    }
+  ],
+  "h3_runtime_removed": true,
+  "h2_retry_new_connection": true
+}

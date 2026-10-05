@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-02T09:56:40.387513+00:00",
+  "console_version": "v0.4.1",
+  "core_version": "v0.4.0",
+  "transport": "h2",
+  "node_process_unchanged": true,
+  "node_pid": 1063191,
+  "node_sha256": "726c91b3e2155632e7a9e794b15b204cda11fdfc23d919b2843858ac38ff302e",
+  "control_sha256": "c564069ca8ef54195b728c8261fed22a733ad05f7b32f6a164237af4581d3137",
+  "panic_events_since_upgrade": 0,
+  "online_enabled_nodes": 1,
+  "node_heartbeat_fresh": true,
+  "udp_8443_listener": false,
+  "public_https_health_passed": true
+}

@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-02T11:13:21.488253+00:00",
+  "console_version": "v0.4.2",
+  "public_url": "https://test.xiaguamail.com/control/",
+  "visual_rendered": false,
+  "live_assets_match": true,
+  "svg_mime_and_xml_valid": true,
+  "management_data_readable": true,
+  "existing_users_nodes_orders_not_modified": true,
+  "cases": [
+    "deployed_asset_index.html",
+    "deployed_asset_app.js",
+    "deployed_asset_style.css",
+    "deployed_asset_icons.svg",
+    "deployed_asset_network.svg",
+    "deployed_asset_mark.svg",
+    "live_read_me",
+    "live_read_admin/summary",
+    "live_read_admin/users",
+    "live_read_admin/nodes",
+    "live_read_admin/plans",
+    "live_read_admin/orders",
+    "live_read_admin/audit",
+    "live_read_admin/settings"
+  ]
+}

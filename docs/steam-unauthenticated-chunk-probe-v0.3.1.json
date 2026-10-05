@@ -1,0 +1,66 @@
+{
+  "checked_at": "2026-10-02T03:23:13.909224+08:00",
+  "passed": false,
+  "depot": 228990,
+  "expected_compressed_bytes": 1048528,
+  "results": [
+    {
+      "host": "dl.steam.clngaa.com",
+      "route": "http-proxy",
+      "range": null,
+      "status": 403,
+      "bytes": 150,
+      "sha256": "32cbc376cd769a26d108ae31678f975b863b7066e110c59d9a212c7281bd8c81",
+      "content_range": null
+    },
+    {
+      "host": "dl.steam.clngaa.com",
+      "route": "socks-open",
+      "range": null,
+      "status": 403,
+      "bytes": 150,
+      "sha256": "32cbc376cd769a26d108ae31678f975b863b7066e110c59d9a212c7281bd8c81",
+      "content_range": null
+    },
+    {
+      "host": "st.dl.eccdnx.com",
+      "route": "http-proxy",
+      "range": null,
+      "status": 403,
+      "bytes": 169,
+      "sha256": "92ae84bd8607e7cc4b88fc747836c89bea6dfdbe79b3abb13a03f11f3814bc9f",
+      "content_range": null
+    },
+    {
+      "host": "st.dl.eccdnx.com",
+      "route": "socks-open",
+      "range": null,
+      "status": 403,
+      "bytes": 169,
+      "sha256": "92ae84bd8607e7cc4b88fc747836c89bea6dfdbe79b3abb13a03f11f3814bc9f",
+      "content_range": null
+    },
+    {
+      "host": "xz.pphimalayanrt.com",
+      "route": "http-proxy",
+      "range": null,
+      "status": 403,
+      "bytes": 238,
+      "sha256": "6e1c38d044037281bc69275855c2951880dcf534f456035d0276a244a4a8c81f",
+      "content_range": null
+    },
+    {
+      "host": "xz.pphimalayanrt.com",
+      "route": "socks-open",
+      "range": null,
+      "status": 403,
+      "bytes": 238,
+      "sha256": "6e1c38d044037281bc69275855c2951880dcf534f456035d0276a244a4a8c81f",
+      "content_range": null
+    }
+  ],
+  "range_results": [],
+  "compressed_bytes_compared_only": true,
+  "full_game_update_verified": false,
+  "purpose": "Unauthenticated chunk URLs: origin access denied, HTTP proxy matches unmodified SOCKS TCP. Not an authenticated download acceptance test."
+}

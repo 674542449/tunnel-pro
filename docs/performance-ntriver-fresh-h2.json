@@ -1,0 +1,22 @@
+{
+  "checked_at": "2026-10-01T23:39:34.064733+08:00",
+  "route": "Windows-fresh-H2",
+  "filename": "zh-cn_windows_11_consumer_editions_version_26h2_x64_dvd_3622091b.iso",
+  "requested_bytes": 8388608,
+  "limit_seconds": 20,
+  "download_host": "tempdelivery.13376767.xyz",
+  "status": 206,
+  "content_range": "bytes 0-8388607/9112440832",
+  "range_honored": true,
+  "cache_status": null,
+  "cdn_location": "ICN",
+  "ttfb_seconds": 1.1867066000122577,
+  "bytes": 8388608,
+  "seconds": 2.0439967999700457,
+  "MBps": 4.104022080720935,
+  "Mbps": 32.83217664576748,
+  "sha256": "b7a657c648929b519390e2e4e372c1e22487aef8071bf5c33b735d9d33cf747b",
+  "completed_sample": true,
+  "passed": true,
+  "bounded_partial_iso": true
+}

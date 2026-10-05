@@ -1,0 +1,69 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-02T19:24:52.822957+00:00",
+  "desktop_version": "v0.6.0",
+  "go_full_regression_passed": true,
+  "go_vet_passed": true,
+  "desktop_race_passed": true,
+  "engine_test_functions": 21,
+  "shell_test_functions": 8,
+  "dom_cases": 33,
+  "native_cases": 15,
+  "native_sha256": "6257d9b84978c0295565e1ec110e1be11f093ab25479fd0b35cd539dac767501",
+  "visual_rendered": false,
+  "real_charge": false,
+  "source_files": [
+    {
+      "path": "desktop/ui/index.html",
+      "sha256": "bca6c95e767a1bff56a07e5c18ac309f9631ff318ed91d9518a110fa121bfcf7"
+    },
+    {
+      "path": "desktop/ui/style.css",
+      "sha256": "a90ef82a9feb2e8b6c3317421ddb1f860c1e65aa036c301d65f1ef5afcd57b8a"
+    },
+    {
+      "path": "desktop/ui/app.js",
+      "sha256": "0141bbd6faa5c6bbb5659900b4caa6494ebde4a9ebfdb7b46901d37b9c7418a7"
+    },
+    {
+      "path": "desktop/main.go",
+      "sha256": "0a65170343ebda68c42ebdd31dee0006ddf9062988f3162292f153cbbff439df"
+    },
+    {
+      "path": "desktop/headless.go",
+      "sha256": "f6cb082178b872e72484c9130cbeca798804540c9a38c6c2f4a82c401305f3e2"
+    },
+    {
+      "path": "desktop/shell_paths.go",
+      "sha256": "1024ee045723f208dc548884816aa54aacd5dcee40dd7256e00d2fd184d229de"
+    },
+    {
+      "path": "internal/desktop/connection.go",
+      "sha256": "aa35071703e7decd54f002485387f1629b1ab3dcaebb4de4d207d6652f397db4"
+    },
+    {
+      "path": "internal/desktop/engine.go",
+      "sha256": "1727e3816881e52c990e07ca3bee6a198051b327712e5965dcd393e785953e5f"
+    },
+    {
+      "path": "internal/desktop/health.go",
+      "sha256": "5df06755ae6ec0e70481f66ebec5323e4291332e7ae0c086b0eb3ed72cb1452c"
+    },
+    {
+      "path": "internal/desktop/protect_other.go",
+      "sha256": "154351d8717f51e9217a1b8df185acd32d84e554c63f566ebb48c31edf7fc9f2"
+    },
+    {
+      "path": "internal/desktop/protect_windows.go",
+      "sha256": "313773c62f3661310efdb68c0418913e0e2a3d561e01b79b4284a8080be54261"
+    },
+    {
+      "path": "internal/desktop/request.go",
+      "sha256": "c591948dbb707adb8179116b42f7145567459154f0695e14342203320e21fd17"
+    },
+    {
+      "path": "internal/desktop/url.go",
+      "sha256": "42af67139d612b1cf8141aa476d12632e4c293409df83a129dca4c3690eefe4f"
+    }
+  ]
+}

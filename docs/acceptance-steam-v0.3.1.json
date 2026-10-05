@@ -1,0 +1,175 @@
+{
+  "checked_at": "2026-10-02T03:20:37.958207+08:00",
+  "passed": true,
+  "client_sha256": "e0011057ea9ffbe12648ae1a4421b3f74a2d631f6c65450e4cb53e252ca848f5",
+  "tests": [
+    {
+      "mode": "h2",
+      "results": [
+        {
+          "host": "dl.steam.clngaa.com",
+          "route": "http-proxy",
+          "status": 401,
+          "bytes": 98,
+          "sha256": "e723d3711be9e49d07a67c3e3e67fd6b62e0f517e1b27f0891429e265be7a76f",
+          "seconds": 1.453
+        },
+        {
+          "host": "dl.steam.clngaa.com",
+          "route": "socks-open",
+          "status": 401,
+          "bytes": 98,
+          "sha256": "e723d3711be9e49d07a67c3e3e67fd6b62e0f517e1b27f0891429e265be7a76f",
+          "seconds": 1.13
+        },
+        {
+          "host": "st.dl.eccdnx.com",
+          "route": "http-proxy",
+          "status": 401,
+          "bytes": 98,
+          "sha256": "e723d3711be9e49d07a67c3e3e67fd6b62e0f517e1b27f0891429e265be7a76f",
+          "seconds": 1.437
+        },
+        {
+          "host": "st.dl.eccdnx.com",
+          "route": "socks-open",
+          "status": 401,
+          "bytes": 98,
+          "sha256": "e723d3711be9e49d07a67c3e3e67fd6b62e0f517e1b27f0891429e265be7a76f",
+          "seconds": 1.44
+        },
+        {
+          "host": "xz.pphimalayanrt.com",
+          "route": "http-proxy",
+          "status": 401,
+          "bytes": 98,
+          "sha256": "e723d3711be9e49d07a67c3e3e67fd6b62e0f517e1b27f0891429e265be7a76f",
+          "seconds": 1.936
+        },
+        {
+          "host": "xz.pphimalayanrt.com",
+          "route": "socks-open",
+          "status": 401,
+          "bytes": 98,
+          "sha256": "e723d3711be9e49d07a67c3e3e67fd6b62e0f517e1b27f0891429e265be7a76f",
+          "seconds": 1.581
+        }
+      ],
+      "strict_ech_accepted": true,
+      "origin_status_and_body_preserved": true
+    },
+    {
+      "mode": "h3",
+      "results": [
+        {
+          "host": "dl.steam.clngaa.com",
+          "route": "http-proxy",
+          "status": 401,
+          "bytes": 98,
+          "sha256": "e723d3711be9e49d07a67c3e3e67fd6b62e0f517e1b27f0891429e265be7a76f",
+          "seconds": 0.802
+        },
+        {
+          "host": "dl.steam.clngaa.com",
+          "route": "socks-open",
+          "status": 401,
+          "bytes": 98,
+          "sha256": "e723d3711be9e49d07a67c3e3e67fd6b62e0f517e1b27f0891429e265be7a76f",
+          "seconds": 1.083
+        },
+        {
+          "host": "st.dl.eccdnx.com",
+          "route": "http-proxy",
+          "status": 401,
+          "bytes": 98,
+          "sha256": "e723d3711be9e49d07a67c3e3e67fd6b62e0f517e1b27f0891429e265be7a76f",
+          "seconds": 1.032
+        },
+        {
+          "host": "st.dl.eccdnx.com",
+          "route": "socks-open",
+          "status": 401,
+          "bytes": 98,
+          "sha256": "e723d3711be9e49d07a67c3e3e67fd6b62e0f517e1b27f0891429e265be7a76f",
+          "seconds": 1.026
+        },
+        {
+          "host": "xz.pphimalayanrt.com",
+          "route": "http-proxy",
+          "status": 401,
+          "bytes": 98,
+          "sha256": "e723d3711be9e49d07a67c3e3e67fd6b62e0f517e1b27f0891429e265be7a76f",
+          "seconds": 0.76
+        },
+        {
+          "host": "xz.pphimalayanrt.com",
+          "route": "socks-open",
+          "status": 401,
+          "bytes": 98,
+          "sha256": "e723d3711be9e49d07a67c3e3e67fd6b62e0f517e1b27f0891429e265be7a76f",
+          "seconds": 0.932
+        }
+      ],
+      "strict_ech_accepted": true,
+      "origin_status_and_body_preserved": true
+    },
+    {
+      "mode": "auto",
+      "results": [
+        {
+          "host": "dl.steam.clngaa.com",
+          "route": "http-proxy",
+          "status": 401,
+          "bytes": 98,
+          "sha256": "e723d3711be9e49d07a67c3e3e67fd6b62e0f517e1b27f0891429e265be7a76f",
+          "seconds": 0.67
+        },
+        {
+          "host": "dl.steam.clngaa.com",
+          "route": "socks-open",
+          "status": 401,
+          "bytes": 98,
+          "sha256": "e723d3711be9e49d07a67c3e3e67fd6b62e0f517e1b27f0891429e265be7a76f",
+          "seconds": 0.965
+        },
+        {
+          "host": "st.dl.eccdnx.com",
+          "route": "http-proxy",
+          "status": 401,
+          "bytes": 98,
+          "sha256": "e723d3711be9e49d07a67c3e3e67fd6b62e0f517e1b27f0891429e265be7a76f",
+          "seconds": 0.786
+        },
+        {
+          "host": "st.dl.eccdnx.com",
+          "route": "socks-open",
+          "status": 401,
+          "bytes": 98,
+          "sha256": "e723d3711be9e49d07a67c3e3e67fd6b62e0f517e1b27f0891429e265be7a76f",
+          "seconds": 0.78
+        },
+        {
+          "host": "xz.pphimalayanrt.com",
+          "route": "http-proxy",
+          "status": 401,
+          "bytes": 98,
+          "sha256": "e723d3711be9e49d07a67c3e3e67fd6b62e0f517e1b27f0891429e265be7a76f",
+          "seconds": 0.895
+        },
+        {
+          "host": "xz.pphimalayanrt.com",
+          "route": "socks-open",
+          "status": 401,
+          "bytes": 98,
+          "sha256": "e723d3711be9e49d07a67c3e3e67fd6b62e0f517e1b27f0891429e265be7a76f",
+          "seconds": 0.659
+        }
+      ],
+      "strict_ech_accepted": true,
+      "origin_status_and_body_preserved": true
+    }
+  ],
+  "https_connect_udp_dns_after_probe_passed": true,
+  "test_client_exited": true,
+  "system_proxy_unchanged": true
+}
