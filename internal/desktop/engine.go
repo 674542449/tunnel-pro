@@ -70,6 +70,7 @@ type Engine struct {
 	managementMu                         sync.Mutex
 	managementEvents                     []managementEvent
 	managementLogWriteFailed             bool
+	managementLogDirty                   bool
 	mux                                  *client.Mux
 	proxy                                *client.Proxy
 	system                               *systemproxy.Manager
@@ -381,5 +382,6 @@ func (e *Engine) ConnLogs() []ConnLog {
 
 func (e *Engine) Close() error {
 	e.http.CloseIdleConnections()
+	e.flushManagementLog()
 	return e.Disconnect()
 }

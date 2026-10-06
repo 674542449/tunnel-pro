@@ -101,11 +101,21 @@ func (e *Engine) recordManagement(path, method string, attempt int, started time
 	if len(e.managementEvents) > 64 {
 		e.managementEvents = append([]managementEvent(nil), e.managementEvents[len(e.managementEvents)-64:]...)
 	}
+	e.managementLogDirty = true
+}
+
+func (e *Engine) flushManagementLog() {
+	e.managementMu.Lock()
+	defer e.managementMu.Unlock()
+	if !e.managementLogDirty {
+		return
+	}
 	b, err := json.MarshalIndent(e.managementEvents, "", "  ")
 	if err == nil {
 		err = control.WriteFile(filepath.Join(e.root, "state", "management-requests.json"), b)
 	}
 	e.managementLogWriteFailed = err != nil
+	e.managementLogDirty = false
 }
 
 func (e *Engine) managementReport() map[string]any {

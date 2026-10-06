@@ -221,7 +221,8 @@ async function refreshStatus() {
     const next = await nativeRead(() => app().Status());
     const sessionEnded = status.logged_in && !next.logged_in;
     const serverChanged = status.api_url && next.api_url !== status.api_url;
-    if (sessionEnded || serverChanged) { clearPrivate(); guestSettings = false; if (sessionEnded) message('登录已结束，请重新登录后继续。','warning'); }
+    const wasConnected = status.connected || status.connection_state === 'connected' || status.connection_state === 'connecting';
+    if (sessionEnded || serverChanged) { clearPrivate(); guestSettings = false; if (sessionEnded) message(wasConnected ? '登录会话已过期，连接已自动断开。请重新登录后继续。' : '登录会话已过期，请重新登录后继续。','warning'); }
     if (serverChanged) { apiDraftDirty = false; publicLoaded = false; publicSettings = null; commerce = null; publicFlight = null; releaseGeneration++; $('release').replaceChildren(); $('download-update').hidden = true; }
     if (!status.logged_in && next.logged_in) { workspaceLoaded = false; nextDataRetry = 0; view = 'dashboard'; }
     status = next; sampleTraffic(); syncNativeTheme().catch(() => {}); delete failures.status; applyPreferences(); renderShell(); renderConnection(); renderDiagnostics(); renderLoadAlert(); setLocks();
@@ -353,7 +354,8 @@ function renderConnection() {
   $('footer-node').textContent = connected ? (status.node_name || node?.name || '当前线路') : node?.name || (status.logged_in ? '选择线路后连接' : '登录后连接');
   $('node-name').textContent = connected ? (status.node_name || node?.name || '当前线路') : (node?.name || (loading.has('nodes') ? '正在读取线路…' : '选择一条线路'));
   const duration = Math.max(0,Math.floor(Date.now()/1000-Number(status.connected_at || 0)));
-  $('duration').textContent = connecting ? (connectionAttempt?.cancelRequested ? '正在取消连接，请稍候…' : stageNames[status.connection_stage] || '正在建立连接…') : connected ? '已连接 '+(duration < 60 ? duration+' 秒' : Math.floor(duration/60)+' 分钟') : '准备好后，点击连接。';
+  const durationText = duration < 60 ? duration+' 秒' : duration < 3600 ? Math.floor(duration/60)+' 分钟' : Math.floor(duration/3600)+' 小时 '+Math.floor(duration%3600/60)+' 分钟';
+  $('duration').textContent = connecting ? (connectionAttempt?.cancelRequested ? '正在取消连接，请稍候…' : stageNames[status.connection_stage] || '正在建立连接…') : connected ? '已连接 '+durationText : '准备好后，点击连接。';
   $('connection-hint').textContent = degraded ? (status.health?.error_kind==='dns_unavailable' ? '节点入口可达，但域名解析失败；正在持续检查备用解析通道。' : status.health?.error_kind==='egress_unavailable' ? '节点入口可达，但 HTTPS 出网检查失败；请查看分层检查结果。' : '最近一次节点入口检查失败，可尝试断开重连或更换线路。') : connected ? '连接已建立。访问速度取决于当前网络与目标站点。' : connecting ? (status.recovering ? '正在恢复网络连接（第 '+(status.recovery_attempt || 1)+' 次尝试），可随时取消。' : '首次连接可能需要一点时间，可随时取消。') : failures.nodes ? '线路未能刷新，请点击上方重新加载。' : !profile ? '正在确认账户与线路信息。' : !available ? (node?.access?.reason || '请先在订阅页查看权益或完成邮箱验证。') : !node ? '暂无可用线路，请稍后刷新或联系服务商。' : !node.online ? '所选线路当前离线，请更换一条在线线路。' : '已准备好。所选代理模式会在连接时生效。';
   $('download').textContent = connected && Number.isFinite(status.download_rate) ? bytes(status.download_rate)+'/s' : '—';
   $('upload').textContent = connected && Number.isFinite(status.upload_rate) ? bytes(status.upload_rate)+'/s' : '—';
@@ -374,7 +376,6 @@ function resetTraffic(caption = '连接后显示实时趋势') {
 }
 function sampleTraffic(now = Date.now()) {
   if (!status.logged_in || !isConnected()) { resetTraffic(); return; }
-  if (document.visibilityState === 'hidden') return;
   const key = epoch+':'+status.node_id+':'+status.connected_at;
   if (key !== trafficKey) { resetTraffic('正在采集网速…'); trafficKey = key; }
   const second = Math.floor(now/1000);
@@ -385,6 +386,7 @@ function sampleTraffic(now = Date.now()) {
   const valid = Number.isFinite(down) && down >= 0 && Number.isFinite(up) && up >= 0;
   trafficSamples = trafficSamples.filter(s => s.time > second-60);
   if (valid) trafficSamples.push({time:second,down,up});
+  if (document.visibilityState === 'hidden') return;
   const scale = Math.max(1024,...trafficSamples.flatMap(s => [s.down,s.up]));
   for (const name of ['down','up']) {
     let previous = -Infinity;
@@ -515,7 +517,9 @@ function renderOrders() {
     if (loading.has('orders')) return empty('orders','正在读取订单','正在同步账户最近的购买记录。',false,true);
     return empty('orders',failures.orders ? '订单暂时无法读取' : '还没有订单',failures.orders ? '请重新加载，或前往网站查看订单。' : '选择套餐后，订单会显示在这里。',!!failures.orders);
   }
-  $('orders').replaceChildren(...[...orderList].sort((a,b) => Number(b.created_at || 0)-Number(a.created_at || 0)).slice(0,6).map(o => {
+  const sortedOrders = [...orderList].sort((a,b) => Number(b.created_at || 0)-Number(a.created_at || 0));
+  const orderLimit = $('orders').dataset.expanded === 'true' ? sortedOrders.length : 6;
+  $('orders').replaceChildren(...sortedOrders.slice(0,orderLimit).map(o => {
     const row = element('div',undefined,'order-row'), summary = element('div'), side = element('div',undefined,'order-side');
     summary.append(element('p',o.plan?.name || '套餐订单','order-name'),element('p',amount(o.plan || {})+' · '+date(o.created_at)+(o.test ? ' · 测试订单' : ''),'order-meta'));
     const orderStatus = o.status === 'pending' && Number(o.expires_at) > 0 && Number(o.expires_at)*1000 <= Date.now() ? 'expired' : o.status;
@@ -523,6 +527,13 @@ function renderOrders() {
     if (orderStatus === 'pending') { const button = element('button','前往网站付款','text-button'); button.onclick = () => openPortal(); side.append(button); }
     row.append(summary,side); return row;
   }));
+  if (sortedOrders.length > 6) {
+    const expanded = $('orders').dataset.expanded === 'true';
+    const toggle = element('button',expanded ? '收起' : '查看全部 '+sortedOrders.length+' 条订单','subtle full-width');
+    toggle.type = 'button';
+    toggle.onclick = () => { $('orders').dataset.expanded = String(!expanded); renderOrders(); };
+    $('orders').append(toggle);
+  }
 }
 function pendingOrder(planID) { return orderList.find(o => o.plan?.id === planID && o.status === 'pending' && (!Number(o.expires_at) || Number(o.expires_at)*1000 > Date.now())); }
 function closePurchase(force = false) {
@@ -834,7 +845,7 @@ async function refreshAfterFocus() {
   lastFocusRefresh = Date.now(); await refreshAll().catch(error => message(friendly(error)));
 }
 window.addEventListener('focus',refreshAfterFocus);
-document.addEventListener('visibilitychange',() => { document.documentElement.dataset.suspended = String(document.visibilityState === 'hidden'); if (document.visibilityState !== 'hidden') refreshAfterFocus(); else resetTraffic('返回窗口后重新采样'); });
+document.addEventListener('visibilitychange',() => { document.documentElement.dataset.suspended = String(document.visibilityState === 'hidden'); if (document.visibilityState !== 'hidden') { sampleTraffic(); refreshAfterFocus(); } });
 async function init() { try { await refreshAll(); } catch (_) { renderAuth(); } } // load-alert tracks failure and clears on recovery.
 document.documentElement.dataset.suspended = String(document.visibilityState === 'hidden');
 renderAuth(); renderConnection(); init();
@@ -872,7 +883,8 @@ $('probe-all').onclick = () => operation('probe-all',async () => {
     if (r.error) probes.set(r.id,{error:r.error});
     else probes.set(r.id,{ms:Number(r.ms),checked:Date.now()});
   }
-  renderNodes(); message('全部线路延迟测试完成。','success');
+  $('node-sort').value = 'latency';
+  renderNodes(); message('全部线路延迟测试完成，已按延迟排序。','success');
 });
 $('refresh-connlogs').onclick = () => operation('connlogs',async () => {
   const logs = await nativeRead(() => app().ConnLogs());

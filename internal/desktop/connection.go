@@ -2,7 +2,6 @@ package desktop
 
 import (
 	"context"
-	"crypto/rand"
 	"errors"
 	"fmt"
 	"io"
@@ -397,6 +396,7 @@ func (e *Engine) disconnect() error {
 		return e.recoverProxy()
 	}
 	e.recordConn("disconnect", "", "", "")
+	e.flushManagementLog()
 	var tunErr error
 	if tun != nil {
 		tunErr = tun.Close()
@@ -432,7 +432,7 @@ func (e *Engine) Probe(id string) (int64, error) {
 	if err := e.request(context.Background(), "/api/nodes/"+id+"/profile", nil, &profile); err != nil {
 		return 0, err
 	}
-	ca := filepath.Join(e.root, "state", "probe-"+rand.Text()+".pem")
+	ca := filepath.Join(e.root, "state", "probe-ca.pem")
 	if err := control.WriteFile(ca, []byte(profile.CAPEM)); err != nil {
 		return 0, err
 	}
@@ -468,7 +468,6 @@ type ProbeResult struct {
 
 func (e *Engine) ProbeAll() []ProbeResult {
 	e.mu.Lock()
-	base := e.settings.APIURL
 	token := e.login.Token
 	e.mu.Unlock()
 	if token == "" {
@@ -500,6 +499,5 @@ func (e *Engine) ProbeAll() []ProbeResult {
 		}(i, n.ID)
 	}
 	wg.Wait()
-	_ = base
 	return results
 }

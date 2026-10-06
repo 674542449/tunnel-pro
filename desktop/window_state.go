@@ -24,7 +24,7 @@ func loadWindowState(root string) windowState {
 		return state
 	}
 	var saved windowState
-	if json.Unmarshal(data, &saved) == nil && saved.Width >= 700 && saved.Width <= 1280 && saved.Height >= 560 && saved.Height <= 900 {
+	if json.Unmarshal(data, &saved) == nil && saved.Width >= 700 && saved.Width <= 3840 && saved.Height >= 560 && saved.Height <= 2160 {
 		return saved
 	}
 	return state
@@ -38,7 +38,7 @@ func (a *App) rememberWindow() {
 	state.Maximised = rt.WindowIsMaximised(a.ctx)
 	if !state.Maximised {
 		w, h := rt.WindowGetSize(a.ctx)
-		state.Width, state.Height = max(700, min(1280, w)), max(560, min(900, h))
+		state.Width, state.Height = max(700, min(3840, w)), max(560, min(2160, h))
 	}
 	if data, err := json.Marshal(state); err == nil {
 		// Geometry is optional. A failed write must never prevent quitting or proxy restoration.
