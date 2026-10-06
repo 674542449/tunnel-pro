@@ -35,6 +35,26 @@ if test "${#missing[@]}" -gt 0; then
 fi
 command -v systemctl >/dev/null
 systemctl is-system-running >/dev/null 2>&1 || test -d /run/systemd/system
+# BBR + fq is best effort: containers and old kernels keep their defaults without failing the install.
+enable_bbr(){
+ conf=/etc/sysctl.d/99-tunnelx-bbr.conf
+ modprobe tcp_bbr >/dev/null 2>&1 || true
+ if ! grep -qw bbr /proc/sys/net/ipv4/tcp_available_congestion_control 2>/dev/null; then
+  echo '提示：当前内核不支持 BBR，保持系统默认拥塞控制。'; return 0
+ fi
+ { printf 'net.core.default_qdisc = fq\nnet.ipv4.tcp_congestion_control = bbr\n' >"$conf" && chmod 644 "$conf"; } 2>/dev/null || true
+ if modinfo tcp_bbr >/dev/null 2>&1 && test -d /etc/modules-load.d; then
+  { echo tcp_bbr >/etc/modules-load.d/tunnelx-bbr.conf && chmod 644 /etc/modules-load.d/tunnelx-bbr.conf; } 2>/dev/null || true
+ fi
+ sysctl -q -w net.core.default_qdisc=fq >/dev/null 2>&1 || true
+ sysctl -q -w net.ipv4.tcp_congestion_control=bbr >/dev/null 2>&1 || true
+ if test "$(cat /proc/sys/net/ipv4/tcp_congestion_control 2>/dev/null)" = bbr; then
+  echo '已开启 BBR + fq（BBR 立即生效，fq 在重启后覆盖全部网卡，重启后设置保持）。'
+ else
+  echo '提示：当前环境不允许修改拥塞控制（例如容器），保持系统默认。'
+ fi
+}
+enable_bbr
 python3 - "$api" <<'PY'
 import sys,urllib.parse,ipaddress
 u=urllib.parse.urlsplit(sys.argv[1])

@@ -10,6 +10,27 @@ case "$domain" in *[!A-Za-z0-9.-]*|'') echo 'Invalid domain' >&2; exit 1;; esac
 command -v python3 >/dev/null
 command -v openssl >/dev/null
 command -v systemctl >/dev/null
+# BBR + fq is best effort: containers and old kernels keep their defaults without failing the install.
+enable_bbr() {
+    conf=/etc/sysctl.d/99-tunnelx-bbr.conf
+    modprobe tcp_bbr >/dev/null 2>&1 || true
+    if ! grep -qw bbr /proc/sys/net/ipv4/tcp_available_congestion_control 2>/dev/null; then
+        echo 'BBR is not available on this kernel; keeping the default congestion control.'
+        return 0
+    fi
+    { printf 'net.core.default_qdisc = fq\nnet.ipv4.tcp_congestion_control = bbr\n' >"$conf" && chmod 644 "$conf"; } 2>/dev/null || true
+    if modinfo tcp_bbr >/dev/null 2>&1 && test -d /etc/modules-load.d; then
+        { echo tcp_bbr >/etc/modules-load.d/tunnelx-bbr.conf && chmod 644 /etc/modules-load.d/tunnelx-bbr.conf; } 2>/dev/null || true
+    fi
+    sysctl -q -w net.core.default_qdisc=fq >/dev/null 2>&1 || true
+    sysctl -q -w net.ipv4.tcp_congestion_control=bbr >/dev/null 2>&1 || true
+    if test "$(cat /proc/sys/net/ipv4/tcp_congestion_control 2>/dev/null)" = bbr; then
+        echo 'BBR + fq enabled (persisted across reboots).'
+    else
+        echo 'This environment does not allow changing congestion control; keeping defaults.'
+    fi
+}
+enable_bbr
 certificate_source=caddy
 if test -f config/cert.pem && test -f config/key.pem; then certificate_source=files; fi
 certificate_source=${2:-$certificate_source}

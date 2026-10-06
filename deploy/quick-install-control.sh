@@ -85,6 +85,28 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
 apt-get install -y -qq python3 curl ca-certificates >/dev/null
 
+# BBR + fq 尽力开启：容器或旧内核不支持时保持系统默认，不影响安装。
+enable_bbr() {
+  conf=/etc/sysctl.d/99-tunnelx-bbr.conf
+  modprobe tcp_bbr >/dev/null 2>&1 || true
+  if ! grep -qw bbr /proc/sys/net/ipv4/tcp_available_congestion_control 2>/dev/null; then
+    echo "        提示：当前内核不支持 BBR，保持系统默认拥塞控制"
+    return 0
+  fi
+  { printf 'net.core.default_qdisc = fq\nnet.ipv4.tcp_congestion_control = bbr\n' >"$conf" && chmod 644 "$conf"; } 2>/dev/null || true
+  if modinfo tcp_bbr >/dev/null 2>&1 && test -d /etc/modules-load.d; then
+    { echo tcp_bbr >/etc/modules-load.d/tunnelx-bbr.conf && chmod 644 /etc/modules-load.d/tunnelx-bbr.conf; } 2>/dev/null || true
+  fi
+  sysctl -q -w net.core.default_qdisc=fq >/dev/null 2>&1 || true
+  sysctl -q -w net.ipv4.tcp_congestion_control=bbr >/dev/null 2>&1 || true
+  if test "$(cat /proc/sys/net/ipv4/tcp_congestion_control 2>/dev/null)" = bbr; then
+    echo "        已开启 BBR + fq（重启后保持）"
+  else
+    echo "        提示：当前环境不允许修改拥塞控制（例如容器），保持系统默认"
+  fi
+}
+enable_bbr
+
 # ── 下载二进制 ──
 echo "  [2/5] 下载最新版本 ..."
 version=$(curl -fsSL "https://api.github.com/repos/$repo/releases/latest" | python3 -c "import sys,json;print(json.load(sys.stdin)['tag_name'])")
