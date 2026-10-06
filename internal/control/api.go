@@ -612,6 +612,44 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, actor *User, session
 	}
 	var fn func(*State) error
 	switch {
+	case path == "users":
+		var b struct {
+			Email    string `json:"email"`
+			Password string `json:"password"`
+			PlanID   string `json:"plan_id"`
+		}
+		if !decode(w, r, &b) {
+			return
+		}
+		b.Email = strings.ToLower(strings.TrimSpace(b.Email))
+		if !validEmail(b.Email) || len(b.Password) < 12 || len(b.Password) > 256 {
+			fail(w, 400, "邮箱无效，密码需要 12 至 256 字节")
+			return
+		}
+		hash, e := passwordHash(b.Password)
+		if e != nil {
+			fail(w, 500, "密码处理失败")
+			return
+		}
+		fn = func(d *State) error {
+			for _, u := range d.Users {
+				if u.Email == b.Email {
+					return errors.New("邮箱已存在")
+				}
+			}
+			if len(d.Users) >= 10000 {
+				return errors.New("用户数量已达上限")
+			}
+			u := User{ID: ID(), Email: b.Email, PasswordHash: hash, TunnelToken: Token(), Role: "user", Devices: 3, CreatedAt: time.Now().Unix()}
+			d.Users = append(d.Users, u)
+			record(d, actor.ID, "register", u.ID)
+			if b.PlanID != "" {
+				if err := assignPlan(d, actor.ID, u.ID, assignmentRequest{PlanID: b.PlanID, Mode: "immediate", Reason: "管理员创建账号时分配", RequestID: ID()}, time.Now().Unix()); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
 	case len(parts) == 3 && parts[0] == "users" && parts[2] == "assign-plan":
 		a.adminAssign(w, r, actor, session, parts[1])
 		return
