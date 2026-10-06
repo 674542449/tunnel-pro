@@ -18,7 +18,8 @@ func failCommit(w http.ResponseWriter, err error, status int, message string) {
 		fail(w, 403, "试用已关闭")
 		return
 	}
-	if errors.Is(err, errTrafficBaseRequired) || errors.Is(err, errPlanNodes) || errors.Is(err, errNodeReferenced) || errors.Is(err, errBetaInvite) || errors.Is(err, errNodeScopeReferenced) || errors.Is(err, errNodeScopeLeases) {
+	if errors.Is(err, errTrafficBaseRequired) || errors.Is(err, errPlanNodes) || errors.Is(err, errNodeReferenced) || errors.Is(err, errBetaInvite) || errors.Is(err, errNodeScopeReferenced) || errors.Is(err, errNodeScopeLeases) ||
+		errors.Is(err, errUserDeleteAdmin) || errors.Is(err, errUserDeletePaid) || errors.Is(err, errUserDeleteLeases) || errors.Is(err, errUserDeleteConfirm) {
 		fail(w, status, err.Error())
 		return
 	}

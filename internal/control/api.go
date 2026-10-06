@@ -866,6 +866,23 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, actor *User, session
 			record(d, actor.ID, "password_reset", u.ID)
 			return nil
 		}
+	case len(parts) == 3 && parts[0] == "users" && parts[2] == "delete":
+		var b struct {
+			Email string `json:"email"`
+		}
+		if !decode(w, r, &b) {
+			return
+		}
+		fn = func(d *State) error {
+			if parts[1] == actor.ID {
+				return errUserDeleteAdmin
+			}
+			if e := deleteUser(d, parts[1], strings.ToLower(strings.TrimSpace(b.Email))); e != nil {
+				return e
+			}
+			record(d, actor.ID, "user_deleted", parts[1])
+			return nil
+		}
 	case len(parts) == 3 && parts[0] == "users" && parts[2] == "update":
 		var b struct {
 			Disabled bool `json:"disabled"`
@@ -1069,7 +1086,9 @@ func (a *API) syncNode(w http.ResponseWriter, r *http.Request) {
 			}
 			u := findUser(d, c.UserID)
 			if u == nil {
-				return errors.New("unknown user")
+				// Deleted account: acknowledge so the node stops resending, but bill nobody.
+				d.Reports[key] = c
+				continue
 			}
 			if n.TestOnly {
 				test := d.TestUsage[u.ID]

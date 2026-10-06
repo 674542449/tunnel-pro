@@ -283,6 +283,8 @@ func auditAction(action string) (kind, summary string) {
 		return "user", "旧账号分组迁移为用户"
 	case "user_status":
 		return "user", "变更账号启用状态"
+	case "user_deleted":
+		return "user", "删除账号"
 	case "user_renewed":
 		return "user", "管理员调整历史账号权益"
 	case "user_token_rotated":
