@@ -206,7 +206,7 @@ func (a *API) login(w http.ResponseWriter, r *http.Request, register bool) {
 						}
 					}
 					if !found {
-						return errors.New("beta invite required")
+						return errBetaInvite
 					}
 				}
 				if e := a.challengeEmail(d, *user, "verify", time.Now().Unix()); e != nil {
@@ -228,6 +228,10 @@ func (a *API) login(w http.ResponseWriter, r *http.Request, register bool) {
 			record(d, v.ID, "register", v.ID)
 			return nil
 		}); e != nil {
+			if errors.Is(e, errBetaInvite) {
+				fail(w, 403, "试运营邀请码无效、已过期或已被使用")
+				return
+			}
 			fail(w, 409, "注册未完成")
 			return
 		}
@@ -490,7 +494,7 @@ func (a *API) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						}
 						order.Test = a.paymentMode(d) == "test"
 						if order.Test && !u.Beta && u.Role != "admin" {
-							return errors.New("beta invite required")
+							return errBetaInvite
 						}
 						if e := validatePurchase(d, order, time.Now().Unix()); e != nil {
 							return e
@@ -624,6 +628,10 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, actor *User, session
 		b.Email = strings.ToLower(strings.TrimSpace(b.Email))
 		if !validEmail(b.Email) || len(b.Password) < 12 || len(b.Password) > 256 {
 			fail(w, 400, "邮箱无效，密码需要 12 至 256 字节")
+			return
+		}
+		if b.PlanID != "" && !a.Config.Commercial.Enabled {
+			fail(w, 409, "请在商业套餐模式下分配套餐；旧版授权可在创建后使用续期")
 			return
 		}
 		hash, e := passwordHash(b.Password)

@@ -250,6 +250,11 @@ func (a *API) maintain(now int64) error {
 			totalUp += u.Upload
 			totalDown += u.Download
 		}
+		// Test-node traffic is metered separately and never touches User counters.
+		for _, c := range d.TestUsage {
+			totalUp += c.Upload
+			totalDown += c.Download
+		}
 		lastSnap := int64(0)
 		if len(d.TrafficHistory) > 0 {
 			lastSnap = d.TrafficHistory[len(d.TrafficHistory)-1].Time
