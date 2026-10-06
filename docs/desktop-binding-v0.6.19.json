@@ -1,14 +1,14 @@
 {
   "passed": true,
   "desktop_version": "v0.6.19",
-  "checked_at": "2026-10-06T12:55:18.949807+00:00",
+  "checked_at": "2026-10-06T13:47:07.611394+00:00",
   "scope": "actual App.Query + desktop.Engine + vendored Wails Bindings, Dispatcher, ParseArgs, BoundMethod.Call and callback serializer",
   "gui_rendered": false,
   "remote_service_used": false,
   "system_proxy_modified": false,
   "injection": "go -overlay, test-only adapter; dependency and release sources unchanged",
   "source_hashes": {
-    "desktop/main.go": "2d00f9aaa78a76e2df1b6ed235e247037c4bab5c7f3915de4a160ccdb813c22a",
+    "desktop/main.go": "c703f240ac4935e53db1409a98e65489c51ccd4549620e0d502e5afaf934e379",
     "desktop/headless.go": "361c45410d500ba883ac860f127cf5c21c00fffa2091434f24546a56ff5c2f99",
     "desktop/vendor/github.com/wailsapp/wails/v2/internal/binding/boundMethod.go": "3749a14214daafbd5db388d5e6f3ad8cf56909d24afafa1bda95a946f9d88aa2",
     "desktop/vendor/github.com/wailsapp/wails/v2/internal/frontend/dispatcher/calls.go": "cdc5752a8f78661f00dac1eb98798c7c4349121fa811e54cdfe526169ca05fd9",
@@ -40,5 +40,5 @@
   ],
   "failures": [],
   "exit_code": 0,
-  "test_log": "C:\\Users\\Administrator\\Desktop\\pro\\.local\\wails-binding\\regression-5ztpzjsh\\go-test.jsonl"
+  "test_log": "C:\\Users\\Administrator\\Desktop\\pro\\.local\\wails-binding\\regression-68mtph80\\go-test.jsonl"
 }
