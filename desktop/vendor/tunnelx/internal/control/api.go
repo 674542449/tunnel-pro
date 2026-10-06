@@ -538,7 +538,26 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, actor *User, session
 					online++
 				}
 			}
-			reply(w, 200, map[string]any{"users": len(d.Users), "nodes": len(d.Nodes), "online_nodes": online, "orders": len(d.Orders), "version": ConsoleVersion, "transport": "h2"})
+			nt := map[string][2]int64{}
+			for key, counter := range d.Reports {
+				parts := strings.SplitN(key, ":", 3)
+				if len(parts) == 3 {
+					v := nt[parts[0]]
+					v[0] += counter.Upload
+					v[1] += counter.Download
+					nt[parts[0]] = v
+				}
+			}
+			nodeTraffic := []map[string]any{}
+			for _, n := range d.Nodes {
+				entry := map[string]any{"id": n.ID, "name": n.Name, "active": n.Active, "upload": int64(0), "download": int64(0)}
+				if t, ok := nt[n.ID]; ok {
+					entry["upload"] = t[0]
+					entry["download"] = t[1]
+				}
+				nodeTraffic = append(nodeTraffic, entry)
+			}
+			reply(w, 200, map[string]any{"users": len(d.Users), "nodes": len(d.Nodes), "online_nodes": online, "orders": len(d.Orders), "version": ConsoleVersion, "transport": "h2", "node_traffic": nodeTraffic, "traffic_history": d.TrafficHistory})
 			return
 		case "users":
 			v := []map[string]any{}
@@ -593,6 +612,58 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, actor *User, session
 	}
 	var fn func(*State) error
 	switch {
+	case path == "users":
+		var b struct {
+			Email    string `json:"email"`
+			Password string `json:"password"`
+			PlanID   string `json:"plan_id"`
+		}
+		if !decode(w, r, &b) {
+			return
+		}
+		b.Email = strings.ToLower(strings.TrimSpace(b.Email))
+		if !validEmail(b.Email) || len(b.Password) < 12 || len(b.Password) > 256 {
+			fail(w, 400, "邮箱无效，密码需要 12 至 256 字节")
+			return
+		}
+		hash, e := passwordHash(b.Password)
+		if e != nil {
+			fail(w, 500, "密码处理失败")
+			return
+		}
+		var validationErr error
+		e = a.commit(actor, session, func(d *State) error {
+			for _, u := range d.Users {
+				if u.Email == b.Email {
+					validationErr = errors.New("邮箱已存在")
+					return validationErr
+				}
+			}
+			if len(d.Users) >= 10000 {
+				validationErr = errors.New("用户数量已达上限")
+				return validationErr
+			}
+			u := User{ID: ID(), Email: b.Email, PasswordHash: hash, TunnelToken: Token(), Role: "user", Devices: 3, CreatedAt: time.Now().Unix()}
+			d.Users = append(d.Users, u)
+			record(d, actor.ID, "register", u.ID)
+			if b.PlanID != "" {
+				validationErr = assignPlan(d, actor.ID, u.ID, assignmentRequest{PlanID: b.PlanID, Mode: "immediate", Reason: "管理员创建账号时分配", RequestID: ID()}, time.Now().Unix())
+				return validationErr
+			}
+			return nil
+		})
+		if e != nil {
+			if errors.Is(e, errSessionRevoked) {
+				failCommit(w, e, 409, "")
+			} else if validationErr != nil {
+				fail(w, 409, validationErr.Error())
+			} else {
+				fail(w, 409, "创建未保存，请核实存储状态后重试")
+			}
+			return
+		}
+		reply(w, 200, map[string]bool{"ok": true})
+		return
 	case len(parts) == 3 && parts[0] == "users" && parts[2] == "assign-plan":
 		a.adminAssign(w, r, actor, session, parts[1])
 		return
@@ -793,6 +864,7 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, actor *User, session
 			Days         int   `json:"days"`
 			TrafficBytes int64 `json:"traffic_bytes"`
 			Devices      int   `json:"devices"`
+			SpeedLimit   int64 `json:"speed_limit"`
 		}
 		if !decode(w, r, &b) {
 			return
@@ -802,7 +874,7 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, actor *User, session
 			if u == nil {
 				return errors.New("missing user")
 			}
-			if e := extend(u, b.Days, b.TrafficBytes, b.Devices); e != nil {
+			if e := extend(u, b.Days, b.TrafficBytes, b.Devices, b.SpeedLimit); e != nil {
 				return e
 			}
 			record(d, actor.ID, "user_renewed", u.ID)
@@ -837,7 +909,7 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, actor *User, session
 					if u == nil || u.Disabled {
 						return errors.New("missing or disabled user")
 					}
-					if e := extend(u, o.Plan.Days, o.Plan.TrafficBytes, o.Plan.Devices); e != nil {
+					if e := extend(u, o.Plan.Days, o.Plan.TrafficBytes, o.Plan.Devices, o.Plan.SpeedLimit); e != nil {
 						return e
 					}
 					o.Status = "paid"
@@ -996,7 +1068,7 @@ func (a *API) syncNode(w http.ResponseWriter, r *http.Request) {
 				}
 				if v.Active(time.Now().Unix()) && !(v.NeedsEmailVerification && v.EmailVerifiedAt == 0) {
 					remaining := v.Limit - v.Upload - v.Download
-					response.Grants = append(response.Grants, Grant{UserID: u.ID, Token: u.TunnelToken, ExpiresAt: v.ExpiresAt, Remaining: remaining, Unlimited: v.Limit == 0, Devices: v.Devices, RequireLeases: commercial})
+					response.Grants = append(response.Grants, Grant{UserID: u.ID, Token: u.TunnelToken, ExpiresAt: v.ExpiresAt, Remaining: remaining, Unlimited: v.Limit == 0, Devices: v.Devices, SpeedLimit: v.SpeedLimit, RequireLeases: commercial})
 				}
 			}
 		}

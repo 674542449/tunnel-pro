@@ -874,17 +874,19 @@ document.querySelectorAll('input[name="proxy-mode"]').forEach(input => input.add
 $('direct-domains').addEventListener('input',() => { routingDraftDirty = true; });
 $('save-routing').onclick = () => operation('mode',() => saveProxyMode(status.preferences?.proxy_mode || 'global'));
 $('probe-all').onclick = () => operation('probe-all',async () => {
-  $('probe-all').textContent = '正在测速…';
-  const results = await nativeRead(() => app().ProbeAll());
-  if (!Array.isArray(results)) return;
   const currentEpoch = epoch;
-  for (const r of results) {
-    if (currentEpoch !== epoch) break;
-    if (r.error) probes.set(r.id,{error:r.error});
-    else probes.set(r.id,{ms:Number(r.ms),checked:Date.now()});
-  }
-  $('node-sort').value = 'latency';
-  renderNodes(); message('全部线路延迟测试完成，已按延迟排序。','success');
+  $('probe-all-label').textContent = '正在测速…';
+  try {
+    // Each probe may take up to ~25s; nativeRead's 20s cap would misreport long runs.
+    const results = await app().ProbeAll();
+    if (currentEpoch !== epoch || !Array.isArray(results)) return;
+    for (const r of results) {
+      if (r.error) probes.set(r.id,{error:friendly(r.error)});
+      else probes.set(r.id,{ms:Number(r.ms),checked:Date.now()});
+    }
+    $('node-sort').value = 'latency';
+    renderNodes(); message(results.length ? '全部线路延迟测试完成，已按延迟排序。' : '当前没有可测速的线路。','success');
+  } finally { $('probe-all-label').textContent = '全部测速'; }
 });
 $('refresh-connlogs').onclick = () => operation('connlogs',async () => {
   const logs = await nativeRead(() => app().ConnLogs());
@@ -898,7 +900,7 @@ function renderConnLogs(logs) {
     row.append(element('span',new Date(l.time).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}),'conn-log-time'));
     row.append(element('span',eventNames[l.event] || l.event,'pill '+(l.event === 'connect' ? 'good' : 'neutral')));
     row.append(element('span',l.node_name || l.node_id || '—','conn-log-node'));
-    if (l.detail) row.append(element('span',l.detail,'conn-log-detail'));
+    if (l.detail) row.append(element('span',({global:'全局模式',bypass_cn:'绕过大陆',tun:'TUN 模式'})[l.detail] || l.detail,'conn-log-detail'));
     return row;
   }));
 }

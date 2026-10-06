@@ -97,12 +97,14 @@ func (e *Engine) applyLayers(m *client.Mux, checked int64, kinds [3]string) {
 func (e *Engine) startHealth(ctx context.Context, m *client.Mux) <-chan struct{} {
 	done := make(chan struct{})
 	interval, timeout := e.healthInterval, e.healthTimeout
+	degradedInterval := interval / 3
 	p := e.proxy
 	go func() {
 		defer close(done)
 		ticker := time.NewTicker(interval)
 		defer ticker.Stop()
 		first := true
+		degraded := false
 		for {
 			if !first || p == nil {
 				select {
@@ -136,6 +138,15 @@ func (e *Engine) startHealth(ctx context.Context, m *client.Mux) <-chan struct{}
 					return
 				}
 				e.applyLayers(m, time.Now().Unix(), kinds)
+				nowDegraded := kinds[0] != "" || kinds[1] != "" || kinds[2] != ""
+				if nowDegraded != degraded {
+					degraded = nowDegraded
+					if degraded {
+						ticker.Reset(degradedInterval)
+					} else {
+						ticker.Reset(interval)
+					}
+				}
 				if p.TUN && kinds[0] == "" {
 					available := m.ProbeTUNIPv6(ctx)
 					if ctx.Err() != nil {
@@ -162,6 +173,15 @@ func (e *Engine) startHealth(ctx context.Context, m *client.Mux) <-chan struct{}
 				return
 			}
 			e.applyHealth(m, time.Now().Unix(), kind)
+			nowDegraded := kind != ""
+			if nowDegraded != degraded {
+				degraded = nowDegraded
+				if degraded {
+					ticker.Reset(degradedInterval)
+				} else {
+					ticker.Reset(interval)
+				}
+			}
 		}
 	}()
 	return done
@@ -181,6 +201,7 @@ func safeHealthKind(s string) string {
 	return "unknown"
 }
 func (e *Engine) DiagnosticsReport() (string, error) {
+	e.flushManagementLog()
 	s := e.Status()
 	health := s["health"].(Health)
 	health.ErrorKind = safeHealthKind(health.ErrorKind)

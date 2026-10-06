@@ -120,7 +120,7 @@ func grantPurchase(d *State, o *Order, now int64) error {
 	if p.Kind == "traffic" {
 		devices = 0
 	}
-	d.Entitlements = append(d.Entitlements, Entitlement{ID: ID(), UserID: u.ID, OrderID: o.ID, Source: "purchase", StartsAt: start, EndsAt: end, Bytes: p.TrafficBytes, Devices: devices, NodeIDs: p.NodeIDs, Test: o.Test, Kind: p.Kind})
+	d.Entitlements = append(d.Entitlements, Entitlement{ID: ID(), UserID: u.ID, OrderID: o.ID, Source: "purchase", StartsAt: start, EndsAt: end, Bytes: p.TrafficBytes, Devices: devices, SpeedLimit: p.SpeedLimit, NodeIDs: p.NodeIDs, Test: o.Test, Kind: p.Kind})
 	return nil
 }
 
@@ -190,6 +190,9 @@ func accountForNode(d *State, u User, n Node, now int64) User {
 		}
 		if g.Devices > v.Devices {
 			v.Devices = g.Devices
+		}
+		if g.SpeedLimit > v.SpeedLimit {
+			v.SpeedLimit = g.SpeedLimit
 		}
 		if g.Bytes == 0 && g.Kind != "traffic" {
 			unlimited = true

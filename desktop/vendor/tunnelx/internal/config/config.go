@@ -57,6 +57,10 @@ type Server struct {
 	MaxConnections        int                 `json:"max_connections"`
 	DialTimeout           int                 `json:"dial_timeout_seconds"`
 	IdleTimeout           int                 `json:"idle_timeout_seconds"`
+	MaxLifetime           int                 `json:"max_lifetime_seconds,omitempty"`
+	BandwidthLimit        int64               `json:"bandwidth_limit_bytes,omitempty"`
+	DNSCacheTTL           int                 `json:"dns_cache_ttl_seconds,omitempty"`
+	AccessLog             string              `json:"access_log,omitempty"`
 }
 type ECHKey struct {
 	Config     []byte `json:"config"`
@@ -195,6 +199,15 @@ func (s *Server) Validate() error {
 	}
 	if s.DialTimeout < 1 || s.DialTimeout > 60 || s.IdleTimeout < 10 || s.IdleTimeout > 3600 {
 		return errors.New("invalid server timeout")
+	}
+	if s.MaxLifetime != 0 && (s.MaxLifetime < 60 || s.MaxLifetime > 86400) {
+		return errors.New("max_lifetime_seconds must be 0 or 60..86400")
+	}
+	if s.BandwidthLimit != 0 && (s.BandwidthLimit < 1024 || s.BandwidthLimit > 1<<30) {
+		return errors.New("bandwidth_limit_bytes must be 0 or 1024..1073741824")
+	}
+	if s.DNSCacheTTL != 0 && (s.DNSCacheTTL < 10 || s.DNSCacheTTL > 3600) {
+		return errors.New("dns_cache_ttl_seconds must be 0 or 10..3600")
 	}
 	if len(s.PreferredTargetIPs) > 128 {
 		return errors.New("too many preferred target domains")

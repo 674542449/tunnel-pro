@@ -380,7 +380,7 @@ func (e *Engine) disconnectSession(expected *client.Mux) error {
 func (e *Engine) disconnect() error {
 	e.mu.Lock()
 	m, p, l, cancel, finish, healthDone := e.mux, e.proxy, e.logger, e.cancel, e.finish, e.healthDone
-	tun := e.tun
+	tun, nodeID, nodeName := e.tun, e.nodeID, e.nodeName
 	e.tun = nil
 	e.mux = nil
 	e.proxy = nil
@@ -395,7 +395,7 @@ func (e *Engine) disconnect() error {
 	if m == nil {
 		return e.recoverProxy()
 	}
-	e.recordConn("disconnect", "", "", "")
+	e.recordConn("disconnect", nodeID, nodeName, "")
 	e.flushManagementLog()
 	var tunErr error
 	if tun != nil {
@@ -432,11 +432,21 @@ func (e *Engine) Probe(id string) (int64, error) {
 	if err := e.request(context.Background(), "/api/nodes/"+id+"/profile", nil, &profile); err != nil {
 		return 0, err
 	}
-	ca := filepath.Join(e.root, "state", "probe-ca.pem")
-	if err := control.WriteFile(ca, []byte(profile.CAPEM)); err != nil {
+	// ProbeAll runs probes concurrently; each needs its own CA file because
+	// client.New reads it immediately and the deferred removal must not race.
+	file, err := os.CreateTemp(filepath.Join(e.root, "state"), "probe-*.pem")
+	if err != nil {
 		return 0, err
 	}
+	ca := file.Name()
 	defer os.Remove(ca)
+	_, err = file.WriteString(profile.CAPEM)
+	if closeErr := file.Close(); err == nil {
+		err = closeErr
+	}
+	if err != nil {
+		return 0, err
+	}
 	profile.Client.CAFile = ca
 	m, err := client.New(profile.Client)
 	if err != nil {
@@ -466,24 +476,33 @@ type ProbeResult struct {
 	Error string `json:"error,omitempty"`
 }
 
-func (e *Engine) ProbeAll() []ProbeResult {
+func (e *Engine) ProbeAll() ([]ProbeResult, error) {
 	e.mu.Lock()
 	token := e.login.Token
 	e.mu.Unlock()
 	if token == "" {
-		return nil
+		return nil, errors.New("请先登录")
 	}
-	var nodes []struct {
-		ID string `json:"id"`
+	var all []struct {
+		ID     string `json:"id"`
+		Access *struct {
+			Allowed bool `json:"allowed"`
+		} `json:"access"`
 	}
-	if err := e.request(context.Background(), "/api/nodes", nil, &nodes); err != nil || len(nodes) == 0 {
-		return nil
+	if err := e.request(context.Background(), "/api/nodes", nil, &all); err != nil {
+		return nil, err
 	}
-	results := make([]ProbeResult, len(nodes))
+	var ids []string
+	for _, n := range all {
+		if n.Access == nil || n.Access.Allowed {
+			ids = append(ids, n.ID)
+		}
+	}
+	results := make([]ProbeResult, len(ids))
 	var wg sync.WaitGroup
 	sem := make(chan struct{}, 4)
-	for i, n := range nodes {
-		results[i].ID = n.ID
+	for i, id := range ids {
+		results[i].ID = id
 		wg.Add(1)
 		go func(idx int, id string) {
 			defer wg.Done()
@@ -496,8 +515,8 @@ func (e *Engine) ProbeAll() []ProbeResult {
 			} else {
 				results[idx].Ms = ms
 			}
-		}(i, n.ID)
+		}(i, id)
 	}
 	wg.Wait()
-	return results
+	return results, nil
 }

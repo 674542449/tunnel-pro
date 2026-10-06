@@ -22,16 +22,17 @@ const Version = "v0.4.0"
 const ConsoleVersion = "v0.6.18"
 
 type Config struct {
-	Listen        string           `json:"listen"`
-	PublicURL     string           `json:"public_url"`
-	DataFile      string           `json:"data_file"`
-	AdminEmail    string           `json:"admin_email"`
-	AdminPassword string           `json:"admin_password"`
-	Registration  bool             `json:"registration"`
-	TrialHours    int              `json:"trial_hours"`
-	DatabaseURL   string           `json:"database_url,omitempty"`
-	Commercial    CommercialConfig `json:"commercial,omitempty"`
-	Mail          MailConfig       `json:"mail,omitempty"`
+	Listen             string           `json:"listen"`
+	PublicURL          string           `json:"public_url"`
+	DataFile           string           `json:"data_file"`
+	AdminEmail         string           `json:"admin_email"`
+	AdminPassword      string           `json:"admin_password"`
+	Registration       bool             `json:"registration"`
+	TrialHours         int              `json:"trial_hours"`
+	DatabaseURL        string           `json:"database_url,omitempty"`
+	AuditRetentionDays int              `json:"audit_retention_days,omitempty"`
+	Commercial         CommercialConfig `json:"commercial,omitempty"`
+	Mail               MailConfig       `json:"mail,omitempty"`
 }
 
 func (c *Config) Validate() error {
@@ -70,6 +71,7 @@ type User struct {
 	Download               int64  `json:"download"`
 	Limit                  int64  `json:"limit"`
 	Devices                int    `json:"devices"`
+	SpeedLimit             int64  `json:"speed_limit,omitempty"`
 	CreatedAt              int64  `json:"created_at"`
 	EmailVerifiedAt        int64  `json:"email_verified_at,omitempty"`
 	NeedsEmailVerification bool   `json:"needs_email_verification,omitempty"`
@@ -83,7 +85,7 @@ func (u User) Active(now int64) bool {
 	return !u.Disabled && !u.QuotaExhausted && u.ExpiresAt > now && (u.Limit == 0 || u.Upload+u.Download < u.Limit)
 }
 func (u User) Public() map[string]any {
-	return map[string]any{"id": u.ID, "email": u.Email, "role": u.Role, "disabled": u.Disabled, "active": u.Active(time.Now().Unix()), "expires_at": u.ExpiresAt, "trial_used": u.TrialUsed, "upload": u.Upload, "download": u.Download, "traffic_limit": u.Limit, "device_limit": u.Devices, "created_at": u.CreatedAt, "email_verified": u.EmailVerifiedAt > 0, "verification_required": u.NeedsEmailVerification && u.EmailVerifiedAt == 0, "mfa_enabled": u.MFASecret != "", "beta": u.Beta}
+	return map[string]any{"id": u.ID, "email": u.Email, "role": u.Role, "disabled": u.Disabled, "active": u.Active(time.Now().Unix()), "expires_at": u.ExpiresAt, "trial_used": u.TrialUsed, "upload": u.Upload, "download": u.Download, "traffic_limit": u.Limit, "device_limit": u.Devices, "speed_limit": u.SpeedLimit, "created_at": u.CreatedAt, "email_verified": u.EmailVerifiedAt > 0, "verification_required": u.NeedsEmailVerification && u.EmailVerifiedAt == 0, "mfa_enabled": u.MFASecret != "", "beta": u.Beta}
 }
 
 type Node struct {
@@ -143,6 +145,7 @@ type Plan struct {
 	PriceCents   int64    `json:"price_cents"`
 	TrafficBytes int64    `json:"traffic_bytes"`
 	Devices      int      `json:"devices"`
+	SpeedLimit   int64    `json:"speed_limit,omitempty"`
 	Enabled      bool     `json:"enabled"`
 	Kind         string   `json:"kind,omitempty"`
 	Currency     string   `json:"currency,omitempty"`
@@ -181,6 +184,11 @@ type Counter struct {
 	Upload   int64  `json:"upload"`
 	Download int64  `json:"download"`
 }
+type TrafficSnapshot struct {
+	Time     int64 `json:"time"`
+	Upload   int64 `json:"upload"`
+	Download int64 `json:"download"`
+}
 type SyncRequest struct {
 	RecoveredLeases []string  `json:"recovered_leases,omitempty"`
 	BootID          string    `json:"boot_id"`
@@ -196,6 +204,7 @@ type Grant struct {
 	Remaining     int64  `json:"remaining"`
 	Unlimited     bool   `json:"unlimited"`
 	Devices       int    `json:"devices"`
+	SpeedLimit    int64  `json:"speed_limit,omitempty"`
 	RequireLeases bool   `json:"require_leases,omitempty"`
 }
 type SyncResponse struct {
@@ -230,8 +239,9 @@ type State struct {
 	Challenges    []Challenge        `json:"challenges,omitempty"`
 	Outbox        []MailMessage      `json:"outbox,omitempty"`
 	Tickets       []Ticket           `json:"tickets,omitempty"`
-	Incidents     []Incident         `json:"incidents,omitempty"`
-	Invites       []BetaInvite       `json:"invites,omitempty"`
+	Incidents      []Incident         `json:"incidents,omitempty"`
+	TrafficHistory []TrafficSnapshot  `json:"traffic_history,omitempty"`
+	Invites        []BetaInvite       `json:"invites,omitempty"`
 	Leases        []Lease            `json:"leases,omitempty"`
 	TestUsage     map[string]Counter `json:"test_usage,omitempty"`
 }
@@ -306,13 +316,13 @@ func passwordValid(encoded, v string) bool {
 	return e == nil && subtle.ConstantTimeCompare(key, expected) == 1
 }
 func validatePlan(p Plan) error {
-	if strings.TrimSpace(p.Name) == "" || len(p.Name) > 128 || p.Days < 1 || p.Days > 3650 || p.PriceCents < 0 || p.PriceCents > 1e9 || p.TrafficBytes < 0 || p.TrafficBytes > 1<<50 || p.Devices < 1 || p.Devices > 32 {
+	if strings.TrimSpace(p.Name) == "" || len(p.Name) > 128 || p.Days < 1 || p.Days > 3650 || p.PriceCents < 0 || p.PriceCents > 1e9 || p.TrafficBytes < 0 || p.TrafficBytes > 1<<50 || p.Devices < 1 || p.Devices > 32 || p.SpeedLimit < 0 || p.SpeedLimit > 1<<30 {
 		return errors.New("invalid plan")
 	}
 	return nil
 }
-func extend(u *User, days int, quota int64, devices int) error {
-	if days < 1 || days > 3650 || quota < 0 || quota > 1<<50 || devices < 1 || devices > 32 {
+func extend(u *User, days int, quota int64, devices int, speedLimit int64) error {
+	if days < 1 || days > 3650 || quota < 0 || quota > 1<<50 || devices < 1 || devices > 32 || speedLimit < 0 || speedLimit > 1<<30 {
 		return errors.New("invalid entitlement")
 	}
 	now := time.Now().Unix()
@@ -322,6 +332,7 @@ func extend(u *User, days int, quota int64, devices int) error {
 	}
 	u.ExpiresAt += int64(days) * 86400
 	u.Devices = devices
+	u.SpeedLimit = speedLimit
 	if quota == 0 || wasUnlimited {
 		u.Limit = 0
 	} else {

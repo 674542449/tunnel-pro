@@ -61,7 +61,7 @@ func (a *App) Connect(id string, proxy bool) error { return a.engine.Connect(id,
 func (a *App) Disconnect() error                   { return a.engine.Disconnect() }
 func (a *App) RecoverProxy() error                 { return a.engine.RecoverProxy() }
 func (a *App) Probe(id string) (int64, error)      { return a.engine.Probe(id) }
-func (a *App) ProbeAll() []desktop.ProbeResult      { return a.engine.ProbeAll() }
+func (a *App) ProbeAll() ([]desktop.ProbeResult, error) { return a.engine.ProbeAll() }
 func (a *App) ConnLogs() []desktop.ConnLog           { return a.engine.ConnLogs() }
 func (a *App) SetAPI(base string) error            { return a.engine.SetAPI(base) }
 func (a *App) SavePreferences(nodeID string, proxy bool) error {

@@ -70,6 +70,7 @@ type Engine struct {
 	managementMu                         sync.Mutex
 	managementEvents                     []managementEvent
 	managementLogWriteFailed             bool
+	managementLogDirty                   bool
 	mux                                  *client.Mux
 	proxy                                *client.Proxy
 	system                               *systemproxy.Manager
@@ -100,6 +101,7 @@ type Engine struct {
 	recoveryEpoch                        uint64
 	recovering                           bool
 	recoveryAttempt                      int
+	connLogs                             []ConnLog
 }
 
 func New(root string, settings Settings) (*Engine, error) {
@@ -355,7 +357,31 @@ func (e *Engine) Status() map[string]any {
 	}
 	return s
 }
+type ConnLog struct {
+	Time     string `json:"time"`
+	Event    string `json:"event"`
+	NodeID   string `json:"node_id"`
+	NodeName string `json:"node_name"`
+	Detail   string `json:"detail,omitempty"`
+}
+
+func (e *Engine) recordConn(event, nodeID, nodeName, detail string) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.connLogs = append(e.connLogs, ConnLog{Time: time.Now().UTC().Format(time.RFC3339), Event: event, NodeID: nodeID, NodeName: nodeName, Detail: detail})
+	if len(e.connLogs) > 200 {
+		e.connLogs = append([]ConnLog(nil), e.connLogs[len(e.connLogs)-200:]...)
+	}
+}
+
+func (e *Engine) ConnLogs() []ConnLog {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	return append([]ConnLog(nil), e.connLogs...)
+}
+
 func (e *Engine) Close() error {
 	e.http.CloseIdleConnections()
+	e.flushManagementLog()
 	return e.Disconnect()
 }

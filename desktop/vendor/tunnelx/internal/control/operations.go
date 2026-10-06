@@ -245,6 +245,31 @@ func (a *API) maintain(now int64) error {
 				}
 			}
 		}
+		var totalUp, totalDown int64
+		for _, u := range d.Users {
+			totalUp += u.Upload
+			totalDown += u.Download
+		}
+		lastSnap := int64(0)
+		if len(d.TrafficHistory) > 0 {
+			lastSnap = d.TrafficHistory[len(d.TrafficHistory)-1].Time
+		}
+		if now-lastSnap >= 3600 {
+			d.TrafficHistory = append(d.TrafficHistory, TrafficSnapshot{Time: now, Upload: totalUp, Download: totalDown})
+			if len(d.TrafficHistory) > 168 {
+				d.TrafficHistory = d.TrafficHistory[len(d.TrafficHistory)-168:]
+			}
+		}
+		if retention := a.Config.AuditRetentionDays; retention > 0 {
+			cutoff := now - int64(retention)*86400
+			kept := d.Audit[:0]
+			for _, entry := range d.Audit {
+				if entry.Time >= cutoff {
+					kept = append(kept, entry)
+				}
+			}
+			d.Audit = kept
+		}
 		return nil
 	})
 }

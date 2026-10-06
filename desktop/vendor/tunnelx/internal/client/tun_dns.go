@@ -117,6 +117,10 @@ func (p *Proxy) queryDNS(ctx context.Context, target string, query []byte) ([]by
 		return nil, e
 	}
 	defer stream.Close()
+	// Cancellation does not interrupt reads on an established H2 stream; without
+	// this a silent resolver blocks health checks and therefore Disconnect.
+	stop := context.AfterFunc(ctx, func() { stream.Close() })
+	defer stop()
 	frame := binary.BigEndian.AppendUint16(nil, uint16(len(query)))
 	frame = append(frame, query...)
 	if _, e = stream.Write(frame); e != nil {
