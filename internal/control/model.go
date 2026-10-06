@@ -19,7 +19,7 @@ import (
 )
 
 const Version = "v0.4.0"
-const ConsoleVersion = "v0.6.18"
+const ConsoleVersion = "v0.6.19"
 
 type Config struct {
 	Listen             string           `json:"listen"`

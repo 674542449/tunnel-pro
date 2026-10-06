@@ -28,7 +28,7 @@ type Settings struct {
 	Web    string `json:"web_listen"`
 }
 
-const DesktopVersion = "v0.6.18"
+const DesktopVersion = "v0.6.19"
 
 type Preferences struct {
 	SelectedNodeID string   `json:"selected_node_id"`
