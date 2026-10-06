@@ -631,25 +631,39 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, actor *User, session
 			fail(w, 500, "密码处理失败")
 			return
 		}
-		fn = func(d *State) error {
+		var validationErr error
+		e = a.commit(actor, session, func(d *State) error {
 			for _, u := range d.Users {
 				if u.Email == b.Email {
-					return errors.New("邮箱已存在")
+					validationErr = errors.New("邮箱已存在")
+					return validationErr
 				}
 			}
 			if len(d.Users) >= 10000 {
-				return errors.New("用户数量已达上限")
+				validationErr = errors.New("用户数量已达上限")
+				return validationErr
 			}
 			u := User{ID: ID(), Email: b.Email, PasswordHash: hash, TunnelToken: Token(), Role: "user", Devices: 3, CreatedAt: time.Now().Unix()}
 			d.Users = append(d.Users, u)
 			record(d, actor.ID, "register", u.ID)
 			if b.PlanID != "" {
-				if err := assignPlan(d, actor.ID, u.ID, assignmentRequest{PlanID: b.PlanID, Mode: "immediate", Reason: "管理员创建账号时分配", RequestID: ID()}, time.Now().Unix()); err != nil {
-					return err
-				}
+				validationErr = assignPlan(d, actor.ID, u.ID, assignmentRequest{PlanID: b.PlanID, Mode: "immediate", Reason: "管理员创建账号时分配", RequestID: ID()}, time.Now().Unix())
+				return validationErr
 			}
 			return nil
+		})
+		if e != nil {
+			if errors.Is(e, errSessionRevoked) {
+				failCommit(w, e, 409, "")
+			} else if validationErr != nil {
+				fail(w, 409, validationErr.Error())
+			} else {
+				fail(w, 409, "创建未保存，请核实存储状态后重试")
+			}
+			return
 		}
+		reply(w, 200, map[string]bool{"ok": true})
+		return
 	case len(parts) == 3 && parts[0] == "users" && parts[2] == "assign-plan":
 		a.adminAssign(w, r, actor, session, parts[1])
 		return
