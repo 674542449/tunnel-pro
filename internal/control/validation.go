@@ -22,6 +22,39 @@ var releaseVersion = regexp.MustCompile(`^v?[0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9
 var errPlanNodes = errors.New("套餐节点范围无效，请选择存在的节点，且不要重复选择")
 var errNodeReferenced = errors.New("节点仍被套餐、未到期订单或有效权益引用，请先调整套餐、取消待付订单或处理相关退款")
 var errBetaInvite = errors.New("当前为试运营阶段，仅限持有效邀请的账号注册或购买")
+var errNodeScopeReferenced = errors.New("节点仍被套餐、未到期订单或有效权益指定，请先调整这些套餐或等待相关权益结束后再改范围")
+var errNodeScopeLeases = errors.New("节点仍有使用中的流量预留，请等待用户断开或在运维页面完成对账后再改范围")
+
+// An explicit admin choice wins; otherwise simulated-payment mode defaults
+// new nodes to the test scope so test entitlements have somewhere to run.
+func (a *API) newNodeTestOnly(d *State, explicit *bool) bool {
+	if explicit != nil {
+		return *explicit
+	}
+	return a.Config.Commercial.Enabled && a.paymentMode(d) == "test"
+}
+
+// Test and production usage are metered separately, so a node may change
+// scope only while nothing is pinned to it and no lease budget is in flight.
+func changeNodeScope(d *State, id string, testOnly bool, now int64) (*Node, error) {
+	n := findNode(d, id)
+	if n == nil {
+		return nil, errors.New("missing node")
+	}
+	if n.TestOnly == testOnly {
+		return n, nil
+	}
+	if nodeReferenced(d, id, now) {
+		return nil, errNodeScopeReferenced
+	}
+	for _, l := range d.Leases {
+		if l.NodeID == id && !l.Closed {
+			return nil, errNodeScopeLeases
+		}
+	}
+	n.TestOnly = testOnly
+	return n, nil
+}
 
 func nodeReferenced(d *State, id string, now int64) bool {
 	for _, p := range d.Plans {

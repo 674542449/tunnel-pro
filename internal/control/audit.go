@@ -293,6 +293,8 @@ func auditAction(action string) (kind, summary string) {
 		return "node", "保存节点配置"
 	case "node_status":
 		return "node", "变更节点启用状态"
+	case "node_scope_changed":
+		return "node", "调整节点测试 / 正式范围"
 	case "node_deleted":
 		return "node", "删除节点"
 	case "node_install_command":

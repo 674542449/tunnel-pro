@@ -28,7 +28,7 @@ type setupInput struct {
 	Domain          string `json:"domain"`
 	CertificateMode string `json:"certificate_mode"`
 	InnerName       string `json:"inner_name"`
-	TestOnly        bool   `json:"test_only"`
+	TestOnly        *bool  `json:"test_only"`
 }
 type setupArtifact struct {
 	Name   string `json:"name"`
@@ -195,7 +195,7 @@ func (a *API) adminNodeSetup(w http.ResponseWriter, r *http.Request, actor *User
 			}
 			d.Nodes = append(d.Nodes, Node{ID: id, Name: input.Name, Region: input.Region, AgentKey: Token(), Client: config.Client{ServerIP: input.IP, Port: input.Port, ServerName: input.InnerName, Transport: "h2", Privacy: "strict"}, Setup: &NodeSetup{Domain: input.Domain, CertificateMode: input.CertificateMode}})
 			n = &d.Nodes[len(d.Nodes)-1]
-			n.TestOnly = input.TestOnly || a.Config.Commercial.Enabled && a.paymentMode(d) == "test"
+			n.TestOnly = a.newNodeTestOnly(d, input.TestOnly)
 		} else {
 			n = findNode(d, parts[1])
 			if n == nil || !n.Pending() {

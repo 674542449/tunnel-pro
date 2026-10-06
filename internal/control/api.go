@@ -676,10 +676,14 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, actor *User, session
 		a.adminAssign(w, r, actor, session, parts[1])
 		return
 	case path == "nodes" || len(parts) == 2 && parts[0] == "nodes":
-		var n Node
-		if !decode(w, r, &n) {
+		var b struct {
+			Node
+			TestOnly *bool `json:"test_only"`
+		}
+		if !decode(w, r, &b) {
 			return
 		}
+		n := b.Node
 		if e := validateNode(&n); e != nil {
 			fail(w, 400, e.Error())
 			return
@@ -691,7 +695,7 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, actor *User, session
 				}
 				n.ID = ID()
 				n.AgentKey = Token()
-				n.TestOnly = n.TestOnly || a.Config.Commercial.Enabled && a.paymentMode(d) == "test"
+				n.TestOnly = a.newNodeTestOnly(d, b.TestOnly)
 				d.Nodes = append(d.Nodes, n)
 			} else {
 				old := findNode(d, parts[1])
@@ -754,6 +758,21 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, actor *User, session
 				}
 			}
 			record(d, actor.ID, "plan_saved", p.ID)
+			return nil
+		}
+	case len(parts) == 3 && parts[0] == "nodes" && parts[2] == "scope":
+		var b struct {
+			TestOnly bool `json:"test_only"`
+		}
+		if !decode(w, r, &b) {
+			return
+		}
+		fn = func(d *State) error {
+			n, e := changeNodeScope(d, parts[1], b.TestOnly, time.Now().Unix())
+			if e != nil {
+				return e
+			}
+			record(d, actor.ID, "node_scope_changed", n.ID)
 			return nil
 		}
 	case len(parts) == 3 && parts[0] == "nodes" && parts[2] == "enabled":
