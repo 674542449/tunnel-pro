@@ -139,7 +139,7 @@ func (a *App) startup(ctx context.Context) {
 	maximiseOnSmallScreen(ctx)
 	// Wails has acquired its single-instance lock before startup. Any recovery
 	// failure stays visible in Status and can be retried without ending the app.
-	a.engine.RecoverProxy()
+	a.engine.RestoreProxyAtStartup()
 	go systray.Run(func() {
 		systray.SetIcon(icon)
 		systray.SetTitle("tunnelX")

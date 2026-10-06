@@ -18,6 +18,10 @@ type Permit interface {
 }
 type permitKey struct{}
 
+// LimitedPermit returns account-wide limiters shared by all of an account's
+// streams; nil means the account has no speed limit in that direction.
+type LimitedPermit interface{ Limiter(upload bool) *Limiter }
+
 // ChargePermit atomically admits only the bytes covered by a managed quota.
 type ChargePermit interface{ Charge(upload bool, n int) int }
 

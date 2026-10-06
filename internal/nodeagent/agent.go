@@ -60,7 +60,12 @@ type Agent struct {
 	acknowledged map[string]control.Counter
 	validUntil   time.Time
 	permits      map[*access]bool
+	limiters     map[string]*accountLimiters
 	client       *http.Client
+}
+type accountLimiters struct {
+	rate     int64
+	up, down *server.Limiter
 }
 type access struct {
 	agent          *Agent
@@ -76,7 +81,7 @@ func New(c Config) (*Agent, error) {
 	if e := c.Validate(); e != nil {
 		return nil, e
 	}
-	a := &Agent{Config: c, grants: map[[32]byte]control.Grant{}, acknowledged: map[string]control.Counter{}, permits: map[*access]bool{}, client: &http.Client{Timeout: 10 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}}
+	a := &Agent{Config: c, grants: map[[32]byte]control.Grant{}, acknowledged: map[string]control.Counter{}, permits: map[*access]bool{}, limiters: map[string]*accountLimiters{}, client: &http.Client{Timeout: 10 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}}
 	b, e := os.ReadFile(c.StateFile)
 	if e == nil {
 		if json.Unmarshal(b, &a.state) != nil || len(a.state.BootID) != 32 || a.state.Counters == nil {
@@ -175,6 +180,15 @@ func (a *Agent) Sync(ctx context.Context) error {
 		}
 	}
 	a.grants = grants
+	rates := map[string]int64{}
+	for _, g := range grants {
+		rates[g.UserID] = g.SpeedLimit
+	}
+	for user, l := range a.limiters {
+		if rates[user] != l.rate {
+			delete(a.limiters, user)
+		}
+	}
 	cleared := map[string]bool{}
 	for _, id := range response.ClearedRecovery {
 		cleared[id] = true
@@ -289,6 +303,25 @@ func (p *access) SpeedLimit() int64 {
 		return g.SpeedLimit
 	}
 	return 0
+}
+// Limiter shares one bucket per account and direction across all its streams.
+func (p *access) Limiter(upload bool) *server.Limiter {
+	a := p.agent
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	g, ok := a.grants[p.hash]
+	if !ok || g.SpeedLimit <= 0 {
+		return nil
+	}
+	l := a.limiters[p.userID]
+	if l == nil || l.rate != g.SpeedLimit {
+		l = &accountLimiters{rate: g.SpeedLimit, up: server.NewLimiter(g.SpeedLimit), down: server.NewLimiter(g.SpeedLimit)}
+		a.limiters[p.userID] = l
+	}
+	if upload {
+		return l.up
+	}
+	return l.down
 }
 func (p *access) Close() {
 	p.once.Do(func() { p.cancel(); p.agent.mu.Lock(); delete(p.agent.permits, p); p.agent.mu.Unlock() })

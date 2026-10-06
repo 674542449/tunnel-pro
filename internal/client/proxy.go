@@ -378,6 +378,7 @@ type udpFlow struct {
 	stream  packetTransport
 	address []byte
 	log     *flowLog
+	ended   atomic.Bool
 }
 
 func (p *Proxy) udpAssociate(parent context.Context, control net.Conn, requested string) {
@@ -433,7 +434,23 @@ func (p *Proxy) udpAssociate(parent context.Context, control net.Conn, requested
 			peer = src
 		}
 		f := flows[target]
+		if f != nil && f.ended.Load() {
+			f.stream.Close()
+			f.log.end()
+			delete(flows, target)
+			f = nil
+		}
 		if f == nil {
+			// Streams closed by the node's idle timeout must not hold slots forever.
+			if len(flows) >= 32 {
+				for key, old := range flows {
+					if old.ended.Load() {
+						old.stream.Close()
+						old.log.end()
+						delete(flows, key)
+					}
+				}
+			}
 			if len(flows) >= 32 {
 				p.Mux.Stats.UDPDropped.Add(1)
 				continue
@@ -449,6 +466,7 @@ func (p *Proxy) udpAssociate(parent context.Context, control net.Conn, requested
 			f = &udpFlow{stream: stream, address: raw, log: trace}
 			flows[target] = f
 			go func(flow *udpFlow, dest *net.UDPAddr) {
+				defer flow.ended.Store(true)
 				for {
 					b, e := flow.stream.Receive(ctx)
 					if e != nil {

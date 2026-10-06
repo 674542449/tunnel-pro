@@ -64,3 +64,31 @@ func TestRegistrySnapshotRestoreAndCrashRecovery(t *testing.T) {
 		t.Fatal(e)
 	}
 }
+
+func TestConfirmedRecoveryKeepsExternalProxyAndUnblocks(t *testing.T) {
+	path := fmt.Sprintf(`Software\tunnelX-tests\%d`, time.Now().UnixNano())
+	k, _, e := registry.CreateKey(registry.CURRENT_USER, path, registry.ALL_ACCESS)
+	if e != nil {
+		t.Fatal(e)
+	}
+	defer registry.DeleteKey(registry.CURRENT_USER, path)
+	defer k.Close()
+	k.SetStringValue("ProxyServer", "old.example:1234")
+	m := &Manager{Path: filepath.Join(t.TempDir(), "proxy.json"), Proxy: "127.0.0.1:1", KeyPath: path}
+	if e = m.Enable(); e != nil {
+		t.Fatal(e)
+	}
+	k.SetStringValue("ProxyServer", "external.example:3333")
+	if m.RestoreOrphan() == nil || !m.Enabled() {
+		t.Fatal("automatic recovery must not discard state after an external change")
+	}
+	if e = m.RecoverOrphan(); e != nil {
+		t.Fatal(e)
+	}
+	if v, _, _ := k.GetStringValue("ProxyServer"); v != "external.example:3333" || m.Enabled() {
+		t.Fatal("confirmed recovery overwrote the external proxy or kept the stale snapshot", v)
+	}
+	if e = m.Enable(); e != nil {
+		t.Fatal("proxy stayed blocked after confirmed recovery", e)
+	}
+}

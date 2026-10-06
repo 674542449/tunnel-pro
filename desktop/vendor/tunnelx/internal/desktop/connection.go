@@ -48,7 +48,14 @@ func (e *Engine) connectionStage(ctx context.Context, attempt uint64, stage stri
 	}
 	return ctx.Err()
 }
-func (e *Engine) RecoverProxy() error {
+// RecoverProxy is the user's explicit recovery request.
+func (e *Engine) RecoverProxy() error { return e.recoverIdle(true) }
+
+// RestoreProxyAtStartup never discards a snapshot when another program has
+// replaced the proxy; only an explicit RecoverProxy may do that.
+func (e *Engine) RestoreProxyAtStartup() error { return e.recoverIdle(false) }
+
+func (e *Engine) recoverIdle(confirmed bool) error {
 	if !e.lifecycle.TryLock() {
 		return errors.New("请先断开或取消节点连接")
 	}
@@ -59,7 +66,12 @@ func (e *Engine) RecoverProxy() error {
 	if active {
 		return errors.New("请先断开节点再恢复系统代理")
 	}
-	return e.recoverProxy()
+	if !confirmed {
+		return e.recoverProxy()
+	}
+	err := errors.Join(e.system.RecoverOrphan(), tunmode.Recover(filepath.Join(e.root, "state", "tun-state.json")))
+	e.setProxyError(err)
+	return err
 }
 func (e *Engine) recoverProxy() error {
 	err := errors.Join(e.system.RestoreOrphan(), tunmode.Recover(filepath.Join(e.root, "state", "tun-state.json")))

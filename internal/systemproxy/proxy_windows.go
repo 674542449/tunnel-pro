@@ -95,7 +95,7 @@ func (m *Manager) Enable() (err error) {
 func (m *Manager) Restore() error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	return m.restore(false)
+	return m.restore(false, false)
 }
 
 // RestoreOrphan reserves the saved loopback endpoint before restoring it. A
@@ -104,10 +104,19 @@ func (m *Manager) Restore() error {
 func (m *Manager) RestoreOrphan() error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	return m.restore(true)
+	return m.restore(true, false)
 }
 
-func (m *Manager) restore(orphanOnly bool) error {
+// RecoverOrphan is the user-confirmed recovery. When another program has
+// since replaced the proxy, its settings stay untouched and only our stale
+// snapshot is dropped, so recovery can never be blocked permanently.
+func (m *Manager) RecoverOrphan() error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.restore(true, true)
+}
+
+func (m *Manager) restore(orphanOnly, keepExternal bool) error {
 	b, e := os.ReadFile(m.Path)
 	if os.IsNotExist(e) {
 		return nil
@@ -138,7 +147,10 @@ func (m *Manager) restore(orphanOnly bool) error {
 	defer k.Close()
 	current, _, e := k.GetStringValue("ProxyServer")
 	if e == nil && current != s.OurProxy {
-		return errors.New("system proxy changed externally; saved state retained for manual recovery")
+		if keepExternal {
+			return os.Remove(m.Path)
+		}
+		return errors.New("系统代理已被其他程序修改，为避免覆盖其设置已暂停自动恢复；请在设置中点击「恢复系统代理」确认")
 	}
 	if e = restoreValues(k, s); e != nil {
 		return e

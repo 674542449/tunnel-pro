@@ -172,6 +172,9 @@ func accountForNode(d *State, u User, n Node, now int64) User {
 	v.Limit = v.Upload + v.Download
 	remaining := int64(0)
 	unlimited := false
+	// Only subscriptions carry a speed tier; 0 means unlimited and must win.
+	v.SpeedLimit = 0
+	unlimitedSpeed := false
 	for _, g := range d.Entitlements {
 		if g.UserID != u.ID || g.Test != n.TestOnly || g.RevokedAt != 0 || g.StartsAt > now || g.EndsAt <= now {
 			continue
@@ -191,14 +194,21 @@ func accountForNode(d *State, u User, n Node, now int64) User {
 		if g.Devices > v.Devices {
 			v.Devices = g.Devices
 		}
-		if g.SpeedLimit > v.SpeedLimit {
-			v.SpeedLimit = g.SpeedLimit
+		if g.Kind != "traffic" {
+			if g.SpeedLimit == 0 {
+				unlimitedSpeed = true
+			} else if g.SpeedLimit > v.SpeedLimit {
+				v.SpeedLimit = g.SpeedLimit
+			}
 		}
 		if g.Bytes == 0 && g.Kind != "traffic" {
 			unlimited = true
 		} else if g.Bytes > g.Used {
 			remaining += g.Bytes - g.Used
 		}
+	}
+	if unlimitedSpeed {
+		v.SpeedLimit = 0
 	}
 	if unlimited {
 		v.Limit = 0

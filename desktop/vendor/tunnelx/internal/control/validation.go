@@ -21,6 +21,7 @@ var releaseVersion = regexp.MustCompile(`^v?[0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9
 
 var errPlanNodes = errors.New("套餐节点范围无效，请选择存在的节点，且不要重复选择")
 var errNodeReferenced = errors.New("节点仍被套餐、未到期订单或有效权益引用，请先调整套餐、取消待付订单或处理相关退款")
+var errBetaInvite = errors.New("当前为试运营阶段，仅限持有效邀请的账号注册或购买")
 
 func nodeReferenced(d *State, id string, now int64) bool {
 	for _, p := range d.Plans {

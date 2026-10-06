@@ -101,12 +101,6 @@ func (s *Server) public(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" && r.URL.Path == "/health" {
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Cache-Control", "no-store")
-		fmt.Fprintf(w, `{"status":"ok","active":%d}`, s.Active.Load())
-		return
-	}
 	if s.Config.ManagedOnly || !s.auth.Valid(r.Header.Values("Authorization")) {
 		var p Permit
 		var ok bool
@@ -119,6 +113,13 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		defer p.Close()
 		r = r.WithContext(context.WithValue(p.Context(), permitKey{}, p))
+	}
+	// Anonymous probes must see only the public site, never proxy state.
+	if r.Method == "GET" && r.URL.Path == "/health" {
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Cache-Control", "no-store")
+		fmt.Fprintf(w, `{"status":"ok","active":%d}`, s.Active.Load())
+		return
 	}
 	w.Header().Set("Tunnelx-Version", config.Version)
 	if r.Header.Get("Tunnelx-Version") != config.Version {
@@ -208,21 +209,14 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	})
 	defer cleanup()
 	idle := time.Duration(s.Config.IdleTimeout) * time.Second
-	speedLimit := s.Config.BandwidthLimit
-	if p := permit(r.Context()); p != nil && p.SpeedLimit() > 0 {
-		speedLimit = p.SpeedLimit()
-	}
-	var th *throttle
-	if speedLimit > 0 {
-		th = &throttle{limit: speedLimit, start: time.Now()}
-	}
+	upLimit, downLimit := s.limiters(r.Context())
 	var upBytes, downBytes atomic.Int64
 	proxyStart := time.Now()
 	up := make(chan error, 1)
 	go func() {
 		var reader io.Reader = r.Body
-		if th != nil {
-			reader = throttledReader{r: reader, t: th}
+		if upLimit != nil {
+			reader = throttledReader{r: reader, l: upLimit, ctx: r.Context()}
 		}
 		if p := permit(r.Context()); p != nil {
 			reader = accountReader{reader: reader, access: p, upload: true}
@@ -235,8 +229,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		up <- e
 	}()
 	var reader io.Reader = idleConn{Conn: conn, idle: idle}
-	if th != nil {
-		reader = throttledReader{r: reader, t: th}
+	if downLimit != nil {
+		reader = throttledReader{r: reader, l: downLimit, ctx: r.Context()}
 	}
 	if p := permit(r.Context()); p != nil {
 		reader = accountReader{reader: reader, access: p}
@@ -387,6 +381,7 @@ func (s *Server) udp(w http.ResponseWriter, r *http.Request, ip net.IP, port int
 		stopWrite := joinCancellation(ctx, func() { http.NewResponseController(w).SetWriteDeadline(time.Now()) })
 		defer stopWrite()
 	}
+	upLimit, downLimit := s.limiters(r.Context())
 	go func() {
 		for {
 			b, e := ps.Receive(ctx)
@@ -404,6 +399,10 @@ func (s *Server) udp(w http.ResponseWriter, r *http.Request, ip net.IP, port int
 					closeAll()
 					return
 				}
+			}
+			if upLimit.Wait(ctx, len(b)) != nil {
+				closeAll()
+				return
 			}
 			if _, e = conn.Write(b); e != nil {
 				closeAll()
@@ -425,6 +424,9 @@ func (s *Server) udp(w http.ResponseWriter, r *http.Request, ip net.IP, port int
 			if charge(p, false, n) != n {
 				return
 			}
+		}
+		if downLimit.Wait(ctx, n) != nil {
+			return
 		}
 		if e = ps.Send(b[:n]); e != nil {
 			return
@@ -487,45 +489,80 @@ func (c *dnsCache) Lookup(ctx context.Context, host string) ([]net.IP, error) {
 	return ips, nil
 }
 
-type throttle struct {
-	limit int64
-	mu    sync.Mutex
-	count int64
-	start time.Time
+// Limiter is a token bucket in bytes per second. One limiter may be shared by
+// every stream of an account so that opening more connections gains no speed.
+// The bounded burst stops idle time from accumulating unthrottled credit.
+type Limiter struct {
+	mu     sync.Mutex
+	rate   float64
+	burst  float64
+	tokens float64
+	last   time.Time
 }
 
-func (t *throttle) wait(n int) {
-	t.mu.Lock()
-	t.count += int64(n)
-	elapsed := time.Since(t.start)
-	if elapsed > 0 {
-		rate := float64(t.count) / elapsed.Seconds()
-		if rate > float64(t.limit) {
-			delay := time.Duration(float64(t.count)/float64(t.limit)*float64(time.Second)) - elapsed
-			if delay > 10*time.Second {
-				delay = 10 * time.Second
-			}
-			if delay > 0 {
-				t.mu.Unlock()
-				time.Sleep(delay)
-				return
-			}
-		}
+func NewLimiter(bytesPerSecond int64) *Limiter {
+	rate := float64(bytesPerSecond)
+	burst := max(rate/4, 64<<10)
+	return &Limiter{rate: rate, burst: burst, tokens: burst, last: time.Now()}
+}
+
+func (l *Limiter) Wait(ctx context.Context, n int) error {
+	if l == nil || n <= 0 {
+		return nil
 	}
-	t.mu.Unlock()
+	l.mu.Lock()
+	now := time.Now()
+	l.tokens = min(l.burst, l.tokens+now.Sub(l.last).Seconds()*l.rate)
+	l.last = now
+	l.tokens -= float64(n)
+	delay := time.Duration(-l.tokens / l.rate * float64(time.Second))
+	l.mu.Unlock()
+	if delay <= 0 {
+		return nil
+	}
+	t := time.NewTimer(delay)
+	defer t.Stop()
+	select {
+	case <-t.C:
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
 }
 
 type throttledReader struct {
-	r io.Reader
-	t *throttle
+	r   io.Reader
+	l   *Limiter
+	ctx context.Context
 }
 
 func (r throttledReader) Read(b []byte) (int, error) {
 	n, e := r.r.Read(b)
 	if n > 0 {
-		r.t.wait(n)
+		if we := r.l.Wait(r.ctx, n); we != nil && e == nil {
+			e = we
+		}
 	}
 	return n, e
+}
+
+// limiters returns the upload and download limiters for one stream. Managed
+// accounts share theirs across streams; the node-wide setting is per stream.
+func (s *Server) limiters(ctx context.Context) (up, down *Limiter) {
+	if p := permit(ctx); p != nil {
+		if lp, ok := p.(LimitedPermit); ok {
+			up, down = lp.Limiter(true), lp.Limiter(false)
+		} else if v := p.SpeedLimit(); v > 0 {
+			up, down = NewLimiter(v), NewLimiter(v)
+		}
+		if up != nil || down != nil {
+			return up, down
+		}
+	}
+	if v := s.Config.BandwidthLimit; v > 0 {
+		return NewLimiter(v), NewLimiter(v)
+	}
+	return nil, nil
 }
 
 type countReader struct {
