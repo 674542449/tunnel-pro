@@ -78,6 +78,6 @@ body[data-role=user] dialog[open]{animation:member-enter .2s ease-out}
 .inline-status .install-error{display:inline-block;vertical-align:middle;max-width:170px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #content[data-page=users] td:last-child,#content[data-page=nodes] td:last-child{position:sticky;right:0;background:var(--surface);box-shadow:-8px 0 8px -8px #302e2924}
 #content[data-page=users] th:last-child,#content[data-page=nodes] th:last-child{position:sticky;right:0;background:#f8f6f0;box-shadow:-8px 0 8px -8px #302e2924}
-#content td .user-actions{display:grid;grid-auto-flow:column;grid-auto-columns:76px;gap:3px;align-items:center}
-.user-actions>button{width:100%;justify-content:flex-start}
-.user-actions>.action-slot{display:block;height:1px}
+#content td .slot-actions{display:grid;grid-auto-flow:column;gap:3px;align-items:center;max-width:none}
+.slot-actions>button{width:100%;justify-content:flex-start}
+.slot-actions>.action-slot{display:block;height:1px}
