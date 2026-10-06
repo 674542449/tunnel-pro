@@ -122,11 +122,7 @@ func (a *Agent) Sync(ctx context.Context) error {
 		a.mu.Unlock()
 		return e
 	}
-	b := control.SyncRequest{BootID: a.state.BootID, Version: control.Version, Active: int64(len(a.permits)), Counters: []control.Counter{}}
-	if a.ManagedOnly {
-		b.Version = control.ConsoleVersion
-		b.Capabilities = []string{"strict-billing", "leases-v1"}
-	}
+	b := control.SyncRequest{BootID: a.state.BootID, Version: control.ConsoleVersion, Active: int64(len(a.permits)), Counters: []control.Counter{}, Capabilities: []string{"strict-billing", "leases-v1"}}
 	for _, l := range a.state.RecoveryLeases {
 		b.RecoveredLeases = append(b.RecoveredLeases, l.ID)
 	}
