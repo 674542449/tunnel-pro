@@ -1,15 +1,18 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 	"tunnelx/internal/config"
@@ -24,6 +27,8 @@ func main() {
 	backup := flag.String("backup", "", "export a private consistent snapshot to an absolute path and exit")
 	backupKey := flag.String("backup-key", "", "32-byte private encryption key file; encrypt backup if provided")
 	restore := flag.String("restore-new", "", "restore an encrypted backup into a NEW empty store and exit")
+	resetAdmin := flag.String("reset-admin", "", "reset this administrator's password (read from stdin), clear its MFA and sessions, and exit")
+	newEmail := flag.String("new-email", "", "optional new email for -reset-admin")
 	flag.Parse()
 	if *init {
 		if _, e := os.Stat(*path); !os.IsNotExist(e) {
@@ -58,6 +63,19 @@ func main() {
 	}
 	if *check {
 		fmt.Println("Control configuration and persistent store valid")
+		return
+	}
+	if *resetAdmin != "" {
+		// stdin keeps the password out of argv and the process list.
+		line, e := bufio.NewReader(os.Stdin).ReadString('\n')
+		if e != nil && e != io.EOF {
+			fatal(e)
+		}
+		if e = a.Store.ResetAdmin(*resetAdmin, *newEmail, strings.TrimRight(line, "\r\n")); e != nil {
+			fatal(e)
+		}
+		a.Store.Close()
+		fmt.Println("Administrator credentials reset; MFA and sessions cleared")
 		return
 	}
 	if *backup != "" {
